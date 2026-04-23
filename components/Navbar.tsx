@@ -11,6 +11,7 @@ const links = [
   { href: "/gallery", label: "Gallery" },
   { href: "/team", label: "Our Team" },
   { href: "/contact", label: "Contact" },
+  { href: "/account", label: "My Account" },
 ];
 
 const THEMES: { id: Theme; label: string; color: string; ring: string }[] = [

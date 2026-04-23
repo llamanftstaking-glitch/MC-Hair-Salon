@@ -2,14 +2,12 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "@/lib/theme";
 
 export default function SplashScreen() {
   const [visible, setVisible] = useState(true);
-  const { theme } = useTheme();
-  const isLite = theme === "lite";
 
   useEffect(() => {
+    // Only show once per session
     if (sessionStorage.getItem("splashed")) {
       setVisible(false);
       return;
@@ -21,30 +19,26 @@ export default function SplashScreen() {
     return () => clearTimeout(t);
   }, []);
 
-  const glowColor = isLite
-    ? "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(124,58,237,0.15) 0%, transparent 70%)"
-    : "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(180,130,20,0.2) 0%, transparent 70%)";
-
-  const lineColor = isLite
-    ? "linear-gradient(90deg, transparent, #7c3aed, transparent)"
-    : "linear-gradient(90deg, transparent, #C9A84C, transparent)";
-
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          className={`fixed inset-0 z-[9999] flex items-center justify-center ${isLite ? "bg-[#faf8ff]" : "bg-black"}`}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
+          {/* Ambient glow */}
           <motion.div
             className="absolute inset-0 pointer-events-none"
             animate={{ opacity: [0, 0.4, 0.2] }}
             transition={{ duration: 2, ease: "easeOut" }}
-            style={{ background: glowColor }}
+            style={{
+              background: "radial-gradient(ellipse 50% 40% at 50% 50%, var(--mc-hero-glow) 0%, transparent 70%)",
+            }}
           />
 
+          {/* Logo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -61,16 +55,17 @@ export default function SplashScreen() {
               />
             </div>
 
+            {/* Animated gold line */}
             <motion.div
               className="h-px"
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: 80, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-              style={{ background: lineColor }}
+              style={{ background: "linear-gradient(90deg, transparent, var(--mc-accent), transparent)" }}
             />
 
             <motion.p
-              className={`uppercase tracking-[0.5em] text-xs ${isLite ? "text-[#7c3aed]" : "text-[#C9A84C]"}`}
+              className="text-[var(--mc-accent)] uppercase tracking-[0.5em] text-xs"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.8 }}

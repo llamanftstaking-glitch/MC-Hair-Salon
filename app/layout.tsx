@@ -4,7 +4,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SplashScreen from "@/components/SplashScreen";
 import JsonLd from "@/components/JsonLd";
-import { ThemeProvider } from "@/lib/theme";
 
 const SITE_URL = "https://mchairsalon.com";
 
@@ -75,15 +74,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Prevents theme flash on load */}
+        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('mc-theme')||'bw';if(t!=='bw')document.documentElement.setAttribute('data-theme',t);}catch(e){}` }} />
+      </head>
       <body>
-        <ThemeProvider>
-          <JsonLd />
-          <SplashScreen />
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-        </ThemeProvider>
+        <JsonLd />
+        <SplashScreen />
+        <Navbar />
+        <main>{children}</main>
+        <Footer />
       </body>
     </html>
   );

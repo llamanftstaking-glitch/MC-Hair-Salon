@@ -139,16 +139,12 @@ body {
 }
 
 /* ── LOGO VISIBILITY PER THEME ─────────────────────────────────────────────── */
-.logo-bw   { display: block; }
-.logo-gold { display: none; }
-.logo-light{ display: none; }
+/* White logo (bw) is default — works for both B&W and Gold dark themes */
+.logo-bw    { display: block; }
+.logo-light { display: none; }
 
-html[data-theme="gold"] .logo-bw    { display: none; }
-html[data-theme="gold"] .logo-gold  { display: block; }
-html[data-theme="gold"] .logo-light { display: none; }
-
+/* Lavender/light theme: swap to black logo */
 html[data-theme="light"] .logo-bw    { display: none; }
-html[data-theme="light"] .logo-gold  { display: none; }
 html[data-theme="light"] .logo-light { display: block; }
 
 /* ── LIGHT MODE BG OVERRIDES ───────────────────────────────────────────────── */

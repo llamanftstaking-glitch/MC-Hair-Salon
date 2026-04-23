@@ -47,10 +47,9 @@ export default function HeroLogo() {
             }}
           />
 
-          {/* Three logos — CSS shows correct one */}
+          {/* Two logos — white for dark themes, black for lavender */}
           <div className="relative w-full h-full overflow-hidden rounded-full">
             <Image src="/mc-logo-bw.png"    alt="MC Hair Salon & Spa" fill className="logo-bw    object-contain" priority />
-            <Image src="/mc-logo-gold.png"  alt="MC Hair Salon & Spa" fill className="logo-gold  object-contain" priority />
             <Image src="/mc-logo-black.png" alt="MC Hair Salon & Spa" fill className="logo-light object-contain" priority />
 
             {/* Light sweep animation */}

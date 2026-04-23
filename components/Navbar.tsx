@@ -48,7 +48,6 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-3 cursor-pointer">
           <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0">
             <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" />
-            <Image src="/mc-logo-gold.png"  alt="MC Hair Salon" fill className="logo-gold  object-contain" />
             <Image src="/mc-logo-black.png" alt="MC Hair Salon" fill className="logo-light object-contain" />
           </div>
           <span className="hidden sm:block font-serif text-base gold-gradient font-bold tracking-wide">

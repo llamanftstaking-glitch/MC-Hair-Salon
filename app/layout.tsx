@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SplashScreen from "@/components/SplashScreen";
 import JsonLd from "@/components/JsonLd";
+import { ThemeProvider } from "@/lib/theme";
 
 const SITE_URL = "https://mchairsalon.com";
 
@@ -76,11 +77,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <JsonLd />
-        <SplashScreen />
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <ThemeProvider>
+          <JsonLd />
+          <SplashScreen />
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

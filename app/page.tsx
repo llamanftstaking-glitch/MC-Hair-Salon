@@ -6,6 +6,7 @@ import { Star, ChevronRight, Scissors, Wind, Palette, Sparkles } from "lucide-re
 import { SERVICES, TESTIMONIALS, GALLERY_IMAGES, SALON_INFO } from "@/lib/data";
 import HeroLogo from "@/components/HeroLogo";
 import NewsletterStrip from "@/components/NewsletterStrip";
+import { useTheme } from "@/lib/theme";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -20,6 +21,17 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default function Home() {
+  const { theme } = useTheme();
+  const isLite = theme === "lite";
+
+  const ctaBg = isLite
+    ? "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #f5f3ff 100%)"
+    : "linear-gradient(135deg, #0a0800 0%, #1a1200 50%, #0a0800 100%)";
+
+  const ctaGlow = isLite
+    ? "radial-gradient(circle at 50% 50%, #7c3aed 0%, transparent 60%)"
+    : "radial-gradient(circle at 50% 50%, #C9A84C 0%, transparent 60%)";
+
   return (
     <>
       {/* HERO — Animated Logo */}
@@ -136,17 +148,17 @@ export default function Home() {
       <NewsletterStrip />
 
       {/* BOOK CTA */}
-      <section className="py-24 px-6 relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #0a0800 0%, #1a1200 50%, #0a0800 100%)" }}>
-        <div className="absolute inset-0 opacity-20"
-          style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #C9A84C 0%, transparent 60%)" }} />
+      <section className="py-24 px-6 relative overflow-hidden" style={{ background: ctaBg }}>
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: ctaGlow }} />
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <p className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-6">Ready to Transform?</p>
-            <h2 className="font-serif text-4xl md:text-6xl font-bold text-white mb-8">
+            <p className="uppercase tracking-[0.4em] text-xs font-semibold mb-6" style={{ color: isLite ? "#7c3aed" : "#C9A84C" }}>
+              Ready to Transform?
+            </p>
+            <h2 className="font-serif text-4xl md:text-6xl font-bold mb-8" style={{ color: isLite ? "#1e1b4b" : "#ffffff" }}>
               Book Your <span className="gold-gradient">Experience</span>
             </h2>
-            <p className="text-[#a89070] text-lg mb-10 leading-relaxed">
+            <p className="text-lg mb-10 leading-relaxed" style={{ color: isLite ? "#6d5b98" : "#a89070" }}>
               Reserve your appointment online or call us at {SALON_INFO.phone}. Walk-ins always welcome.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -155,7 +167,11 @@ export default function Home() {
                 Book Online
               </Link>
               <a href={`tel:${SALON_INFO.phone}`}
-                className="border border-[#C9A84C] text-[#C9A84C] font-semibold px-12 py-5 uppercase tracking-widest text-sm hover:bg-[#C9A84C] hover:text-black transition-all duration-300 cursor-pointer">
+                className="font-semibold px-12 py-5 uppercase tracking-widest text-sm transition-all duration-300 cursor-pointer border"
+                style={{
+                  borderColor: isLite ? "#7c3aed" : "#C9A84C",
+                  color: isLite ? "#7c3aed" : "#C9A84C",
+                }}>
                 Call Us
               </a>
             </div>

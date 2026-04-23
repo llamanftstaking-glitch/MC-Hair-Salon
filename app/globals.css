@@ -14,6 +14,39 @@
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
+/* ── Theme Variables ── */
+:root {
+  --accent:        #C9A84C;
+  --accent-light:  #FFD700;
+  --accent-dark:   #B8860B;
+  --bg:            #000000;
+  --bg-alt:        #050505;
+  --surface:       #0f0f0f;
+  --surface-2:     #0a0a0a;
+  --border:        #2a2a2a;
+  --border-subtle: #1a1a1a;
+  --text:          #f5f0e8;
+  --text-muted:    #a89070;
+  --text-dim:      #666666;
+  --text-dimmer:   #444444;
+}
+
+html.lite {
+  --accent:        #7c3aed;
+  --accent-light:  #a78bfa;
+  --accent-dark:   #5b21b6;
+  --bg:            #faf8ff;
+  --bg-alt:        #f5f3ff;
+  --surface:       #ffffff;
+  --surface-2:     #f0eeff;
+  --border:        #ddd6fe;
+  --border-subtle: #ede9fe;
+  --text:          #1e1b4b;
+  --text-muted:    #6d5b98;
+  --text-dim:      #8b7bb0;
+  --text-dimmer:   #b0a3c8;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -23,39 +56,42 @@ html {
 }
 
 body {
-  background: #000000;
-  color: #f5f0e8;
+  background: var(--bg);
+  color: var(--text);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .font-serif {
   font-family: 'Playfair Display', Georgia, serif;
 }
 
+/* ── Accent / gradient utilities ── */
 .gold-gradient {
-  background: linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #C9A84C 100%);
+  background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent-light) 50%, var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gold-gradient-bg {
-  background: linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #C9A84C 100%);
+  background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent-light) 50%, var(--accent) 100%);
 }
 
 .gold-border {
-  border: 1px solid #C9A84C;
+  border: 1px solid var(--accent);
 }
 
+/* ── Card ── */
 .luxury-card {
-  background: #0f0f0f;
-  border: 1px solid #2a2a2a;
-  transition: border-color 0.3s ease, transform 0.3s ease;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: border-color 0.3s ease, transform 0.3s ease, background 0.3s ease;
 }
 
 .luxury-card:hover {
-  border-color: #C9A84C;
+  border-color: var(--accent);
   transform: translateY(-2px);
 }
 
@@ -63,19 +99,23 @@ body {
   background: radial-gradient(ellipse at top, #1a1400 0%, #000000 60%);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #000; }
-::-webkit-scrollbar-thumb { background: #C9A84C; border-radius: 3px; }
+html.lite .hero-bg {
+  background: radial-gradient(ellipse at top, #ede9fe 0%, #faf8ff 60%);
+}
 
-/* Animations */
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+/* ── Shimmer ── */
 @keyframes shimmer {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
 
 .shimmer-text {
-  background: linear-gradient(90deg, #B8860B 0%, #FFD700 25%, #fff 50%, #FFD700 75%, #B8860B 100%);
+  background: linear-gradient(90deg, var(--accent-dark) 0%, var(--accent-light) 25%, #fff 50%, var(--accent-light) 75%, var(--accent-dark) 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -83,25 +123,111 @@ body {
   animation: shimmer 4s linear infinite;
 }
 
+html.lite .shimmer-text {
+  background: linear-gradient(90deg, var(--accent-dark) 0%, var(--accent-light) 25%, var(--text) 50%, var(--accent-light) 75%, var(--accent-dark) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .shimmer-text { animation: none; }
   * { transition: none !important; }
 }
 
-/* Mobile */
+/* ── Mobile ── */
 @media (max-width: 640px) {
   h1 { font-size: clamp(2.2rem, 10vw, 4rem); }
   .luxury-card { padding: 1.25rem; }
   .shimmer-text { background-size: 300% auto; }
 }
 
-/* Prevent horizontal overflow */
 html, body { overflow-x: hidden; max-width: 100vw; }
-
-/* Tap highlight remove on mobile */
 * { -webkit-tap-highlight-color: transparent; }
 
-/* Mobile touch targets */
 @media (max-width: 768px) {
   a, button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
 }
+
+/* ══════════════════════════════════════════════
+   LITE MODE — background, text & border overrides
+   Using var() fallbacks so dark mode is unaffected
+   ══════════════════════════════════════════════ */
+
+/* Backgrounds */
+html.lite .bg-black          { background-color: var(--bg) !important; }
+html.lite .bg-\[\#000\]      { background-color: var(--bg) !important; }
+html.lite .bg-\[\#050505\]   { background-color: var(--bg-alt) !important; }
+html.lite .bg-\[\#0a0a0a\]   { background-color: var(--surface-2) !important; }
+html.lite .bg-\[\#0f0f0f\]   { background-color: var(--surface) !important; }
+html.lite .min-h-screen.bg-black { background-color: var(--bg) !important; }
+
+/* Text */
+html.lite .text-white         { color: var(--text) !important; }
+html.lite .text-\[\#f5f0e8\] { color: var(--text) !important; }
+html.lite .text-\[\#a89070\] { color: var(--text-muted) !important; }
+html.lite .text-\[\#666\]    { color: var(--text-dim) !important; }
+html.lite .text-\[\#555\]    { color: var(--text-dim) !important; }
+html.lite .text-\[\#444\]    { color: var(--text-dimmer) !important; }
+html.lite .text-\[\#333\]    { color: var(--text-dimmer) !important; }
+html.lite .text-\[\#C9A84C\] { color: var(--accent) !important; }
+html.lite .text-\[\#FFD700\] { color: var(--accent-light) !important; }
+
+/* Hover text overrides */
+html.lite .hover\:text-\[\#FFD700\]:hover { color: var(--accent-light) !important; }
+html.lite .hover\:text-\[\#C9A84C\]:hover { color: var(--accent) !important; }
+
+/* Borders */
+html.lite .border-\[\#2a2a2a\]   { border-color: var(--border) !important; }
+html.lite .border-\[\#1a1a1a\]   { border-color: var(--border-subtle) !important; }
+html.lite .border-\[\#C9A84C\]   { border-color: var(--accent) !important; }
+html.lite .border-t.border-\[\#2a2a2a\] { border-color: var(--border) !important; }
+html.lite .border-b.border-\[\#2a2a2a\] { border-color: var(--border) !important; }
+
+/* Hover border */
+html.lite .hover\:border-\[\#C9A84C\]:hover { border-color: var(--accent) !important; }
+
+/* Focus borders on inputs */
+html.lite .focus\:border-\[\#C9A84C\]:focus { border-color: var(--accent) !important; }
+
+/* Inputs & textareas in forms */
+html.lite input,
+html.lite textarea,
+html.lite select {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+html.lite input::placeholder,
+html.lite textarea::placeholder { color: var(--text-dimmer) !important; }
+
+/* Navbar */
+html.lite nav.fixed { border-bottom-color: var(--border) !important; }
+html.lite .bg-black\/95 { background-color: rgba(250,248,255,0.97) !important; }
+html.lite .bg-black\/98 { background-color: rgba(250,248,255,0.99) !important; }
+
+/* Placeholder colors */
+html.lite .placeholder-\[\#444\]::placeholder { color: var(--text-dimmer) !important; }
+html.lite .placeholder-\[\#333\]::placeholder { color: var(--text-dimmer) !important; }
+
+/* Stat bar & other bg-[#0f0f0f] sections */
+html.lite .bg-\[\#0f0f0f\].border-y { background-color: var(--surface-2) !important; }
+
+/* CTA gradient section */
+html.lite .bg-gradient-cta {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #f5f3ff 100%) !important;
+}
+
+/* Admin panel dark inputs */
+html.lite .bg-\[\#0a0a0a\] { background-color: var(--surface-2) !important; }
+
+/* Footer */
+html.lite footer { background-color: var(--surface-2) !important; border-top-color: var(--border) !important; }
+
+/* Map section tint */
+html.lite iframe[title] { filter: grayscale(20%) contrast(90%) !important; }
+
+/* Overlay/backdrop adjustments for gallery lightbox */
+html.lite .fixed.inset-0.z-50 { }

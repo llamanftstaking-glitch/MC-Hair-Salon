@@ -139,13 +139,15 @@ body {
 }
 
 /* ── LOGO VISIBILITY PER THEME ─────────────────────────────────────────────── */
-/* White logo (bw) is default — works for both B&W and Gold dark themes */
+/* White logo (bw) used for all themes — inverted to dark on lavender */
 .logo-bw    { display: block; }
 .logo-light { display: none; }
 
-/* Lavender/light theme: swap to black logo */
-html[data-theme="light"] .logo-bw    { display: none; }
-html[data-theme="light"] .logo-light { display: block; }
+/* Lavender: invert white logo to black, blend away the white background */
+html[data-theme="light"] .logo-bw {
+  filter: invert(1);
+  mix-blend-mode: multiply;
+}
 
 /* ── LIGHT MODE BG OVERRIDES ───────────────────────────────────────────────── */
 html[data-theme="light"] .bg-black {

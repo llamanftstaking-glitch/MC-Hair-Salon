@@ -26,7 +26,7 @@ export default function Home() {
       <HeroLogo />
 
       {/* STATS BAR */}
-      <section className="bg-[#0f0f0f] border-y border-[#2a2a2a] py-8">
+      <section className="bg-[var(--mc-surface)] border-y border-[var(--mc-border)] py-8">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
             { value: "13+", label: "Years of Excellence" },
@@ -36,7 +36,7 @@ export default function Home() {
           ].map((s) => (
             <div key={s.label}>
               <p className="font-serif text-3xl gold-gradient font-bold">{s.value}</p>
-              <p className="text-[#666] text-xs uppercase tracking-widest mt-1">{s.label}</p>
+              <p className="text-[var(--mc-text-dim)] text-xs uppercase tracking-widest mt-1">{s.label}</p>
             </div>
           ))}
         </div>
@@ -47,7 +47,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="text-center mb-16">
-            <p className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-4">What We Offer</p>
+            <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">What We Offer</p>
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-white">Our Services</h2>
           </motion.div>
 
@@ -55,12 +55,12 @@ export default function Home() {
             {SERVICES.map((s, i) => (
               <motion.div key={s.category} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
                 className="luxury-card p-8 cursor-pointer">
-                <div className="text-[#C9A84C] mb-6">{iconMap[s.icon]}</div>
+                <div className="text-[var(--mc-accent)] mb-6">{iconMap[s.icon]}</div>
                 <h3 className="font-serif text-xl font-semibold text-white mb-3">{s.category}</h3>
-                <p className="text-[#666] text-sm leading-relaxed mb-6">
+                <p className="text-[var(--mc-text-dim)] text-sm leading-relaxed mb-6">
                   {s.items.length} services available, from ${Math.min(...s.items.map(item => item.price))}+
                 </p>
-                <Link href="/services" className="text-[#C9A84C] text-xs uppercase tracking-widest hover:text-[#FFD700] transition-colors flex items-center gap-2 cursor-pointer">
+                <Link href="/services" className="text-[var(--mc-accent)] text-xs uppercase tracking-widest hover:text-[var(--mc-accent-2)] transition-colors flex items-center gap-2 cursor-pointer">
                   Explore <ChevronRight size={14} />
                 </Link>
               </motion.div>
@@ -69,7 +69,7 @@ export default function Home() {
 
           <div className="text-center mt-12">
             <Link href="/services"
-              className="border border-[#C9A84C] text-[#C9A84C] px-10 py-4 uppercase tracking-widest text-sm hover:bg-[#C9A84C] hover:text-black transition-all duration-300 cursor-pointer">
+              className="border border-[var(--mc-accent)] text-[var(--mc-accent)] px-10 py-4 uppercase tracking-widest text-sm hover:bg-[var(--mc-accent)] hover:text-black transition-all duration-300 cursor-pointer">
               View Full Menu & Pricing
             </Link>
           </div>
@@ -77,11 +77,11 @@ export default function Home() {
       </section>
 
       {/* GALLERY PREVIEW */}
-      <section className="py-24 px-6 bg-[#050505]">
+      <section className="py-24 px-6 bg-[var(--mc-surface-dark)]">
         <div className="max-w-7xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="text-center mb-16">
-            <p className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Our Work</p>
+            <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Our Work</p>
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-white">Gallery</h2>
           </motion.div>
 
@@ -97,7 +97,7 @@ export default function Home() {
 
           <div className="text-center mt-10">
             <Link href="/gallery"
-              className="border border-[#C9A84C] text-[#C9A84C] px-10 py-4 uppercase tracking-widest text-sm hover:bg-[#C9A84C] hover:text-black transition-all duration-300 cursor-pointer">
+              className="border border-[var(--mc-accent)] text-[var(--mc-accent)] px-10 py-4 uppercase tracking-widest text-sm hover:bg-[var(--mc-accent)] hover:text-black transition-all duration-300 cursor-pointer">
               View Full Gallery
             </Link>
           </div>
@@ -109,7 +109,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="text-center mb-16">
-            <p className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Client Love</p>
+            <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Client Love</p>
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-white">What They Say</h2>
           </motion.div>
 
@@ -119,10 +119,10 @@ export default function Home() {
                 className="luxury-card p-8">
                 <div className="flex gap-1 mb-6">
                   {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} size={16} className="fill-[#C9A84C] text-[#C9A84C]" />
+                    <Star key={j} size={16} className="fill-[var(--mc-accent)] text-[var(--mc-accent)]" />
                   ))}
                 </div>
-                <p className="text-[#a89070] text-sm leading-relaxed mb-6 italic">&ldquo;{t.text}&rdquo;</p>
+                <p className="text-[var(--mc-muted)] text-sm leading-relaxed mb-6 italic">&ldquo;{t.text}&rdquo;</p>
                 <div>
                   <p className="text-white font-semibold text-sm">{t.name}</p>
                   <p className="text-[#555] text-xs mt-1">{t.service}</p>
@@ -139,14 +139,14 @@ export default function Home() {
       <section className="py-24 px-6 relative overflow-hidden"
         style={{ background: "linear-gradient(135deg, #0a0800 0%, #1a1200 50%, #0a0800 100%)" }}>
         <div className="absolute inset-0 opacity-20"
-          style={{ backgroundImage: "radial-gradient(circle at 50% 50%, #C9A84C 0%, transparent 60%)" }} />
+          style={{ backgroundImage: "radial-gradient(circle at 50% 50%, var(--mc-accent) 0%, transparent 60%)" }} />
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <p className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-6">Ready to Transform?</p>
+            <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-6">Ready to Transform?</p>
             <h2 className="font-serif text-4xl md:text-6xl font-bold text-white mb-8">
               Book Your <span className="gold-gradient">Experience</span>
             </h2>
-            <p className="text-[#a89070] text-lg mb-10 leading-relaxed">
+            <p className="text-[var(--mc-muted)] text-lg mb-10 leading-relaxed">
               Reserve your appointment online or call us at {SALON_INFO.phone}. Walk-ins always welcome.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -155,7 +155,7 @@ export default function Home() {
                 Book Online
               </Link>
               <a href={`tel:${SALON_INFO.phone}`}
-                className="border border-[#C9A84C] text-[#C9A84C] font-semibold px-12 py-5 uppercase tracking-widest text-sm hover:bg-[#C9A84C] hover:text-black transition-all duration-300 cursor-pointer">
+                className="border border-[var(--mc-accent)] text-[var(--mc-accent)] font-semibold px-12 py-5 uppercase tracking-widest text-sm hover:bg-[var(--mc-accent)] hover:text-black transition-all duration-300 cursor-pointer">
                 Call Us
               </a>
             </div>

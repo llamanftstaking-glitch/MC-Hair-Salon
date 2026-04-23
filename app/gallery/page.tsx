@@ -28,7 +28,7 @@ export default function GalleryPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
-            className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-4"
+            className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4"
           >
             Our Work
           </motion.p>
@@ -44,13 +44,13 @@ export default function GalleryPage() {
             initial={{ scaleX: 0 }}
             animate={headerInView ? { scaleX: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="mx-auto h-px w-20 bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent mb-6"
+            className="mx-auto h-px w-20 bg-gradient-to-r from-transparent via-[var(--mc-accent)] to-transparent mb-6"
           />
           <motion.p
             initial={{ opacity: 0 }}
             animate={headerInView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-[#a89070] max-w-xl mx-auto leading-relaxed"
+            className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed"
           >
             Transformations, artistry, and the luxury experience at MC Hair Salon & Spa.
           </motion.p>
@@ -72,8 +72,8 @@ export default function GalleryPage() {
                 onClick={() => setActiveFilter(cat)}
                 className={`cursor-pointer px-5 py-2 text-xs tracking-widest uppercase transition-all duration-200 border ${
                   activeFilter === cat
-                    ? "bg-[#C9A84C] text-black border-[#C9A84C] font-semibold"
-                    : "bg-transparent border-[#2a2a2a] text-[#666] hover:border-[#C9A84C]/50 hover:text-[#C9A84C]"
+                    ? "bg-[var(--mc-accent)] text-black border-[var(--mc-accent)] font-semibold"
+                    : "bg-transparent border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]/50 hover:text-[var(--mc-accent)]"
                 }`}
               >
                 {cat}
@@ -97,7 +97,7 @@ export default function GalleryPage() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.45, delay: i * 0.04, ease: [0.16, 1, 0.3, 1] }}
-                  className={`relative overflow-hidden cursor-pointer group border border-[#1a1a1a] hover:border-[#C9A84C]/40 transition-all duration-300 ${
+                  className={`relative overflow-hidden cursor-pointer group border border-[var(--mc-border)] hover:border-[var(--mc-accent)]/40 transition-all duration-300 ${
                     i % 7 === 0 ? "col-span-2 row-span-2" : ""
                   }`}
                   style={{ aspectRatio: i % 7 === 0 ? "1/1" : "3/4" }}
@@ -113,12 +113,12 @@ export default function GalleryPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   {/* Category tag */}
                   <div className="absolute top-2 right-2 px-2 py-1 bg-black/50 backdrop-blur-sm border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-[#C9A84C] text-[9px] tracking-[0.3em] uppercase">{img.category}</span>
+                    <span className="text-[var(--mc-accent)] text-[9px] tracking-[0.3em] uppercase">{img.category}</span>
                   </div>
                   {/* Expand icon */}
                   <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="w-8 h-8 bg-black/60 backdrop-blur-sm border border-[#C9A84C]/30 flex items-center justify-center">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.5" className="w-4 h-4">
+                    <div className="w-8 h-8 bg-black/60 backdrop-blur-sm border border-[var(--mc-accent)]/30 flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" className="w-4 h-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
                       </svg>
                     </div>
@@ -129,12 +129,12 @@ export default function GalleryPage() {
           </AnimatePresence>
 
           <div className="text-center mt-16">
-            <p className="text-[#666] text-sm mb-6">Follow us for daily inspiration</p>
+            <p className="text-[var(--mc-text-dim)] text-sm mb-6">Follow us for daily inspiration</p>
             <a
               href="https://www.instagram.com/mchairsalonspa/"
               target="_blank"
               rel="noopener noreferrer"
-              className="border border-[#C9A84C] text-[#C9A84C] px-10 py-4 uppercase tracking-widest text-sm hover:bg-[#C9A84C] hover:text-black transition-all duration-300 cursor-pointer inline-block"
+              className="border border-[var(--mc-accent)] text-[var(--mc-accent)] px-10 py-4 uppercase tracking-widest text-sm hover:bg-[var(--mc-accent)] hover:text-black transition-all duration-300 cursor-pointer inline-block"
             >
               @mchairsalonspa
             </a>
@@ -142,10 +142,10 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      <section className="py-16 px-6 bg-[#050505] text-center">
+      <section className="py-16 px-6 bg-[var(--mc-surface-dark)] text-center">
         <div className="max-w-2xl mx-auto">
           <h2 className="font-serif text-3xl text-white mb-4">Ready for Your Transformation?</h2>
-          <p className="text-[#666] text-sm mb-8">Book your appointment online — it takes less than a minute.</p>
+          <p className="text-[var(--mc-text-dim)] text-sm mb-8">Book your appointment online — it takes less than a minute.</p>
           <Link
             href="/book"
             className="gold-gradient-bg text-black font-bold px-12 py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity cursor-pointer inline-block"
@@ -175,7 +175,7 @@ export default function GalleryPage() {
               className="relative max-w-4xl w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative overflow-hidden border border-[#C9A84C]/20">
+              <div className="relative overflow-hidden border border-[var(--mc-accent)]/20">
                 <Image
                   src={selected.src}
                   alt={selected.alt}

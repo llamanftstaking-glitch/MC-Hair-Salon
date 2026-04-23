@@ -47,14 +47,14 @@ export default function BookPage() {
     }
   };
 
-  const inputClass = "w-full bg-[#0f0f0f] border border-[#2a2a2a] text-white px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C] transition-colors placeholder-[#444]";
-  const labelClass = "block text-[#C9A84C] text-xs uppercase tracking-widest font-semibold mb-2";
+  const inputClass = "w-full bg-[var(--mc-surface)] border border-[var(--mc-border)] text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444]";
+  const labelClass = "block text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2";
 
   return (
     <>
       <section className="pt-32 pb-16 px-6 bg-black text-center">
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
-          className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
+          className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
           Reserve Your Visit
         </motion.p>
         <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
@@ -62,7 +62,7 @@ export default function BookPage() {
           Book Appointment
         </motion.h1>
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2}
-          className="text-[#a89070] max-w-xl mx-auto leading-relaxed">
+          className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">
           Fill out the form below and we&apos;ll confirm your appointment within 24 hours.
         </motion.p>
       </section>
@@ -72,9 +72,9 @@ export default function BookPage() {
           {success ? (
             <motion.div variants={fadeUp} initial="hidden" animate="visible"
               className="text-center py-20 luxury-card p-12">
-              <CheckCircle size={64} className="text-[#C9A84C] mx-auto mb-6" />
+              <CheckCircle size={64} className="text-[var(--mc-accent)] mx-auto mb-6" />
               <h2 className="font-serif text-3xl font-bold text-white mb-4">Booking Received!</h2>
-              <p className="text-[#a89070] leading-relaxed mb-8">
+              <p className="text-[var(--mc-muted)] leading-relaxed mb-8">
                 Thank you! We&apos;ll confirm your appointment within 24 hours via email or phone.
               </p>
               <button onClick={() => setSuccess(false)}
@@ -156,7 +156,7 @@ export default function BookPage() {
               </button>
 
               <p className="text-[#555] text-xs text-center">
-                Or call us at <a href="tel:(212) 988-5252" className="text-[#C9A84C] hover:underline cursor-pointer">(212) 988-5252</a>
+                Or call us at <a href="tel:(212) 988-5252" className="text-[var(--mc-accent)] hover:underline cursor-pointer">(212) 988-5252</a>
               </p>
             </motion.form>
           )}

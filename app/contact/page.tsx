@@ -19,14 +19,14 @@ export default function ContactPage() {
     setForm({ name: "", email: "", message: "" });
   };
 
-  const inputClass = "w-full bg-[#0f0f0f] border border-[#2a2a2a] text-white px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C] transition-colors placeholder-[#444]";
-  const labelClass = "block text-[#C9A84C] text-xs uppercase tracking-widest font-semibold mb-2";
+  const inputClass = "w-full bg-[var(--mc-surface)] border border-[var(--mc-border)] text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444]";
+  const labelClass = "block text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2";
 
   return (
     <>
       <section className="pt-32 pb-16 px-6 bg-black text-center">
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
-          className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
+          className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
           Get in Touch
         </motion.p>
         <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
@@ -43,56 +43,56 @@ export default function ContactPage() {
 
             <div className="space-y-8">
               <div className="flex gap-4">
-                <div className="w-12 h-12 border border-[#C9A84C] flex items-center justify-center text-[#C9A84C] shrink-0">
+                <div className="w-12 h-12 border border-[var(--mc-accent)] flex items-center justify-center text-[var(--mc-accent)] shrink-0">
                   <MapPin size={20} />
                 </div>
                 <div>
-                  <p className="text-[#C9A84C] text-xs uppercase tracking-widest font-semibold mb-1">Address</p>
+                  <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-1">Address</p>
                   <p className="text-white">{SALON_INFO.address}</p>
                   <a href="https://maps.google.com/?q=336+East+78th+St+New+York+NY+10075"
                     target="_blank" rel="noopener noreferrer"
-                    className="text-[#666] text-sm hover:text-[#C9A84C] transition-colors mt-1 inline-block cursor-pointer">
+                    className="text-[var(--mc-text-dim)] text-sm hover:text-[var(--mc-accent)] transition-colors mt-1 inline-block cursor-pointer">
                     Get Directions →
                   </a>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="w-12 h-12 border border-[#C9A84C] flex items-center justify-center text-[#C9A84C] shrink-0">
+                <div className="w-12 h-12 border border-[var(--mc-accent)] flex items-center justify-center text-[var(--mc-accent)] shrink-0">
                   <Phone size={20} />
                 </div>
                 <div>
-                  <p className="text-[#C9A84C] text-xs uppercase tracking-widest font-semibold mb-1">Phone</p>
+                  <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-1">Phone</p>
                   <a href={`tel:${SALON_INFO.phone}`}
-                    className="text-white hover:text-[#C9A84C] transition-colors cursor-pointer">
+                    className="text-white hover:text-[var(--mc-accent)] transition-colors cursor-pointer">
                     {SALON_INFO.phone}
                   </a>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="w-12 h-12 border border-[#C9A84C] flex items-center justify-center text-[#C9A84C] shrink-0">
+                <div className="w-12 h-12 border border-[var(--mc-accent)] flex items-center justify-center text-[var(--mc-accent)] shrink-0">
                   <Mail size={20} />
                 </div>
                 <div>
-                  <p className="text-[#C9A84C] text-xs uppercase tracking-widest font-semibold mb-1">Email</p>
+                  <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-1">Email</p>
                   <a href={`mailto:${SALON_INFO.email}`}
-                    className="text-white hover:text-[#C9A84C] transition-colors cursor-pointer">
+                    className="text-white hover:text-[var(--mc-accent)] transition-colors cursor-pointer">
                     {SALON_INFO.email}
                   </a>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="w-12 h-12 border border-[#C9A84C] flex items-center justify-center text-[#C9A84C] shrink-0">
+                <div className="w-12 h-12 border border-[var(--mc-accent)] flex items-center justify-center text-[var(--mc-accent)] shrink-0">
                   <Clock size={20} />
                 </div>
                 <div>
-                  <p className="text-[#C9A84C] text-xs uppercase tracking-widest font-semibold mb-3">Hours</p>
+                  <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">Hours</p>
                   <div className="space-y-1.5">
                     {SALON_INFO.hours.map((h) => (
                       <div key={h.day} className="flex justify-between gap-8 text-sm">
-                        <span className="text-[#666]">{h.day}</span>
+                        <span className="text-[var(--mc-text-dim)]">{h.day}</span>
                         <span className="text-white">{h.open} – {h.close}</span>
                       </div>
                     ))}
@@ -102,11 +102,11 @@ export default function ContactPage() {
 
               <div className="flex gap-4">
                 <a href={SALON_INFO.instagram} target="_blank" rel="noopener noreferrer"
-                  className="w-12 h-12 border border-[#2a2a2a] flex items-center justify-center text-[#666] hover:text-[#C9A84C] hover:border-[#C9A84C] transition-all cursor-pointer">
+                  className="w-12 h-12 border border-[var(--mc-border)] flex items-center justify-center text-[var(--mc-text-dim)] hover:text-[var(--mc-accent)] hover:border-[var(--mc-accent)] transition-all cursor-pointer">
                   <Globe size={20} />
                 </a>
                 <a href={SALON_INFO.facebook} target="_blank" rel="noopener noreferrer"
-                  className="w-12 h-12 border border-[#2a2a2a] flex items-center justify-center text-[#666] hover:text-[#C9A84C] hover:border-[#C9A84C] transition-all cursor-pointer">
+                  className="w-12 h-12 border border-[var(--mc-border)] flex items-center justify-center text-[var(--mc-text-dim)] hover:text-[var(--mc-accent)] hover:border-[var(--mc-accent)] transition-all cursor-pointer">
                   <Share2 size={20} />
                 </a>
               </div>
@@ -119,11 +119,11 @@ export default function ContactPage() {
 
             {sent ? (
               <div className="luxury-card p-10 text-center">
-                <CheckCircle size={48} className="text-[#C9A84C] mx-auto mb-4" />
+                <CheckCircle size={48} className="text-[var(--mc-accent)] mx-auto mb-4" />
                 <h3 className="font-serif text-2xl text-white mb-3">Message Sent!</h3>
-                <p className="text-[#a89070]">We&apos;ll get back to you within 24 hours.</p>
+                <p className="text-[var(--mc-muted)]">We&apos;ll get back to you within 24 hours.</p>
                 <button onClick={() => setSent(false)}
-                  className="mt-6 text-[#C9A84C] text-sm underline cursor-pointer">
+                  className="mt-6 text-[var(--mc-accent)] text-sm underline cursor-pointer">
                   Send another message
                 </button>
               </div>

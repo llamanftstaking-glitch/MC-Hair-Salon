@@ -34,7 +34,7 @@ export default function SplashScreen() {
             animate={{ opacity: [0, 0.4, 0.2] }}
             transition={{ duration: 2, ease: "easeOut" }}
             style={{
-              background: "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(180,130,20,0.2) 0%, transparent 70%)",
+              background: "radial-gradient(ellipse 50% 40% at 50% 50%, var(--mc-hero-glow) 0%, transparent 70%)",
             }}
           />
 
@@ -61,11 +61,11 @@ export default function SplashScreen() {
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: 80, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-              style={{ background: "linear-gradient(90deg, transparent, #C9A84C, transparent)" }}
+              style={{ background: "linear-gradient(90deg, transparent, var(--mc-accent), transparent)" }}
             />
 
             <motion.p
-              className="text-[#C9A84C] uppercase tracking-[0.5em] text-xs"
+              className="text-[var(--mc-accent)] uppercase tracking-[0.5em] text-xs"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.8 }}

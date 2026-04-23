@@ -22,7 +22,7 @@ export default function ServicesPage() {
       {/* Header */}
       <section className="pt-32 pb-16 px-6 bg-black text-center">
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
-          className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
+          className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
           What We Offer
         </motion.p>
         <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
@@ -30,7 +30,7 @@ export default function ServicesPage() {
           Services & Pricing
         </motion.h1>
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2}
-          className="text-[#a89070] max-w-xl mx-auto leading-relaxed">
+          className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">
           All prices listed are starting rates. Final pricing may vary based on hair length, density, and complexity.
         </motion.p>
       </section>
@@ -45,8 +45,8 @@ export default function ServicesPage() {
             <motion.div key={category.category}
               variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={ci}>
               {/* Category header */}
-              <div className="flex items-center gap-4 mb-10 pb-4 border-b border-[#2a2a2a]">
-                <div className="w-12 h-12 border border-[#C9A84C] flex items-center justify-center text-[#C9A84C]">
+              <div className="flex items-center gap-4 mb-10 pb-4 border-b border-[var(--mc-border)]">
+                <div className="w-12 h-12 border border-[var(--mc-accent)] flex items-center justify-center text-[var(--mc-accent)]">
                   {iconMap[category.icon]}
                 </div>
                 <h2 className="font-serif text-3xl font-bold text-white">{category.category}</h2>
@@ -59,12 +59,12 @@ export default function ServicesPage() {
                     variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={ii * 0.1}
                     className="flex items-center justify-between p-6 luxury-card group">
                     <div className="flex items-start gap-4">
-                      <div className="w-5 h-5 border border-[#C9A84C] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#C9A84C] transition-colors">
-                        <Check size={12} className="text-[#C9A84C] group-hover:text-black transition-colors" />
+                      <div className="w-5 h-5 border border-[var(--mc-accent)] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[var(--mc-accent)] transition-colors">
+                        <Check size={12} className="text-[var(--mc-accent)] group-hover:text-black transition-colors" />
                       </div>
                       <div>
                         <p className="text-white font-semibold">{item.name}</p>
-                        <p className="text-[#666] text-sm mt-1">{item.description}</p>
+                        <p className="text-[var(--mc-text-dim)] text-sm mt-1">{item.description}</p>
                       </div>
                     </div>
                     <div className="text-right shrink-0 ml-8">
@@ -79,7 +79,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Disclaimer + CTA */}
-      <section className="py-16 px-6 bg-[#050505] text-center">
+      <section className="py-16 px-6 bg-[var(--mc-surface-dark)] text-center">
         <div className="max-w-2xl mx-auto">
           <p className="text-[#555] text-sm mb-10 leading-relaxed">
             * Prices are starting rates and may vary based on hair length, density, and service complexity.

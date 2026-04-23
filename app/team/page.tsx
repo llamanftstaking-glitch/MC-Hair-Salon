@@ -14,7 +14,7 @@ export default function TeamPage() {
     <>
       <section className="pt-32 pb-16 px-6 bg-black text-center">
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
-          className="text-[#C9A84C] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
+          className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
           The Experts
         </motion.p>
         <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
@@ -22,7 +22,7 @@ export default function TeamPage() {
           Our Team
         </motion.h1>
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2}
-          className="text-[#a89070] max-w-xl mx-auto leading-relaxed">
+          className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">
           A talented team of stylists and spa specialists who have been crafting beauty together for over a decade.
         </motion.p>
       </section>
@@ -41,17 +41,17 @@ export default function TeamPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                 <div className="absolute bottom-6 left-6">
                   <p className="font-serif text-2xl font-bold text-white">{member.name}</p>
-                  <p className="text-[#C9A84C] text-sm uppercase tracking-widest mt-1">{member.role}</p>
+                  <p className="text-[var(--mc-accent)] text-sm uppercase tracking-widest mt-1">{member.role}</p>
                 </div>
               </div>
               <div className="p-8">
-                <p className="text-[#a89070] text-sm leading-relaxed mb-6">{member.bio}</p>
+                <p className="text-[var(--mc-muted)] text-sm leading-relaxed mb-6">{member.bio}</p>
                 <div>
-                  <p className="text-[#C9A84C] text-xs uppercase tracking-widest font-semibold mb-3">Specialties</p>
+                  <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">Specialties</p>
                   <div className="flex flex-wrap gap-2">
                     {member.specialties.map((spec) => (
                       <span key={spec}
-                        className="border border-[#2a2a2a] text-[#666] text-xs px-3 py-1.5 uppercase tracking-wider">
+                        className="border border-[var(--mc-border)] text-[var(--mc-text-dim)] text-xs px-3 py-1.5 uppercase tracking-wider">
                         {spec}
                       </span>
                     ))}

@@ -74,7 +74,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Prevents theme flash on load */}
+        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('mc-theme')||'bw';if(t!=='bw')document.documentElement.setAttribute('data-theme',t);}catch(e){}` }} />
+      </head>
       <body>
         <JsonLd />
         <SplashScreen />

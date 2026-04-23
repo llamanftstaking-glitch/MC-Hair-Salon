@@ -6,34 +6,26 @@ import { motion } from "framer-motion";
 
 export default function HeroLogo() {
   const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setReady(true), 200);
-    return () => clearTimeout(t);
-  }, []);
+  useEffect(() => { const t = setTimeout(() => setReady(true), 200); return () => clearTimeout(t); }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[var(--mc-bg)]">
 
-      {/* Subtle ambient glow — no shape, just warmth */}
+      {/* Ambient glow — updates per theme via CSS var */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: ready ? 1 : 0 }}
         transition={{ duration: 2.5, ease: "easeOut" }}
-        style={{
-          background: "radial-gradient(ellipse 60% 50% at 50% 40%, rgba(180,130,20,0.14) 0%, transparent 70%)",
-        }}
+        style={{ background: "radial-gradient(ellipse 60% 50% at 50% 40%, var(--mc-hero-glow) 0%, transparent 70%)" }}
       />
 
-      {/* Very subtle breathing glow pulse */}
+      {/* Breathing pulse */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         animate={{ opacity: [0, 0.08, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        style={{
-          background: "radial-gradient(ellipse 40% 35% at 50% 38%, rgba(255,215,0,0.3) 0%, transparent 60%)",
-        }}
+        style={{ background: "radial-gradient(ellipse 40% 35% at 50% 38%, var(--mc-hero-pulse) 0%, transparent 60%)" }}
       />
 
       {/* LOGO */}
@@ -44,33 +36,27 @@ export default function HeroLogo() {
           animate={ready ? { opacity: 1, scale: 1, y: 0 } : {}}
           transition={{ duration: 1.4, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          {/* Glow behind logo */}
+          {/* Glow ring behind logo */}
           <motion.div
             className="absolute inset-0 rounded-full pointer-events-none"
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            animate={{ opacity: [0.3, 0.7, 0.3] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             style={{
-              background: "radial-gradient(circle, rgba(201,168,76,0.25) 0%, transparent 70%)",
+              background: "radial-gradient(circle, var(--mc-hero-glow) 0%, transparent 70%)",
               filter: "blur(20px)",
             }}
           />
 
-          {/* Logo image with light sweep */}
+          {/* Three logos — CSS shows correct one */}
           <div className="relative w-full h-full overflow-hidden rounded-full">
-            <Image
-              src="/mc-logo-gold.png"
-              alt="MC Hair Salon & Spa"
-              fill
-              className="object-contain"
-              priority
-            />
+            <Image src="/mc-logo-bw.png"    alt="MC Hair Salon & Spa" fill className="logo-bw    object-contain" priority />
+            <Image src="/mc-logo-gold.png"  alt="MC Hair Salon & Spa" fill className="logo-gold  object-contain" priority />
+            <Image src="/mc-logo-black.png" alt="MC Hair Salon & Spa" fill className="logo-light object-contain" priority />
 
-            {/* Single elegant light sweep */}
+            {/* Light sweep animation */}
             <motion.div
               className="absolute inset-0 pointer-events-none"
-              style={{
-                background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%)",
-              }}
+              style={{ background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.14) 50%, transparent 70%)" }}
               initial={{ x: "-100%" }}
               animate={ready ? { x: "200%" } : { x: "-100%" }}
               transition={{ duration: 1.2, delay: 1.2, ease: "easeInOut" }}
@@ -78,18 +64,19 @@ export default function HeroLogo() {
           </div>
         </motion.div>
 
-        {/* Gold divider line */}
+        {/* Divider line */}
         <motion.div
           className="mt-10 h-px"
           initial={{ width: 0, opacity: 0 }}
           animate={ready ? { width: 120, opacity: 1 } : {}}
           transition={{ duration: 1, delay: 1.4, ease: "easeOut" }}
-          style={{ background: "linear-gradient(90deg, transparent, #C9A84C, transparent)" }}
+          style={{ background: "linear-gradient(90deg, transparent, var(--mc-accent), transparent)" }}
         />
 
         {/* Location tag */}
         <motion.p
-          className="text-[#C9A84C] uppercase tracking-[0.5em] text-xs font-semibold mt-6"
+          className="uppercase tracking-[0.5em] text-xs font-semibold mt-6"
+          style={{ color: "var(--mc-accent)" }}
           initial={{ opacity: 0, y: 8 }}
           animate={ready ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.9, delay: 1.6, ease: "easeOut" }}
@@ -106,7 +93,7 @@ export default function HeroLogo() {
         >
           <span className="shimmer-text">Where Beauty</span>
           <br />
-          <span className="text-white">Meets Luxury</span>
+          <span style={{ color: "var(--mc-text)" }}>Meets Luxury</span>
         </motion.h1>
 
         {/* Subtitle */}
@@ -116,9 +103,11 @@ export default function HeroLogo() {
           animate={ready ? { opacity: 1 } : {}}
           transition={{ duration: 0.9, delay: 2.2, ease: "easeOut" }}
         >
-          <div className="h-px w-10" style={{ background: "linear-gradient(90deg, transparent, #C9A84C)" }} />
-          <p className="text-[#a89070] text-xs uppercase tracking-[0.35em]">Premium Hair & Spa Services</p>
-          <div className="h-px w-10" style={{ background: "linear-gradient(90deg, #C9A84C, transparent)" }} />
+          <div className="h-px w-10" style={{ background: `linear-gradient(90deg, transparent, var(--mc-accent))` }} />
+          <p className="text-xs uppercase tracking-[0.35em]" style={{ color: "var(--mc-muted)" }}>
+            Premium Hair & Spa Services
+          </p>
+          <div className="h-px w-10" style={{ background: `linear-gradient(90deg, var(--mc-accent), transparent)` }} />
         </motion.div>
 
         {/* CTA Buttons */}
@@ -136,7 +125,19 @@ export default function HeroLogo() {
           </Link>
           <Link
             href="/services"
-            className="border border-[#C9A84C] text-[#C9A84C] font-semibold px-12 py-4 uppercase tracking-widest text-sm hover:bg-[#C9A84C] hover:text-black transition-all duration-300 cursor-pointer"
+            className="font-semibold px-12 py-4 uppercase tracking-widest text-sm transition-all duration-300 cursor-pointer"
+            style={{
+              border: "1px solid var(--mc-accent)",
+              color: "var(--mc-accent)",
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.background = "var(--mc-accent)";
+              (e.currentTarget as HTMLElement).style.color = "var(--mc-bg)";
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.background = "transparent";
+              (e.currentTarget as HTMLElement).style.color = "var(--mc-accent)";
+            }}
           >
             View Services
           </Link>
@@ -151,7 +152,7 @@ export default function HeroLogo() {
         >
           <motion.div
             className="w-px h-14 origin-top"
-            style={{ background: "linear-gradient(to bottom, #C9A84C, transparent)" }}
+            style={{ background: `linear-gradient(to bottom, var(--mc-accent), transparent)` }}
             animate={{ scaleY: [0, 1, 0], opacity: [0, 1, 0] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           />

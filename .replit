@@ -1,8 +1,13 @@
-run = "npm run build && npm start"
+run = "npm install && npm run build && npm start"
 entrypoint = "app/page.tsx"
 
 [nix]
 channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npm run build && npm start"]
+deploymentTarget = "static"
+build = ["sh", "-c", "npm run build"]
 
 [[ports]]
 localPort = 3000

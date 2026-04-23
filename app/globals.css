@@ -229,5 +229,3 @@ html.lite footer { background-color: var(--surface-2) !important; border-top-col
 /* Map section tint */
 html.lite iframe[title] { filter: grayscale(20%) contrast(90%) !important; }
 
-/* Overlay/backdrop adjustments for gallery lightbox */
-html.lite .fixed.inset-0.z-50 { }

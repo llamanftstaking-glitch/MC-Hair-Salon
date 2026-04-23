@@ -39,7 +39,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 cursor-pointer">
           <Image
-            src={isLite ? "/mc-logo-black.png" : "/mc-logo-black.png"}
+            src="/mc-logo-black.png"
             alt="MC Hair Salon & Spa"
             width={52}
             height={52}

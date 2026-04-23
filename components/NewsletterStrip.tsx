@@ -136,7 +136,7 @@ export default function NewsletterStrip() {
                 type="submit"
                 disabled={status === "loading"}
                 className="cursor-pointer px-8 py-3.5 font-semibold text-xs uppercase tracking-widest transition-all duration-200 disabled:opacity-50 whitespace-nowrap text-black"
-                style={{ backgroundColor: status === "loading" ? accent : accent }}
+                style={{ backgroundColor: accent }}
                 onMouseEnter={e => (e.currentTarget.style.backgroundColor = accentHover)}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = accent)}
               >

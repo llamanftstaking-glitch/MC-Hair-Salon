@@ -26,7 +26,6 @@ export default function Navbar() {
   const [open, setOpen]         = useState(false);
   const [theme, setThemeState]  = useState<Theme>("bw");
   const [user, setUser]         = useState<AuthUser | null>(null);
-  const [authLoaded, setAuthLoaded] = useState(false);
 
   useEffect(() => {
     setThemeState(getTheme());
@@ -35,8 +34,8 @@ export default function Navbar() {
 
     fetch("/api/auth/me")
       .then(r => r.ok ? r.json() : null)
-      .then(data => { setUser(data); setAuthLoaded(true); })
-      .catch(() => setAuthLoaded(true));
+      .then(data => setUser(data ?? null))
+      .catch(() => {});
 
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -82,36 +81,34 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
 
           {/* Auth buttons — desktop only */}
-          {authLoaded && (
-            <div className="hidden md:flex items-center gap-2">
-              {user ? (
-                <>
-                  <Link href="/account"
-                    className="flex items-center gap-2 text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
-                    <User size={14} />
-                    {user.name.split(" ")[0]}
-                  </Link>
-                  <button onClick={handleLogout}
-                    className="text-[var(--mc-text-dim)] hover:text-red-400 transition-colors cursor-pointer"
-                    title="Sign out">
-                    <LogOut size={14} />
-                  </button>
-                </>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link href="/login"
-                    className="text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
-                    Sign In
-                  </Link>
-                  <span className="text-[var(--mc-border)]">|</span>
-                  <Link href="/signup"
-                    className="text-xs font-bold uppercase tracking-widest px-4 py-2 border border-[var(--mc-accent)] text-[var(--mc-accent)] hover:bg-[var(--mc-accent)] hover:text-[var(--mc-bg)] transition-all duration-200 cursor-pointer">
-                    Create Account
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
+          <div className="hidden md:flex items-center gap-2" suppressHydrationWarning>
+            {user ? (
+              <>
+                <Link href="/account"
+                  className="flex items-center gap-2 text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
+                  <User size={14} />
+                  {user.name.split(" ")[0]}
+                </Link>
+                <button onClick={handleLogout}
+                  className="text-[var(--mc-text-dim)] hover:text-red-400 transition-colors cursor-pointer"
+                  title="Sign out">
+                  <LogOut size={14} />
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login"
+                  className="text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
+                  Sign In
+                </Link>
+                <span className="text-[var(--mc-border)] select-none">|</span>
+                <Link href="/signup"
+                  className="text-xs font-bold uppercase tracking-widest px-4 py-2 border border-[var(--mc-accent)] text-[var(--mc-accent)] hover:bg-[var(--mc-accent)] hover:text-[var(--mc-bg)] transition-all duration-200 cursor-pointer">
+                  Create Account
+                </Link>
+              </>
+            )}
+          </div>
 
           <Link href="/book"
             className="hidden md:inline-flex gold-gradient-bg text-black text-xs font-bold px-5 py-2.5 tracking-widest uppercase hover:opacity-90 transition-opacity cursor-pointer">
@@ -153,9 +150,9 @@ export default function Navbar() {
           ))}
 
           {/* Auth in mobile menu */}
-          {authLoaded && (
-            user ? (
-              <div className="flex flex-col gap-3 pt-2 border-t border-[var(--mc-border)]">
+          <div className="flex flex-col gap-3 pt-2 border-t border-[var(--mc-border)]" suppressHydrationWarning>
+            {user ? (
+              <>
                 <Link href="/account" onClick={() => setOpen(false)}
                   className="flex items-center gap-2 text-[var(--mc-accent)] text-sm uppercase tracking-widest cursor-pointer">
                   <User size={15} /> My Account ({user.name.split(" ")[0]})
@@ -164,9 +161,9 @@ export default function Navbar() {
                   className="text-left text-[var(--mc-text-dim)] text-sm uppercase tracking-widest cursor-pointer hover:text-red-400 transition-colors">
                   Sign Out
                 </button>
-              </div>
+              </>
             ) : (
-              <div className="flex flex-col gap-3 pt-2 border-t border-[var(--mc-border)]">
+              <>
                 <Link href="/login" onClick={() => setOpen(false)}
                   className="text-[var(--mc-muted)] text-sm uppercase tracking-widest cursor-pointer hover:text-[var(--mc-accent)] transition-colors">
                   Sign In
@@ -175,9 +172,9 @@ export default function Navbar() {
                   className="gold-gradient-bg text-black font-bold px-6 py-3 text-center tracking-widest uppercase text-sm cursor-pointer">
                   Create Account
                 </Link>
-              </div>
-            )
-          )}
+              </>
+            )}
+          </div>
 
           <Link href="/book" onClick={() => setOpen(false)}
             className="gold-gradient-bg text-black font-bold px-6 py-4 text-center tracking-widest uppercase text-sm cursor-pointer">

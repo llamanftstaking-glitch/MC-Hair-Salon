@@ -16,7 +16,7 @@ const links = [
 const THEMES: { id: Theme; label: string; color: string; ring: string }[] = [
   { id: "bw",    label: "Classic",    color: "#ffffff", ring: "#ffffff" },
   { id: "gold",  label: "Gold",       color: "#C9A84C", ring: "#C9A84C" },
-  { id: "light", label: "Light",      color: "#f5f0e8", ring: "#8B6914" },
+  { id: "light", label: "Lavender",   color: "#a78bfa", ring: "#7c3aed" },
 ];
 
 export default function Navbar() {

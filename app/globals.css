@@ -60,27 +60,27 @@ html[data-theme="gold"] {
   --mc-card-border:  #2a2a2a;
 }
 
-/* ── LIGHT / CREAM ─────────────────────────────────────────────────────────── */
+/* ── LIGHT / LAVENDER ──────────────────────────────────────────────────────── */
 html[data-theme="light"] {
-  --mc-bg:           #faf8f4;
-  --mc-surface:      #f5f0e8;
-  --mc-surface-2:    #ede8de;
-  --mc-surface-dark: #e2dcd2;
-  --mc-border:       #d8d0c0;
-  --mc-text:         #1a1510;
-  --mc-text-body:    #2a2018;
-  --mc-muted:        #7a6a55;
-  --mc-text-dim:     #998870;
-  --mc-accent:       #8B6914;
-  --mc-accent-2:     #C9A84C;
-  --mc-hero-glow:    rgba(180,130,20,0.07);
-  --mc-hero-pulse:   rgba(201,168,76,0.14);
-  --mc-divider:      rgba(139,105,20,0.35);
-  --mc-scrollbar:    #C9A84C;
-  --mc-title-grad:   linear-gradient(135deg, #8B6914 0%, #C9A84C 50%, #8B6914 100%);
-  --mc-shimmer:      linear-gradient(90deg, #8B6914 0%, #C9A84C 25%, #B8860B 50%, #C9A84C 75%, #8B6914 100%);
+  --mc-bg:           #faf8ff;
+  --mc-surface:      #f5f3ff;
+  --mc-surface-2:    #f0eeff;
+  --mc-surface-dark: #ede9fe;
+  --mc-border:       #ddd6fe;
+  --mc-text:         #1e1b4b;
+  --mc-text-body:    #2d2a5e;
+  --mc-muted:        #6d5b98;
+  --mc-text-dim:     #8b7bb0;
+  --mc-accent:       #7c3aed;
+  --mc-accent-2:     #a78bfa;
+  --mc-hero-glow:    rgba(124,58,237,0.08);
+  --mc-hero-pulse:   rgba(167,139,250,0.15);
+  --mc-divider:      rgba(124,58,237,0.3);
+  --mc-scrollbar:    #a78bfa;
+  --mc-title-grad:   linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #a78bfa 100%);
+  --mc-shimmer:      linear-gradient(90deg, #5b21b6 0%, #7c3aed 25%, #a78bfa 50%, #7c3aed 75%, #5b21b6 100%);
   --mc-card-bg:      #ffffff;
-  --mc-card-border:  #d8d0c0;
+  --mc-card-border:  #ddd6fe;
 }
 
 /* ── BASE ──────────────────────────────────────────────────────────────────── */
@@ -160,7 +160,7 @@ html[data-theme="light"] [class*="bg-[#0"] {
 }
 html[data-theme="light"] nav.bg-black\/95,
 html[data-theme="light"] nav {
-  background-color: rgba(250, 248, 244, 0.96) !important;
+  background-color: rgba(250, 248, 255, 0.96) !important;
 }
 html[data-theme="light"] footer {
   background-color: var(--mc-surface) !important;

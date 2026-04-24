@@ -41,18 +41,17 @@ export default function HeroLogo() {
         style={{ background: "radial-gradient(ellipse 75% 55% at 50% 38%, var(--mc-hero-glow) 0%, transparent 70%)" }}
       />
 
-      {/* Tight glow that breathes slowly */}
+      {/* Static soft glow — no blur animation, just opacity fade-in */}
       <motion.div
         className="absolute pointer-events-none"
         style={{
-          top: "10%", left: "50%", transform: "translateX(-50%)",
-          width: 520, height: 520,
-          background: "radial-gradient(circle, var(--mc-hero-pulse) 0%, transparent 68%)",
-          filter: "blur(55px)",
+          top: "5%", left: "50%", transform: "translateX(-50%)",
+          width: 560, height: 560,
+          background: "radial-gradient(circle, var(--mc-hero-pulse) 0%, transparent 65%)",
         }}
         initial={{ opacity: 0 }}
-        animate={ready ? { opacity: [0.3, 0.65, 0.3] } : { opacity: 0 }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        animate={{ opacity: ready ? 0.55 : 0 }}
+        transition={{ duration: 3, ease: "easeOut", delay: 1 }}
       />
 
       {/* ── LOGO ── */}
@@ -71,21 +70,19 @@ export default function HeroLogo() {
             transition={{ duration: 1.5, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
 
-            {/* Subtle glow behind logo */}
-            <motion.div
+            {/* Glow ring — static, no blur animation */}
+            <div
               className="absolute inset-0 rounded-full pointer-events-none"
-              animate={{ opacity: [0.45, 0.85, 0.45] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
               style={{
                 background: "radial-gradient(circle, var(--mc-hero-glow) 0%, transparent 72%)",
-                filter: "blur(16px)",
+                boxShadow: "0 0 60px 20px var(--mc-hero-glow)",
               }}
             />
 
             {/* Logo images */}
             <div
               className="relative w-full h-full overflow-hidden rounded-full"
-              style={{ filter: "brightness(1.12) drop-shadow(0 0 28px rgba(255,255,255,0.2))" }}
+              style={{ filter: "brightness(1.12)" }}
             >
               <Image src="/mc-logo-bw.png"    alt="MC Hair Salon & Spa" fill className="logo-bw    object-contain" priority />
               <Image src="/mc-logo-black.png" alt="MC Hair Salon & Spa" fill className="logo-light object-contain" priority />

@@ -71,41 +71,6 @@ export default function HeroLogo() {
             transition={{ duration: 1.5, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
 
-            {/* ── Single SVG ring — draws clockwise from 12 o'clock ── */}
-            <motion.div
-              style={{ position: "absolute", inset: -22, borderRadius: "50%", overflow: "visible" }}
-              animate={ready ? { rotate: 360 } : {}}
-              transition={{ duration: 32, repeat: Infinity, ease: "linear", delay: 3.8 }}
-            >
-              <svg
-                width="100%" height="100%"
-                viewBox="0 0 100 100"
-                style={{ position: "absolute", inset: 0, overflow: "visible" }}
-              >
-                {/* Static ring */}
-                <motion.circle
-                  cx="50" cy="50" r="48.5"
-                  fill="none"
-                  stroke="rgba(201,168,76,0.38)"
-                  strokeWidth="0.55"
-                  transform="rotate(-90, 50, 50)"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={ready ? { pathLength: 1, opacity: 1 } : {}}
-                  transition={{ duration: 2.6, delay: 1.6, ease: [0.4, 0, 0.2, 1] }}
-                />
-                {/* Small glowing dot at top of ring */}
-                <motion.circle
-                  cx="50" cy="1.5"
-                  r="1.6"
-                  fill="var(--mc-accent)"
-                  initial={{ opacity: 0 }}
-                  animate={ready ? { opacity: [0, 1, 0.7] } : {}}
-                  transition={{ duration: 0.6, delay: 4.2 }}
-                  style={{ filter: "drop-shadow(0 0 4px var(--mc-accent))" }}
-                />
-              </svg>
-            </motion.div>
-
             {/* Subtle glow behind logo */}
             <motion.div
               className="absolute inset-0 rounded-full pointer-events-none"

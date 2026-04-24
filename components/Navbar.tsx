@@ -2,204 +2,219 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { User, LogOut, X } from "lucide-react";
 import { setTheme, getTheme, type Theme } from "@/lib/theme";
 
-const leftLinks  = [
+const navLinks = [
   { href: "/",         label: "Home"     },
   { href: "/services", label: "Services" },
   { href: "/gallery",  label: "Gallery"  },
-];
-const rightLinks = [
-  { href: "/team",    label: "Team"    },
-  { href: "/contact", label: "Contact" },
+  { href: "/team",     label: "Our Team" },
+  { href: "/contact",  label: "Contact"  },
 ];
 
-const THEMES: { id: Theme; color: string; ring: string }[] = [
-  { id: "bw",    color: "#ffffff", ring: "#ffffff" },
-  { id: "gold",  color: "#C9A84C", ring: "#C9A84C" },
-  { id: "light", color: "#a78bfa", ring: "#7c3aed" },
+const THEMES: { id: Theme; label: string; color: string; ring: string }[] = [
+  { id: "bw",    label: "Classic",  color: "#ffffff", ring: "#ffffff" },
+  { id: "gold",  label: "Gold",     color: "#C9A84C", ring: "#C9A84C" },
+  { id: "light", label: "Lavender", color: "#a78bfa", ring: "#7c3aed" },
 ];
 
 interface AuthUser { name: string; email: string }
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen]         = useState(false);
-  const [theme, setThemeState]  = useState<Theme>("bw");
-  const [user, setUser]         = useState<AuthUser | null>(null);
+  const [menuOpen, setMenuOpen]   = useState(false);
+  const [theme, setThemeState]    = useState<Theme>("bw");
+  const [user, setUser]           = useState<AuthUser | null>(null);
+  const [scrolled, setScrolled]   = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useEffect(() => {
     setThemeState(getTheme());
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
     fetch("/api/auth/me")
       .then(r => r.ok ? r.json() : null)
       .then(data => setUser(data ?? null))
       .catch(() => {});
-    return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Track scroll to reveal logo on home page
+  useEffect(() => {
+    if (!isHome) return;
+    const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.6);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
   function changeTheme(t: Theme) { setTheme(t); setThemeState(t); }
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
+    setMenuOpen(false);
     window.location.href = "/";
   }
 
-  const linkClass = "text-[11px] uppercase tracking-[0.14em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors duration-200 whitespace-nowrap cursor-pointer";
-
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled ? "bg-[var(--mc-bg)]/95 backdrop-blur-md border-b border-[var(--mc-border)]" : "bg-transparent"
-    }`}>
-
-      {/* ── Desktop ── */}
-      <div className="hidden lg:grid grid-cols-[1fr_auto_1fr] items-center h-[68px] max-w-7xl mx-auto px-8">
-
-        {/* Left links */}
-        <div className="flex items-center gap-7 justify-end">
-          {leftLinks.map(l => (
-            <Link key={l.href} href={l.href} className={linkClass}>{l.label}</Link>
-          ))}
+    <>
+      {/* ── Announcement bar ── */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-[var(--mc-surface)] border-b border-[var(--mc-border)]">
+        <div className="flex items-center justify-center py-2.5 px-10 relative">
+          <p className="text-[11px] tracking-[0.2em] text-[var(--mc-text)] uppercase">
+            Upper East Side · New York City · <a href="tel:+12129885252" className="hover:text-[var(--mc-accent)] transition-colors cursor-pointer">(212) 988-5252</a>
+          </p>
+          <Link href="/book"
+            className="absolute right-5 text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors text-[11px] tracking-widest uppercase cursor-pointer hidden sm:block">
+            Book →
+          </Link>
         </div>
 
-        {/* Center logo */}
-        <Link href="/" className="flex items-center justify-center px-8 cursor-pointer">
-          <div className="relative w-11 h-11">
-            <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" />
-            <Image src="/mc-logo-black.png" alt="MC Hair Salon" fill className="logo-light object-contain" />
+        {/* ── Main bar ── */}
+        <div className="grid grid-cols-3 items-center h-[60px] px-6 sm:px-10 border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/95 backdrop-blur-md">
+
+          {/* Left */}
+          <div className="flex items-center gap-5">
+            <Link href="/book"
+              className="text-[11px] uppercase tracking-[0.18em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer whitespace-nowrap hidden sm:block">
+              + Book Now
+            </Link>
           </div>
-        </Link>
 
-        {/* Right links + actions */}
-        <div className="flex items-center gap-7 justify-start">
-          {rightLinks.map(l => (
-            <Link key={l.href} href={l.href} className={linkClass}>{l.label}</Link>
-          ))}
+          {/* Center — logo (hidden on home until scrolled past hero) */}
+          <Link href="/" className="flex justify-center cursor-pointer" onClick={() => setMenuOpen(false)}>
+            <div className="relative w-10 h-10 sm:w-12 sm:h-12"
+              style={{ opacity: isHome && !scrolled ? 0 : 1, transition: "opacity 0.4s ease", pointerEvents: isHome && !scrolled ? "none" : "auto" }}>
+              <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" priority />
+              <Image src="/mc-logo-black.png" alt="MC Hair Salon" fill className="logo-light object-contain" priority />
+            </div>
+          </Link>
 
-          {/* Divider */}
-          <div className="w-px h-3.5 bg-[var(--mc-border)]" />
-
-          {/* Auth */}
-          <div className="flex items-center gap-3" suppressHydrationWarning>
+          {/* Right */}
+          <div className="flex items-center gap-3 sm:gap-5 justify-end" suppressHydrationWarning>
+            {/* Account icon */}
             {user ? (
-              <>
-                <Link href="/account" className={`flex items-center gap-1.5 ${linkClass}`}>
-                  <User size={12} />{user.name.split(" ")[0]}
-                </Link>
-                <button onClick={handleLogout} title="Sign out"
-                  className="text-[var(--mc-text-dim)] hover:text-red-400 transition-colors cursor-pointer">
-                  <LogOut size={12} />
-                </button>
-              </>
+              <Link href="/account"
+                className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer"
+                title={user.name}>
+                <User size={17} />
+              </Link>
             ) : (
-              <Link href="/login" className={`flex items-center gap-1.5 ${linkClass}`}>
-                <User size={12} />Sign In
+              <Link href="/login"
+                className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer"
+                title="Sign In">
+                <User size={17} />
               </Link>
             )}
-          </div>
 
-          {/* Book Now */}
-          <Link href="/book"
-            className="text-[11px] font-bold uppercase tracking-[0.14em] px-4 py-2 gold-gradient-bg text-black hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
-            Book Now
-          </Link>
-
-          {/* Theme dots — minimal, no container */}
-          <div className="flex items-center gap-2">
-            {THEMES.map(t => (
-              <button key={t.id} onClick={() => changeTheme(t.id)} title={t.id}
-                style={{ width: 28, height: 28, background: "transparent", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
-              >
-                <span style={{
-                  width: 8, height: 8, borderRadius: "50%", background: t.color, display: "block",
-                  border: theme === t.id ? `2px solid ${t.ring}` : "1.5px solid rgba(128,128,128,0.3)",
-                  outline: theme === t.id ? `1.5px solid ${t.ring}` : "none",
-                  outlineOffset: 2, transition: "all 0.2s",
-                }} />
-              </button>
-            ))}
+            {/* MENU button */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center gap-2 px-3.5 py-1.5 border border-[var(--mc-border)] hover:border-[var(--mc-accent)] transition-colors cursor-pointer group"
+              aria-label="Toggle menu"
+            >
+              <span className="flex flex-col gap-[4px] w-4">
+                <span className="block h-px w-full bg-[var(--mc-text)] group-hover:bg-[var(--mc-accent)] transition-colors" />
+                <span className="block h-px w-full bg-[var(--mc-text)] group-hover:bg-[var(--mc-accent)] transition-colors" />
+                <span className="block h-px w-2/3 bg-[var(--mc-text)] group-hover:bg-[var(--mc-accent)] transition-colors" />
+              </span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--mc-text)] group-hover:text-[var(--mc-accent)] transition-colors hidden sm:block">
+                Menu
+              </span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* ── Mobile header ── */}
-      <div className="lg:hidden flex items-center justify-between h-16 px-5">
-        <Link href="/" className="relative w-9 h-9 cursor-pointer flex-shrink-0">
-          <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" />
-          <Image src="/mc-logo-black.png" alt="MC Hair Salon" fill className="logo-light object-contain" />
-        </Link>
+      {/* ── Full-screen menu overlay ── */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[60] bg-[var(--mc-bg)] flex flex-col">
 
-        <div className="flex items-center gap-3">
-          <Link href="/book"
-            className="text-[10px] font-bold uppercase tracking-widest px-3.5 py-2 gold-gradient-bg text-black cursor-pointer">
-            Book Now
-          </Link>
-          <button onClick={() => setOpen(!open)} aria-label="Toggle menu"
-            className="text-[var(--mc-accent)] cursor-pointer p-1">
-            {open ? <X size={21} /> : <Menu size={21} />}
-          </button>
-        </div>
-      </div>
-
-      {/* ── Mobile menu ── */}
-      {open && (
-        <div className="lg:hidden bg-[var(--mc-bg)] border-t border-[var(--mc-border)] px-5 py-6 flex flex-col gap-5">
-          {[...leftLinks, ...rightLinks].map(l => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
-              className="text-sm text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors uppercase tracking-widest cursor-pointer">
-              {l.label}
+          {/* Overlay header */}
+          <div className="grid grid-cols-3 items-center h-[100px] px-8 sm:px-14 border-b border-[var(--mc-border)] flex-shrink-0">
+            <span className="font-serif text-sm text-[var(--mc-text-dim)] hidden sm:block">MC Hair Salon & Spa</span>
+            <Link href="/" onClick={() => setMenuOpen(false)} className="flex justify-center cursor-pointer">
+              <div className="relative w-12 h-12">
+                <Image src="/mc-logo-bw.png"    alt="MC" fill className="logo-bw    object-contain" />
+                <Image src="/mc-logo-black.png" alt="MC" fill className="logo-light object-contain" />
+              </div>
             </Link>
-          ))}
-
-          <div className="border-t border-[var(--mc-border)] pt-4 flex flex-col gap-3" suppressHydrationWarning>
-            {user ? (
-              <>
-                <Link href="/account" onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 text-sm text-[var(--mc-accent)] uppercase tracking-widest cursor-pointer">
-                  <User size={14} /> My Account ({user.name.split(" ")[0]})
-                </Link>
-                <button onClick={handleLogout}
-                  className="text-left text-sm text-[var(--mc-text-dim)] uppercase tracking-widest cursor-pointer hover:text-red-400 transition-colors">
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setOpen(false)}
-                  className="text-sm text-[var(--mc-muted)] uppercase tracking-widest hover:text-[var(--mc-accent)] transition-colors cursor-pointer">
-                  Sign In
-                </Link>
-                <Link href="/signup" onClick={() => setOpen(false)}
-                  className="text-sm text-[var(--mc-muted)] uppercase tracking-widest hover:text-[var(--mc-accent)] transition-colors cursor-pointer">
-                  Create Account
-                </Link>
-              </>
-            )}
+            <div className="flex justify-end">
+              <button onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer">
+                <X size={16} /> Close
+              </button>
+            </div>
           </div>
 
-          {/* Theme */}
-          <div className="border-t border-[var(--mc-border)] pt-4">
-            <p className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest mb-3">Appearance</p>
-            <div className="flex items-center gap-1">
-              {THEMES.map(t => (
-                <button key={t.id} onClick={() => changeTheme(t.id)} title={t.id}
-                  style={{ background: "transparent", border: "none", padding: "8px 12px", cursor: "pointer" }}>
-                  <span style={{
-                    width: 18, height: 18, borderRadius: "50%", background: t.color, display: "block",
-                    border: theme === t.id ? `2px solid ${t.ring}` : "1.5px solid rgba(128,128,128,0.3)",
-                    outline: theme === t.id ? `2px solid ${t.ring}` : "none",
-                    outlineOffset: 2, transition: "all 0.2s",
-                    boxShadow: theme === t.id ? `0 0 8px ${t.ring}55` : "none",
-                  }} />
-                </button>
-              ))}
+          {/* Nav links */}
+          <nav className="flex-1 flex flex-col justify-center items-center gap-6 sm:gap-8 px-8">
+            {navLinks.map((l) => (
+              <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
+                className="font-serif text-3xl sm:text-5xl font-bold text-[var(--mc-text)] hover:text-[var(--mc-accent)] transition-colors duration-200 tracking-wide cursor-pointer">
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Overlay footer */}
+          <div className="border-t border-[var(--mc-border)] px-8 sm:px-14 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            {/* Auth */}
+            <div className="flex items-center gap-6" suppressHydrationWarning>
+              {user ? (
+                <>
+                  <Link href="/account" onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
+                    <User size={13} /> My Account
+                  </Link>
+                  <button onClick={handleLogout}
+                    className="flex items-center gap-2 text-xs text-[var(--mc-text-dim)] hover:text-red-400 uppercase tracking-widest transition-colors cursor-pointer">
+                    <LogOut size={13} /> Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setMenuOpen(false)}
+                    className="text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
+                    Sign In
+                  </Link>
+                  <Link href="/signup" onClick={() => setMenuOpen(false)}
+                    className="text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
+                    Create Account
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Theme + Book */}
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                {THEMES.map(t => (
+                  <button key={t.id} onClick={() => changeTheme(t.id)} title={t.label}
+                    style={{ width: 32, height: 32, background: "transparent", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{
+                      width: 12, height: 12, borderRadius: "50%", background: t.color, display: "block",
+                      border: theme === t.id ? `2px solid ${t.ring}` : "1.5px solid rgba(128,128,128,0.35)",
+                      outline: theme === t.id ? `2px solid ${t.ring}` : "none",
+                      outlineOffset: 2, transition: "all 0.2s",
+                    }} />
+                  </button>
+                ))}
+              </div>
+              <Link href="/book" onClick={() => setMenuOpen(false)}
+                className="gold-gradient-bg text-black text-[11px] font-bold px-5 py-2.5 uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer">
+                Book Now
+              </Link>
             </div>
           </div>
         </div>
       )}
-    </nav>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import type { Booking } from "./bookings";
+import type { GiftCard } from "./gift-cards";
 
 function getTransporter() {
   return nodemailer.createTransport({
@@ -92,6 +93,57 @@ export async function sendNewsletterEmail(
     }
   }
   return { sent, failed };
+}
+
+export async function sendGiftCardEmail(card: GiftCard): Promise<void> {
+  const html = `
+    <div style="${baseStyle}">
+      <div style="text-align:center;margin-bottom:32px;">
+        <h1 style="font-size:28px;color:#C9A84C;margin:0;letter-spacing:2px;">MC Hair Salon & Spa</h1>
+        <p style="color:#666;font-size:12px;letter-spacing:4px;text-transform:uppercase;margin:8px 0 0;">Upper East Side · New York</p>
+        ${goldLine}
+        <p style="color:#a89070;font-size:16px;margin:8px 0 0;">You've received a gift card! ✨</p>
+      </div>
+
+      <!-- Gift Card Visual -->
+      <div style="background:linear-gradient(135deg,#0a0a0a 0%,#1a1200 50%,#0a0a0a 100%);border:1px solid #C9A84C;border-radius:12px;padding:32px 28px;margin:0 auto 32px;max-width:420px;text-align:center;">
+        <p style="color:#C9A84C;font-size:11px;letter-spacing:4px;text-transform:uppercase;margin:0 0 16px;">Gift Card</p>
+        <p style="font-size:52px;color:#FFD700;margin:0;font-weight:bold;letter-spacing:-1px;">$${card.amount}</p>
+        <div style="width:40px;height:1px;background:#C9A84C;margin:16px auto;"></div>
+        <p style="color:#f5f0e8;font-size:16px;margin:0 0 4px;">To: <strong>${card.recipientName}</strong></p>
+        <p style="color:#a89070;font-size:13px;margin:0 0 16px;">From: ${card.senderName}</p>
+        ${card.message ? `<p style="color:#888;font-size:13px;font-style:italic;margin:0 0 20px;">"${card.message}"</p>` : ""}
+        <div style="background:#111;border:1px solid #333;border-radius:6px;padding:12px 20px;display:inline-block;">
+          <p style="color:#555;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin:0 0 4px;">Your Code</p>
+          <p style="color:#C9A84C;font-size:18px;font-family:monospace;letter-spacing:3px;margin:0;font-weight:bold;">${card.code}</p>
+        </div>
+      </div>
+
+      <div style="background:#0f0f0f;border:1px solid #2a2a2a;padding:24px;margin-bottom:24px;">
+        <h3 style="color:#C9A84C;font-size:13px;letter-spacing:3px;text-transform:uppercase;margin:0 0 16px;">How to Redeem</h3>
+        <ol style="color:#a89070;font-size:14px;line-height:2;margin:0;padding-left:20px;">
+          <li>Book your appointment at <a href="https://mchairsalon.com/book" style="color:#C9A84C;">mchairsalon.com/book</a> or call <a href="tel:2129885252" style="color:#C9A84C;">(212) 988-5252</a></li>
+          <li>Present this code at the salon — in person or by phone</li>
+          <li>Enjoy your luxury experience at MC Hair Salon & Spa ✨</li>
+        </ol>
+      </div>
+
+      <p style="color:#555;font-size:12px;text-align:center;margin-bottom:4px;">Gift cards do not expire and can be used for any service.</p>
+      <p style="color:#555;font-size:12px;text-align:center;">336 East 78th St, New York, NY 10075 · <a href="tel:2129885252" style="color:#C9A84C;">(212) 988-5252</a></p>
+      ${goldLine}
+      <p style="color:#333;font-size:11px;text-align:center;">© ${new Date().getFullYear()} MC Hair Salon & Spa. All rights reserved.</p>
+    </div>
+  `;
+
+  const toEmail = card.recipientEmail ?? card.senderName;
+  if (!toEmail || !toEmail.includes("@")) return;
+
+  await getTransporter().sendMail({
+    from: FROM,
+    to: toEmail,
+    subject: `🎁 You've received a $${card.amount} MC Hair Salon Gift Card from ${card.senderName}!`,
+    html,
+  });
 }
 
 export async function sendContactReply(to: string, name: string, message: string): Promise<void> {

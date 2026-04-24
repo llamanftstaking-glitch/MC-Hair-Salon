@@ -31,11 +31,16 @@ export interface Appointment {
 
 export interface CustomerPackage {
   id: string;
+  packageId: string;
   name: string;
+  tagline?: string;
+  services?: string[];
+  price: number;
   sessionsTotal: number;
   sessionsUsed: number;
   purchasedAt: string;
   expiresAt: string;
+  stripeSessionId?: string;
 }
 
 export interface RedeemedReward {

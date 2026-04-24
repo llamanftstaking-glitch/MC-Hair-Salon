@@ -55,7 +55,17 @@ export const SERVICES = [
     items: [
       { name: "Eyelash Extensions", price: 150, description: "Full, natural-looking lash extensions" },
       { name: "Facial", price: 80, description: "Revitalizing facial treatment" },
-      { name: "Makeup Application", price: 75, description: "Professional makeup by our artists" },
+    ],
+  },
+  {
+    category: "Makeup",
+    icon: "brush",
+    items: [
+      { name: "Makeup Application", price: 75, description: "Day-to-night glam by our resident makeup artist" },
+      { name: "Special Event Makeup", price: 150, description: "Red-carpet ready for galas, parties & milestones" },
+      { name: "Bridal Makeup", price: 200, description: "Flawless bridal looks — trial session available" },
+      { name: "Airbrush Makeup", price: 125, description: "Ultra-smooth finish, long-wearing formula" },
+      { name: "Makeup Lesson (1 hr)", price: 100, description: "Personalized technique coaching, one-on-one" },
     ],
   },
 ];
@@ -89,6 +99,222 @@ export const TEAM = [
     specialties: ["Men's Cuts", "Fades", "Styling"],
     image: "/instagram/mchairsalonspa_1526678565_1782231439342285913_509340228.jpg",
   },
+  {
+    name: "Isabella",
+    role: "Resident Makeup Artist",
+    bio: "Isabella is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry, she tailors every look to your unique features and personal style.",
+    specialties: ["Bridal Makeup", "Airbrush", "Special Events", "Makeup Lessons"],
+    image: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
+    isMakeupArtist: true,
+  },
+];
+
+export interface PackageDef {
+  id: string;
+  name: string;
+  tagline: string;
+  price: number;
+  originalValue: number;
+  sessions: number;
+  services: string[];
+  highlight: string;
+  badge?: string;
+  validityDays: number;
+}
+
+export const PACKAGES: PackageDef[] = [
+  {
+    id: "pkg_blowout_5",
+    name: "Blowout Bundle",
+    tagline: "Your weekly glow, locked in",
+    price: 149,
+    originalValue: 165,
+    sessions: 5,
+    services: ["5 × Blow Out & Style"],
+    highlight: "Save $16 — perfect for busy New Yorkers",
+    validityDays: 180,
+  },
+  {
+    id: "pkg_color_3",
+    name: "Color Club",
+    tagline: "Vibrant, dimensional color all year",
+    price: 235,
+    originalValue: 255,
+    sessions: 3,
+    services: ["3 × Full Color (L'Oréal Majerel/Inoa)"],
+    highlight: "Save $20 — stay fresh between seasons",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_glam_3",
+    name: "Glam Pack",
+    tagline: "Look your best for every occasion",
+    price: 199,
+    originalValue: 225,
+    sessions: 3,
+    services: ["3 × Makeup Application by Isabella"],
+    highlight: "Save $26 — events, date nights, and more",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_bridal_prep",
+    name: "Bridal Prep",
+    tagline: "Everything you need before the big day",
+    price: 449,
+    originalValue: 500,
+    sessions: 4,
+    services: [
+      "1 × Bridal Hair Trial",
+      "1 × Bridal Updo (wedding day)",
+      "1 × Bridal Makeup Trial",
+      "1 × Bridal Makeup (wedding day)",
+    ],
+    highlight: "Save $51 — the complete bridal beauty plan",
+    badge: "Most Popular",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_full_experience",
+    name: "The Full Experience",
+    tagline: "Head-to-toe luxury in one package",
+    price: 279,
+    originalValue: 325,
+    sessions: 4,
+    services: [
+      "1 × Women's Cut & Style",
+      "1 × Full Color",
+      "1 × Blow Out & Style",
+      "1 × Facial",
+    ],
+    highlight: "Save $46 — the ultimate refresh",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_lash_love",
+    name: "Lash Love",
+    tagline: "Full, lush lashes every month",
+    price: 269,
+    originalValue: 300,
+    sessions: 3,
+    services: ["1 × Full Eyelash Extension Set", "2 × Lash Fills"],
+    highlight: "Save $31 — always camera-ready",
+    validityDays: 180,
+  },
+  {
+    id: "pkg_vip_blowout",
+    name: "VIP Year",
+    tagline: "A whole year of flawless hair",
+    price: 329,
+    originalValue: 396,
+    sessions: 12,
+    services: ["12 × Blow Out & Style (monthly)"],
+    highlight: "Save $67 — our best blowout value",
+    badge: "Best Value",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_wellness",
+    name: "Wellness Ritual",
+    tagline: "Skincare that transforms",
+    price: 210,
+    originalValue: 240,
+    sessions: 3,
+    services: ["3 × Revitalizing Facial"],
+    highlight: "Save $30 — glow year-round",
+    validityDays: 365,
+  },
+];
+
+export const WEDDING_SERVICES = [
+  {
+    category: "Bridal Hair",
+    icon: "💍",
+    services: [
+      { name: "Bridal Updo & Style", price: 150, note: "Day-of styling, includes consultation" },
+      { name: "Bridal Hair Trial", price: 120, note: "Recommended 4–8 weeks before the wedding" },
+      { name: "Bridesmaid Hair (each)", price: 85, note: "Updo or blowout styling" },
+      { name: "Mother of the Bride / Groom", price: 100, note: "Updo or elegant styling" },
+      { name: "Flower Girl Style", price: 45, note: "Simple updo or curls, ages 3–12" },
+    ],
+  },
+  {
+    category: "Bridal Makeup",
+    icon: "✨",
+    services: [
+      { name: "Bridal Makeup", price: 200, note: "Full glam application, long-lasting" },
+      { name: "Bridal Makeup Trial", price: 150, note: "Preview your look before the big day" },
+      { name: "Airbrush Bridal Makeup", price: 225, note: "Ultra-smooth, camera-ready finish" },
+      { name: "Bridesmaid Makeup (each)", price: 125, note: "Coordinated looks for the whole party" },
+      { name: "Mother of the Bride Makeup", price: 125, note: "Elegant, age-appropriate artistry" },
+      { name: "Flower Girl Makeup", price: 50, note: "Light, natural look for young ones" },
+    ],
+  },
+  {
+    category: "Pre-Wedding Prep",
+    icon: "🌿",
+    services: [
+      { name: "Bridal Facial", price: 120, note: "Glow-boosting treatment, 2 weeks before" },
+      { name: "Eyelash Extensions (bridal)", price: 150, note: "Full set for a wide-eyed, lush look" },
+      { name: "Bridal Balayage / Color", price: 150, note: "Dimensional color for the big day" },
+      { name: "Deep Conditioning Treatment", price: 60, note: "Silky, healthy hair for styling day" },
+    ],
+  },
+  {
+    category: "On-Location Services",
+    icon: "🏨",
+    services: [
+      { name: "On-Location Travel Fee", price: 150, note: "We come to your venue — NYC area" },
+      { name: "On-Location Bridal Style", price: 175, note: "Hair at your venue or hotel" },
+      { name: "On-Location Bridal Makeup", price: 225, note: "Makeup at your venue or hotel" },
+    ],
+  },
+];
+
+export const WEDDING_TESTIMONIALS = [
+  {
+    name: "Alexandra M.",
+    wedding: "September 2023",
+    review: "MC Hair Salon made my wedding morning absolutely magical. Kato did my updo — I cried happy tears when I saw myself. The entire team was calm, professional, and made every bridesmaid feel beautiful.",
+    rating: 5,
+  },
+  {
+    name: "Danielle R.",
+    wedding: "June 2023",
+    review: "Isabella's bridal makeup was flawless. We did a trial 6 weeks before and she nailed my vision on the first try. I looked like myself — but the most radiant version. Cannot recommend enough.",
+    rating: 5,
+  },
+  {
+    name: "Priya S.",
+    wedding: "October 2022",
+    review: "We had 8 people in the bridal party and the team handled everything seamlessly. They came to our hotel in the Upper East Side and were done in 3 hours flat. Impeccable service.",
+    rating: 5,
+  },
+  {
+    name: "Melissa C.",
+    wedding: "April 2024",
+    review: "The bridal hair trial was one of the most enjoyable appointments I've ever had. Megan listened to exactly what I wanted and even improved on my inspiration photos. Book them — you won't regret it.",
+    rating: 5,
+  },
+];
+
+export const WEDDING_GALLERY = [
+  { src: "/instagram/mchairsalonspa_1774207263_3858649997122708575_509340228.jpg", alt: "Bridal updo" },
+  { src: "/instagram/mchairsalonspa_1732646348_3510014434303531709_509340228.jpg", alt: "Wedding day styling" },
+  { src: "/instagram/mchairsalonspa_1708007392_3303327885522806092_509340228.jpg", alt: "Bridal hair" },
+  { src: "/instagram/mchairsalonspa_1672866306_3008543095357388367_509340228.jpg", alt: "Bridal glam" },
+  { src: "/instagram/mchairsalonspa_1664479225_2938187155735434916_509340228.jpg", alt: "Bridal makeup" },
+  { src: "/instagram/mchairsalonspa_1645811757_2781593085253597123_509340228.jpg", alt: "Bridal party styling" },
+];
+
+export const MAKEUP_GALLERY = [
+  { src: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg", alt: "Makeup artistry by Isabella", label: "Glam" },
+  { src: "/instagram/mchairsalonspa_1594335004_2349774783581733215_509340228.jpg", alt: "Special event look", label: "Event" },
+  { src: "/instagram/mchairsalonspa_1584025690_2263293995516827575_509340228.jpg", alt: "Bridal makeup", label: "Bridal" },
+  { src: "/instagram/mchairsalonspa_1583862336_2261923681251816316_509340228.jpg", alt: "Editorial makeup look", label: "Editorial" },
+  { src: "/instagram/mchairsalonspa_1583176666_2256171862533820128_509340228.jpg", alt: "Natural everyday glam", label: "Natural" },
+  { src: "/instagram/mchairsalonspa_1581106935_2238809697447493007_509340228.jpg", alt: "Airbrush finish", label: "Airbrush" },
+  { src: "/instagram/mchairsalonspa_1579289740_2223565962392628495_509340228.jpg", alt: "Smoky eye look", label: "Glam" },
+  { src: "/instagram/mchairsalonspa_1568744468_2135105812317486094_509340228.jpg", alt: "Bold lip and contour", label: "Bold" },
 ];
 
 export const GALLERY_IMAGES = [

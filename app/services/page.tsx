@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Scissors, Wind, Palette, Sparkles, Check } from "lucide-react";
+import { Scissors, Wind, Palette, Sparkles, Check, Brush } from "lucide-react";
 import { SERVICES } from "@/lib/data";
 
 
@@ -9,6 +9,7 @@ const iconMap: Record<string, React.ReactNode> = {
   wind: <Wind size={24} />,
   palette: <Palette size={24} />,
   sparkles: <Sparkles size={24} />,
+  brush: <Brush size={24} />,
 };
 
 export default function ServicesPage() {

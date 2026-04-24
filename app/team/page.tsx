@@ -1,37 +1,24 @@
 "use client";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { TEAM } from "@/lib/data";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.15, ease: "easeOut" } }),
-};
 
 export default function TeamPage() {
   return (
     <>
       <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
-        <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
-          className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
-          The Experts
-        </motion.p>
-        <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
-          className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
-          Our Team
-        </motion.h1>
-        <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2}
-          className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">
+        <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">The Experts</p>
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Our Team</h1>
+        <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">
           A talented team of stylists and spa specialists who have been crafting beauty together for over a decade.
-        </motion.p>
+        </p>
       </section>
 
       <section className="py-20 px-6 bg-black">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
           {TEAM.map((member, i) => (
-            <motion.div key={member.name}
-              variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
+            <div key={member.name}
               className="luxury-card overflow-hidden group">
               <div className="relative h-64 sm:h-80 overflow-hidden">
                 <Image
@@ -62,7 +49,7 @@ export default function TeamPage() {
                   Book with {member.name}
                 </Link>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>

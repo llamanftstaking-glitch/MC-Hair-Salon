@@ -1,13 +1,8 @@
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { CheckCircle, Loader } from "lucide-react";
 import { SERVICES, TEAM } from "@/lib/data";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.1, ease: "easeOut" } }),
-};
 
 const times = ["10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM",
   "1:00 PM","1:30 PM","2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM",
@@ -53,25 +48,17 @@ export default function BookPage() {
   return (
     <>
       <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
-        <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
-          className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
-          Reserve Your Visit
-        </motion.p>
-        <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
-          className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
-          Book Appointment
-        </motion.h1>
-        <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2}
-          className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">
+        <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Reserve Your Visit</p>
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Book Appointment</h1>
+        <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">
           Fill out the form below and we&apos;ll confirm your appointment within 24 hours.
-        </motion.p>
+        </p>
       </section>
 
       <section className="py-16 px-6 bg-black">
         <div className="max-w-2xl mx-auto">
           {success ? (
-            <motion.div variants={fadeUp} initial="hidden" animate="visible"
-              className="text-center py-20 luxury-card p-12">
+            <div className="text-center py-20 luxury-card p-12">
               <CheckCircle size={64} className="text-[var(--mc-accent)] mx-auto mb-6" />
               <h2 className="font-serif text-3xl font-bold text-white mb-4">Booking Received!</h2>
               <p className="text-[var(--mc-muted)] leading-relaxed mb-8">
@@ -81,10 +68,9 @@ export default function BookPage() {
                 className="gold-gradient-bg text-black font-bold px-10 py-3 uppercase tracking-widest text-sm hover:opacity-90 cursor-pointer">
                 Book Another
               </button>
-            </motion.div>
+            </div>
           ) : (
-            <motion.form onSubmit={handleSubmit} variants={fadeUp} initial="hidden" animate="visible"
-              className="luxury-card p-8 md:p-12 space-y-6">
+            <form onSubmit={handleSubmit} className="luxury-card p-8 md:p-12 space-y-6">
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -158,7 +144,7 @@ export default function BookPage() {
               <p className="text-[#555] text-xs text-center">
                 Or call us at <a href="tel:(212) 988-5252" className="text-[var(--mc-accent)] hover:underline cursor-pointer">(212) 988-5252</a>
               </p>
-            </motion.form>
+            </form>
           )}
         </div>
       </section>

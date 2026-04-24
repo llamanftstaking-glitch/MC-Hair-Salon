@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader, Sparkles } from "lucide-react";
@@ -39,12 +39,7 @@ export default function SignupPage() {
 
   return (
     <section className="min-h-screen flex items-center justify-center px-6 bg-[var(--mc-bg)] pt-20 pb-12">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
-      >
+      <div className="w-full max-w-md">
         {/* Perks banner */}
         <div className="luxury-card p-4 mb-6 flex items-center gap-3">
           <Sparkles size={18} className="text-[var(--mc-accent)] shrink-0" />
@@ -112,7 +107,7 @@ export default function SignupPage() {
             <Link href="/login" className="text-[var(--mc-accent)] hover:underline cursor-pointer">Sign in</Link>
           </p>
         </form>
-      </motion.div>
+      </div>
     </section>
   );
 }

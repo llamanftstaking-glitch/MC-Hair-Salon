@@ -3,7 +3,6 @@ import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import SplashScreen from "@/components/SplashScreen";
 import JsonLd from "@/components/JsonLd";
 
 const SITE_URL = "https://mchairsalon.com";
@@ -81,8 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <JsonLd />
-        <SplashScreen />
-        <Navbar />
+<Navbar />
         <main>{children}</main>
         <Footer />
       </body>

@@ -2,15 +2,16 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, User, LogOut, Palette } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { User, LogOut, X } from "lucide-react";
 import { setTheme, getTheme, type Theme } from "@/lib/theme";
 
-const links = [
-  { href: "/", label: "Home" },
+const navLinks = [
+  { href: "/",         label: "Home"     },
   { href: "/services", label: "Services" },
-  { href: "/gallery", label: "Gallery" },
-  { href: "/team", label: "Our Team" },
-  { href: "/contact", label: "Contact" },
+  { href: "/gallery",  label: "Gallery"  },
+  { href: "/team",     label: "Our Team" },
+  { href: "/contact",  label: "Contact"  },
 ];
 
 const THEMES: { id: Theme; label: string; color: string; ring: string }[] = [
@@ -22,193 +23,198 @@ const THEMES: { id: Theme; label: string; color: string; ring: string }[] = [
 interface AuthUser { name: string; email: string }
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen]         = useState(false);
-  const [theme, setThemeState]  = useState<Theme>("bw");
-  const [user, setUser]         = useState<AuthUser | null>(null);
+  const [menuOpen, setMenuOpen]   = useState(false);
+  const [theme, setThemeState]    = useState<Theme>("bw");
+  const [user, setUser]           = useState<AuthUser | null>(null);
+  const [scrolled, setScrolled]   = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useEffect(() => {
     setThemeState(getTheme());
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
-
     fetch("/api/auth/me")
       .then(r => r.ok ? r.json() : null)
       .then(data => setUser(data ?? null))
       .catch(() => {});
-
-    return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Track scroll to reveal logo on home page
+  useEffect(() => {
+    if (!isHome) return;
+    const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.6);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
+
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
   function changeTheme(t: Theme) { setTheme(t); setThemeState(t); }
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
+    setMenuOpen(false);
     window.location.href = "/";
   }
 
-  const navBg = scrolled
-    ? "backdrop-blur-md border-b border-[var(--mc-border)] bg-[var(--mc-bg)]/95"
-    : "bg-transparent";
-
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navBg}`}>
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 cursor-pointer">
-          <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0">
-            <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" />
-            <Image src="/mc-logo-black.png" alt="MC Hair Salon" fill className="logo-light object-contain" />
-          </div>
-          <span className="hidden sm:block font-serif text-base gold-gradient font-bold tracking-wide">
-            MC Hair Salon & Spa
-          </span>
-        </Link>
-
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-8">
-          {links.map((l) => (
-            <Link key={l.href} href={l.href}
-              className="text-sm text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors duration-200 tracking-widest uppercase cursor-pointer">
-              {l.label}
-            </Link>
-          ))}
+    <>
+      {/* ── Announcement bar ── */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-[var(--mc-surface)] border-b border-[var(--mc-border)]">
+        <div className="flex items-center justify-center py-2.5 px-10 relative">
+          <p className="text-[11px] tracking-[0.2em] text-[var(--mc-text)] uppercase">
+            Upper East Side · New York City · <a href="tel:+12129885252" className="hover:text-[var(--mc-accent)] transition-colors cursor-pointer">(212) 988-5252</a>
+          </p>
+          <Link href="/book"
+            className="absolute right-5 text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors text-[11px] tracking-widest uppercase cursor-pointer hidden sm:block">
+            Book →
+          </Link>
         </div>
 
-        {/* Right side: auth + Book Now + theme + mobile toggle */}
-        <div className="flex items-center gap-3">
+        {/* ── Main bar ── */}
+        <div className="grid grid-cols-3 items-center h-[60px] px-6 sm:px-10 border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/95 backdrop-blur-md">
 
-          {/* Auth buttons — desktop only */}
-          <div className="hidden md:flex items-center gap-2" suppressHydrationWarning>
-            {user ? (
-              <>
-                <Link href="/account"
-                  className="flex items-center gap-2 text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
-                  <User size={14} />
-                  {user.name.split(" ")[0]}
-                </Link>
-                <button onClick={handleLogout}
-                  className="text-[var(--mc-text-dim)] hover:text-red-400 transition-colors cursor-pointer"
-                  title="Sign out">
-                  <LogOut size={14} />
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login"
-                  className="text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
-                  Sign In
-                </Link>
-                <span className="text-[var(--mc-border)] select-none">|</span>
-                <Link href="/signup"
-                  className="text-xs font-bold uppercase tracking-widest px-4 py-2 border border-[var(--mc-accent)] text-[var(--mc-accent)] hover:bg-[var(--mc-accent)] hover:text-[var(--mc-bg)] transition-all duration-200 cursor-pointer">
-                  Create Account
-                </Link>
-              </>
-            )}
+          {/* Left */}
+          <div className="flex items-center gap-5">
+            <Link href="/book"
+              className="text-[11px] uppercase tracking-[0.18em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer whitespace-nowrap hidden sm:block">
+              + Book Now
+            </Link>
           </div>
 
-          <Link href="/book"
-            className="hidden md:inline-flex gold-gradient-bg text-black text-xs font-bold px-5 py-2.5 tracking-widest uppercase hover:opacity-90 transition-opacity cursor-pointer">
-            Book Now
+          {/* Center — logo (hidden on home until scrolled past hero) */}
+          <Link href="/" className="flex justify-center cursor-pointer" onClick={() => setMenuOpen(false)}>
+            <div className="relative w-10 h-10 sm:w-12 sm:h-12"
+              style={{ opacity: isHome && !scrolled ? 0 : 1, transition: "opacity 0.4s ease", pointerEvents: isHome && !scrolled ? "none" : "auto" }}>
+              <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" priority />
+              <Image src="/mc-logo-black.png" alt="MC Hair Salon" fill className="logo-light object-contain" priority />
+            </div>
           </Link>
 
-          {/* Theme selector — elevated pill */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--mc-border)] bg-[var(--mc-surface)]/60 backdrop-blur-sm">
-            <Palette size={11} className="text-[var(--mc-text-dim)]" />
-            {THEMES.map((t) => (
-              <button key={t.id} onClick={() => changeTheme(t.id)}
-                aria-label={`${t.label} theme`} title={t.label}
-                style={{ width: 44, height: 44, background: "transparent", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
-              >
-                <span style={{
-                  width: 10, height: 10, borderRadius: "50%", background: t.color, flexShrink: 0, display: "block",
-                  border: theme === t.id ? `2px solid ${t.ring}` : "2px solid rgba(128,128,128,0.35)",
-                  outline: theme === t.id ? `2px solid ${t.ring}` : "none",
-                  outlineOffset: 2, transition: "all 0.2s",
-                  boxShadow: theme === t.id ? `0 0 6px ${t.ring}66` : "none",
-                }} />
-              </button>
-            ))}
-          </div>
+          {/* Right */}
+          <div className="flex items-center gap-3 sm:gap-5 justify-end" suppressHydrationWarning>
+            {/* Account icon */}
+            {user ? (
+              <Link href="/account"
+                className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer"
+                title={user.name}>
+                <User size={17} />
+              </Link>
+            ) : (
+              <Link href="/login"
+                className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer"
+                title="Sign In">
+                <User size={17} />
+              </Link>
+            )}
 
-          {/* Mobile toggle */}
-          <button className="md:hidden text-[var(--mc-accent)] cursor-pointer"
-            onClick={() => setOpen(!open)} aria-label="Toggle menu">
-            {open ? <X size={24} /> : <Menu size={24} />}
-          </button>
+            {/* MENU button */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center gap-2 px-3.5 py-1.5 border border-[var(--mc-border)] hover:border-[var(--mc-accent)] transition-colors cursor-pointer group"
+              aria-label="Toggle menu"
+            >
+              <span className="flex flex-col gap-[4px] w-4">
+                <span className="block h-px w-full bg-[var(--mc-text)] group-hover:bg-[var(--mc-accent)] transition-colors" />
+                <span className="block h-px w-full bg-[var(--mc-text)] group-hover:bg-[var(--mc-accent)] transition-colors" />
+                <span className="block h-px w-2/3 bg-[var(--mc-text)] group-hover:bg-[var(--mc-accent)] transition-colors" />
+              </span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--mc-text)] group-hover:text-[var(--mc-accent)] transition-colors hidden sm:block">
+                Menu
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {open && (
-        <div className="md:hidden bg-[var(--mc-bg)]/98 border-t border-[var(--mc-border)] px-6 py-8 flex flex-col gap-6">
-          {links.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
-              className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors uppercase tracking-widest text-sm cursor-pointer">
-              {l.label}
-            </Link>
-          ))}
+      {/* ── Full-screen menu overlay ── */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[60] bg-[var(--mc-bg)] flex flex-col">
 
-          {/* Auth in mobile menu */}
-          <div className="flex flex-col gap-3 pt-2 border-t border-[var(--mc-border)]" suppressHydrationWarning>
-            {user ? (
-              <>
-                <Link href="/account" onClick={() => setOpen(false)}
-                  className="flex items-center gap-2 text-[var(--mc-accent)] text-sm uppercase tracking-widest cursor-pointer">
-                  <User size={15} /> My Account ({user.name.split(" ")[0]})
-                </Link>
-                <button onClick={handleLogout}
-                  className="text-left text-[var(--mc-text-dim)] text-sm uppercase tracking-widest cursor-pointer hover:text-red-400 transition-colors">
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setOpen(false)}
-                  className="text-[var(--mc-muted)] text-sm uppercase tracking-widest cursor-pointer hover:text-[var(--mc-accent)] transition-colors">
-                  Sign In
-                </Link>
-                <Link href="/signup" onClick={() => setOpen(false)}
-                  className="gold-gradient-bg text-black font-bold px-6 py-3 text-center tracking-widest uppercase text-sm cursor-pointer">
-                  Create Account
-                </Link>
-              </>
-            )}
+          {/* Overlay header */}
+          <div className="grid grid-cols-3 items-center h-[100px] px-8 sm:px-14 border-b border-[var(--mc-border)] flex-shrink-0">
+            <span className="font-serif text-sm text-[var(--mc-text-dim)] hidden sm:block">MC Hair Salon & Spa</span>
+            <Link href="/" onClick={() => setMenuOpen(false)} className="flex justify-center cursor-pointer">
+              <div className="relative w-12 h-12">
+                <Image src="/mc-logo-bw.png"    alt="MC" fill className="logo-bw    object-contain" />
+                <Image src="/mc-logo-black.png" alt="MC" fill className="logo-light object-contain" />
+              </div>
+            </Link>
+            <div className="flex justify-end">
+              <button onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer">
+                <X size={16} /> Close
+              </button>
+            </div>
           </div>
 
-          <Link href="/book" onClick={() => setOpen(false)}
-            className="gold-gradient-bg text-black font-bold px-6 py-4 text-center tracking-widest uppercase text-sm cursor-pointer">
-            Book Now
-          </Link>
+          {/* Nav links */}
+          <nav className="flex-1 flex flex-col justify-center items-center gap-6 sm:gap-8 px-8">
+            {navLinks.map((l) => (
+              <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
+                className="font-serif text-3xl sm:text-5xl font-bold text-[var(--mc-text)] hover:text-[var(--mc-accent)] transition-colors duration-200 tracking-wide cursor-pointer">
+                {l.label}
+              </Link>
+            ))}
+          </nav>
 
-          {/* Theme selector — mobile */}
-          <div className="pt-2 border-t border-[var(--mc-border)]">
-            <p className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-[0.3em] mb-3">Appearance</p>
-            <div className="flex items-center gap-2">
-              {THEMES.map((t) => (
-                <button key={t.id} onClick={() => changeTheme(t.id)} title={t.label}
-                  className="flex flex-col items-center gap-1.5 cursor-pointer"
-                  style={{ background: "transparent", border: "none", padding: "8px 10px" }}
-                >
-                  <span style={{
-                    width: 20, height: 20, borderRadius: "50%", background: t.color, flexShrink: 0, display: "block",
-                    border: theme === t.id ? `2px solid ${t.ring}` : "2px solid rgba(128,128,128,0.35)",
-                    outline: theme === t.id ? `2px solid ${t.ring}` : "none",
-                    outlineOffset: 2, transition: "all 0.2s",
-                    boxShadow: theme === t.id ? `0 0 8px ${t.ring}66` : "none",
-                  }} />
-                  <span style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.1em", color: theme === t.id ? "var(--mc-accent)" : "var(--mc-text-dim)", transition: "color 0.2s" }}>
-                    {t.label}
-                  </span>
-                </button>
-              ))}
+          {/* Overlay footer */}
+          <div className="border-t border-[var(--mc-border)] px-8 sm:px-14 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            {/* Auth */}
+            <div className="flex items-center gap-6" suppressHydrationWarning>
+              {user ? (
+                <>
+                  <Link href="/account" onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2 text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
+                    <User size={13} /> My Account
+                  </Link>
+                  <button onClick={handleLogout}
+                    className="flex items-center gap-2 text-xs text-[var(--mc-text-dim)] hover:text-red-400 uppercase tracking-widest transition-colors cursor-pointer">
+                    <LogOut size={13} /> Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setMenuOpen(false)}
+                    className="text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
+                    Sign In
+                  </Link>
+                  <Link href="/signup" onClick={() => setMenuOpen(false)}
+                    className="text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] uppercase tracking-widest transition-colors cursor-pointer">
+                    Create Account
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Theme + Book */}
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                {THEMES.map(t => (
+                  <button key={t.id} onClick={() => changeTheme(t.id)} title={t.label}
+                    style={{ width: 32, height: 32, background: "transparent", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{
+                      width: 12, height: 12, borderRadius: "50%", background: t.color, display: "block",
+                      border: theme === t.id ? `2px solid ${t.ring}` : "1.5px solid rgba(128,128,128,0.35)",
+                      outline: theme === t.id ? `2px solid ${t.ring}` : "none",
+                      outlineOffset: 2, transition: "all 0.2s",
+                    }} />
+                  </button>
+                ))}
+              </div>
+              <Link href="/book" onClick={() => setMenuOpen(false)}
+                className="gold-gradient-bg text-black text-[11px] font-bold px-5 py-2.5 uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer">
+                Book Now
+              </Link>
             </div>
           </div>
         </div>
       )}
-    </nav>
+    </>
   );
 }

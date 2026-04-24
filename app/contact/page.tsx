@@ -1,13 +1,8 @@
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Clock, Globe, Share2, CheckCircle } from "lucide-react";
 import { SALON_INFO } from "@/lib/data";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.1, ease: "easeOut" } }),
-};
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -25,20 +20,13 @@ export default function ContactPage() {
   return (
     <>
       <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
-        <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
-          className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
-          Get in Touch
-        </motion.p>
-        <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
-          className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
-          Contact Us
-        </motion.h1>
+        <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Get in Touch</p>
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Contact Us</h1>
       </section>
 
       <section className="py-16 px-6 bg-black">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
-          {/* Info */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+          <div>
             <h2 className="font-serif text-3xl font-bold text-white mb-10">Visit Us</h2>
 
             <div className="space-y-8">
@@ -111,10 +99,10 @@ export default function ContactPage() {
                 </a>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Form */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1}>
+          <div>
             <h2 className="font-serif text-3xl font-bold text-white mb-10">Send a Message</h2>
 
             {sent ? (
@@ -154,7 +142,7 @@ export default function ContactPage() {
                 </button>
               </form>
             )}
-          </motion.div>
+          </div>
         </div>
       </section>
 

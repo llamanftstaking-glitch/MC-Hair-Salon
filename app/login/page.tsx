@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { motion } from "framer-motion";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader } from "lucide-react";
@@ -37,12 +37,7 @@ export default function LoginPage() {
 
   return (
     <section className="min-h-screen flex items-center justify-center px-6 bg-[var(--mc-bg)] pt-20">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
-      >
+      <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-10">
           <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-3">Welcome Back</p>
@@ -87,7 +82,7 @@ export default function LoginPage() {
             <Link href="/signup" className="text-[var(--mc-accent)] hover:underline cursor-pointer">Create one</Link>
           </p>
         </form>
-      </motion.div>
+      </div>
     </section>
   );
 }

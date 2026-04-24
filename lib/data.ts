@@ -55,7 +55,17 @@ export const SERVICES = [
     items: [
       { name: "Eyelash Extensions", price: 150, description: "Full, natural-looking lash extensions" },
       { name: "Facial", price: 80, description: "Revitalizing facial treatment" },
-      { name: "Makeup Application", price: 75, description: "Professional makeup by our artists" },
+    ],
+  },
+  {
+    category: "Makeup",
+    icon: "brush",
+    items: [
+      { name: "Makeup Application", price: 75, description: "Day-to-night glam by our resident makeup artist" },
+      { name: "Special Event Makeup", price: 150, description: "Red-carpet ready for galas, parties & milestones" },
+      { name: "Bridal Makeup", price: 200, description: "Flawless bridal looks — trial session available" },
+      { name: "Airbrush Makeup", price: 125, description: "Ultra-smooth finish, long-wearing formula" },
+      { name: "Makeup Lesson (1 hr)", price: 100, description: "Personalized technique coaching, one-on-one" },
     ],
   },
 ];
@@ -89,6 +99,25 @@ export const TEAM = [
     specialties: ["Men's Cuts", "Fades", "Styling"],
     image: "/instagram/mchairsalonspa_1526678565_1782231439342285913_509340228.jpg",
   },
+  {
+    name: "Isabella",
+    role: "Resident Makeup Artist",
+    bio: "Isabella is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry, she tailors every look to your unique features and personal style.",
+    specialties: ["Bridal Makeup", "Airbrush", "Special Events", "Makeup Lessons"],
+    image: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
+    isMakeupArtist: true,
+  },
+];
+
+export const MAKEUP_GALLERY = [
+  { src: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg", alt: "Makeup artistry by Isabella", label: "Glam" },
+  { src: "/instagram/mchairsalonspa_1594335004_2349774783581733215_509340228.jpg", alt: "Special event look", label: "Event" },
+  { src: "/instagram/mchairsalonspa_1584025690_2263293995516827575_509340228.jpg", alt: "Bridal makeup", label: "Bridal" },
+  { src: "/instagram/mchairsalonspa_1583862336_2261923681251816316_509340228.jpg", alt: "Editorial makeup look", label: "Editorial" },
+  { src: "/instagram/mchairsalonspa_1583176666_2256171862533820128_509340228.jpg", alt: "Natural everyday glam", label: "Natural" },
+  { src: "/instagram/mchairsalonspa_1581106935_2238809697447493007_509340228.jpg", alt: "Airbrush finish", label: "Airbrush" },
+  { src: "/instagram/mchairsalonspa_1579289740_2223565962392628495_509340228.jpg", alt: "Smoky eye look", label: "Glam" },
+  { src: "/instagram/mchairsalonspa_1568744468_2135105812317486094_509340228.jpg", alt: "Bold lip and contour", label: "Bold" },
 ];
 
 export const GALLERY_IMAGES = [

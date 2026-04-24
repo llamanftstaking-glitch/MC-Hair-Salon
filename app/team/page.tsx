@@ -7,7 +7,7 @@ import { TEAM } from "@/lib/data";
 export default function TeamPage() {
   return (
     <>
-      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-black text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">The Experts</p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Our Team</h1>
         <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">

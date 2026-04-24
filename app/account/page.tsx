@@ -52,7 +52,7 @@ export default async function AccountPage() {
             </div>
             <div className="sm:text-right">
               <p className="text-black/60 text-xs mb-2">{tier === "Platinum" ? "Max tier reached!" : `${needed - customer.points} pts to ${next}`}</p>
-              <div className="w-48 h-2 bg-black/20 rounded-full overflow-hidden">
+              <div className="w-full sm:w-48 h-2 bg-black/20 rounded-full overflow-hidden">
                 <div className="h-full bg-black/60 rounded-full transition-all" style={{ width: `${progress}%` }} />
               </div>
             </div>

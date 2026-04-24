@@ -24,13 +24,13 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="pt-32 pb-16 px-6 bg-black text-center">
+      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
           className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
           Get in Touch
         </motion.p>
         <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
-          className="font-serif text-5xl md:text-6xl font-bold text-white mb-6">
+          className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
           Contact Us
         </motion.h1>
       </section>

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Palette } from "lucide-react";
 import { setTheme, getTheme, type Theme } from "@/lib/theme";
 
 const links = [
@@ -115,19 +115,22 @@ export default function Navbar() {
             Book Now
           </Link>
 
-          {/* Theme dots */}
-          <div className="flex items-center gap-1.5">
+          {/* Theme selector — elevated pill */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--mc-border)] bg-[var(--mc-surface)]/60 backdrop-blur-sm">
+            <Palette size={11} className="text-[var(--mc-text-dim)]" />
             {THEMES.map((t) => (
               <button key={t.id} onClick={() => changeTheme(t.id)}
                 aria-label={`${t.label} theme`} title={t.label}
-                style={{
-                  width: 11, height: 11, borderRadius: "50%",
-                  background: t.color,
-                  border: theme === t.id ? `2px solid ${t.ring}` : "2px solid rgba(128,128,128,0.4)",
+                style={{ width: 44, height: 44, background: "transparent", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                <span style={{
+                  width: 10, height: 10, borderRadius: "50%", background: t.color, flexShrink: 0, display: "block",
+                  border: theme === t.id ? `2px solid ${t.ring}` : "2px solid rgba(128,128,128,0.35)",
                   outline: theme === t.id ? `2px solid ${t.ring}` : "none",
-                  outlineOffset: 2, cursor: "pointer", transition: "all 0.2s", padding: 0, flexShrink: 0,
-                }}
-              />
+                  outlineOffset: 2, transition: "all 0.2s",
+                  boxShadow: theme === t.id ? `0 0 6px ${t.ring}66` : "none",
+                }} />
+              </button>
             ))}
           </div>
 
@@ -181,19 +184,28 @@ export default function Navbar() {
             Book Now
           </Link>
 
-          {/* Theme dots */}
-          <div className="flex items-center gap-3 pt-2 border-t border-[var(--mc-border)]">
-            <span className="text-[var(--mc-text-dim)] text-xs uppercase tracking-widest">Theme</span>
-            {THEMES.map((t) => (
-              <button key={t.id} onClick={() => changeTheme(t.id)} title={t.label}
-                style={{
-                  width: 14, height: 14, borderRadius: "50%", background: t.color,
-                  border: theme === t.id ? `2px solid ${t.ring}` : "2px solid rgba(128,128,128,0.4)",
-                  outline: theme === t.id ? `2px solid ${t.ring}` : "none",
-                  outlineOffset: 2, cursor: "pointer", padding: 0,
-                }}
-              />
-            ))}
+          {/* Theme selector — mobile */}
+          <div className="pt-2 border-t border-[var(--mc-border)]">
+            <p className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-[0.3em] mb-3">Appearance</p>
+            <div className="flex items-center gap-2">
+              {THEMES.map((t) => (
+                <button key={t.id} onClick={() => changeTheme(t.id)} title={t.label}
+                  className="flex flex-col items-center gap-1.5 cursor-pointer"
+                  style={{ background: "transparent", border: "none", padding: "8px 10px" }}
+                >
+                  <span style={{
+                    width: 20, height: 20, borderRadius: "50%", background: t.color, flexShrink: 0, display: "block",
+                    border: theme === t.id ? `2px solid ${t.ring}` : "2px solid rgba(128,128,128,0.35)",
+                    outline: theme === t.id ? `2px solid ${t.ring}` : "none",
+                    outlineOffset: 2, transition: "all 0.2s",
+                    boxShadow: theme === t.id ? `0 0 8px ${t.ring}66` : "none",
+                  }} />
+                  <span style={{ fontSize: 9, textTransform: "uppercase", letterSpacing: "0.1em", color: theme === t.id ? "var(--mc-accent)" : "var(--mc-text-dim)", transition: "color 0.2s" }}>
+                    {t.label}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

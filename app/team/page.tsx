@@ -12,13 +12,13 @@ const fadeUp = {
 export default function TeamPage() {
   return (
     <>
-      <section className="pt-32 pb-16 px-6 bg-black text-center">
+      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
           className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
           The Experts
         </motion.p>
         <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
-          className="font-serif text-5xl md:text-6xl font-bold text-white mb-6">
+          className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
           Our Team
         </motion.h1>
         <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2}
@@ -33,7 +33,7 @@ export default function TeamPage() {
             <motion.div key={member.name}
               variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
               className="luxury-card overflow-hidden group">
-              <div className="relative h-80 overflow-hidden">
+              <div className="relative h-64 sm:h-80 overflow-hidden">
                 <Image
                   src={member.image} alt={member.name} fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -44,7 +44,7 @@ export default function TeamPage() {
                   <p className="text-[var(--mc-accent)] text-sm uppercase tracking-widest mt-1">{member.role}</p>
                 </div>
               </div>
-              <div className="p-8">
+              <div className="p-6 sm:p-8">
                 <p className="text-[var(--mc-muted)] text-sm leading-relaxed mb-6">{member.bio}</p>
                 <div>
                   <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">Specialties</p>

@@ -74,7 +74,7 @@ export default function HeroLogo() {
 
         {/* Location tag */}
         <motion.p
-          className="uppercase tracking-[0.5em] text-xs font-semibold mt-6"
+          className="uppercase tracking-[0.3em] sm:tracking-[0.5em] text-[10px] sm:text-xs font-semibold mt-6"
           style={{ color: "var(--mc-accent)" }}
           initial={{ opacity: 0, y: 8 }}
           animate={ready ? { opacity: 1, y: 0 } : {}}
@@ -85,7 +85,7 @@ export default function HeroLogo() {
 
         {/* Headline */}
         <motion.h1
-          className="font-serif text-5xl md:text-7xl font-bold text-center mt-6 leading-tight"
+          className="font-serif text-4xl sm:text-5xl md:text-7xl font-bold text-center mt-6 leading-tight px-4"
           initial={{ opacity: 0, y: 16 }}
           animate={ready ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.9, delay: 1.9, ease: "easeOut" }}
@@ -103,7 +103,7 @@ export default function HeroLogo() {
           transition={{ duration: 0.9, delay: 2.2, ease: "easeOut" }}
         >
           <div className="h-px w-10" style={{ background: `linear-gradient(90deg, transparent, var(--mc-accent))` }} />
-          <p className="text-xs uppercase tracking-[0.35em]" style={{ color: "var(--mc-muted)" }}>
+          <p className="text-xs uppercase tracking-[0.2em] sm:tracking-[0.35em]" style={{ color: "var(--mc-muted)" }}>
             Premium Hair & Spa Services
           </p>
           <div className="h-px w-10" style={{ background: `linear-gradient(90deg, var(--mc-accent), transparent)` }} />

@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "name": "Raymond Quinonnes",
+    "email": "hello@gizerstudio.com",
+    "phone": "9299300229",
+    "passwordHash": "$2b$10$gJ2hZxjGljrNpd.LajjIm.Cr0URgPeJhdI9nXXhoHKbB7Pmg4JWn6",
+    "id": "cust_1776984367169_az9b4",
+    "createdAt": "2026-04-23T22:46:07.169Z",
+    "points": 0,
+    "visits": 0,
+    "totalSpent": 0,
+    "tier": "Bronze",
+    "appointments": [],
+    "packages": [],
+    "rewards": []
+  }
+]

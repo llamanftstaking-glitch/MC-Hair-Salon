@@ -22,7 +22,7 @@ export default function GalleryPage() {
 
   return (
     <>
-      <section className="pt-32 pb-16 px-6 bg-black text-center">
+      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
         <div ref={headerRef}>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -36,7 +36,7 @@ export default function GalleryPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-serif text-5xl md:text-6xl font-bold text-white mb-4"
+            className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4"
           >
             Gallery
           </motion.h1>
@@ -70,7 +70,7 @@ export default function GalleryPage() {
               <button
                 key={cat}
                 onClick={() => setActiveFilter(cat)}
-                className={`cursor-pointer px-5 py-2 text-xs tracking-widest uppercase transition-all duration-200 border ${
+                className={`cursor-pointer px-5 py-3 text-xs tracking-widest uppercase transition-all duration-200 border ${
                   activeFilter === cat
                     ? "bg-[var(--mc-accent)] text-black border-[var(--mc-accent)] font-semibold"
                     : "bg-transparent border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]/50 hover:text-[var(--mc-accent)]"

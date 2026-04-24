@@ -26,8 +26,8 @@ export default function Home() {
       <HeroLogo />
 
       {/* STATS BAR */}
-      <section className="bg-[var(--mc-surface)] border-y border-[var(--mc-border)] py-8">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <section className="bg-[var(--mc-surface)] border-y border-[var(--mc-border)] py-6 sm:py-8">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 text-center">
           {[
             { value: "13+", label: "Years of Excellence" },
             { value: "5★", label: "Average Rating" },
@@ -43,18 +43,18 @@ export default function Home() {
       </section>
 
       {/* SERVICES PREVIEW */}
-      <section className="py-24 px-6 bg-black">
+      <section className="py-16 sm:py-24 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-            className="text-center mb-16">
+            className="text-center mb-10 sm:mb-16">
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">What We Offer</p>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold text-white">Our Services</h2>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">Our Services</h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {SERVICES.map((s, i) => (
               <motion.div key={s.category} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
-                className="luxury-card p-8 cursor-pointer">
+                className="luxury-card p-6 sm:p-8 cursor-pointer">
                 <div className="text-[var(--mc-accent)] mb-6">{iconMap[s.icon]}</div>
                 <h3 className="font-serif text-xl font-semibold text-white mb-3">{s.category}</h3>
                 <p className="text-[var(--mc-text-dim)] text-sm leading-relaxed mb-6">
@@ -77,19 +77,19 @@ export default function Home() {
       </section>
 
       {/* GALLERY PREVIEW */}
-      <section className="py-24 px-6 bg-[var(--mc-surface-dark)]">
+      <section className="py-16 sm:py-24 px-6 bg-[var(--mc-surface-dark)]">
         <div className="max-w-7xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-            className="text-center mb-16">
+            className="text-center mb-10 sm:mb-16">
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Our Work</p>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold text-white">Gallery</h2>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">Gallery</h2>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
             {GALLERY_IMAGES.slice(0, 6).map((img, i) => (
               <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i * 0.1}
                 className="relative overflow-hidden aspect-square group cursor-pointer">
-                <Image src={img.src} alt={img.alt} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                <Image src={img.src} alt={img.alt} fill sizes="(max-width: 640px) 50vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
               </motion.div>
             ))}
@@ -105,18 +105,18 @@ export default function Home() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-24 px-6 bg-black">
+      <section className="py-16 sm:py-24 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}
-            className="text-center mb-16">
+            className="text-center mb-10 sm:mb-16">
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Client Love</p>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold text-white">What They Say</h2>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">What They Say</h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {TESTIMONIALS.map((t, i) => (
               <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i}
-                className="luxury-card p-8">
+                className="luxury-card p-6 sm:p-8">
                 <div className="flex gap-1 mb-6">
                   {Array.from({ length: t.rating }).map((_, j) => (
                     <Star key={j} size={16} className="fill-[var(--mc-accent)] text-[var(--mc-accent)]" />
@@ -136,17 +136,17 @@ export default function Home() {
       <NewsletterStrip />
 
       {/* BOOK CTA */}
-      <section className="py-24 px-6 relative overflow-hidden"
+      <section className="py-16 sm:py-24 px-6 relative overflow-hidden"
         style={{ background: "linear-gradient(135deg, #0a0800 0%, #1a1200 50%, #0a0800 100%)" }}>
         <div className="absolute inset-0 opacity-20"
           style={{ backgroundImage: "radial-gradient(circle at 50% 50%, var(--mc-accent) 0%, transparent 60%)" }} />
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-6">Ready to Transform?</p>
-            <h2 className="font-serif text-4xl md:text-6xl font-bold text-white mb-8">
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-6 sm:mb-8">
               Book Your <span className="gold-gradient">Experience</span>
             </h2>
-            <p className="text-[var(--mc-muted)] text-lg mb-10 leading-relaxed">
+            <p className="text-[var(--mc-muted)] text-base sm:text-lg mb-8 sm:mb-10 leading-relaxed">
               Reserve your appointment online or call us at {SALON_INFO.phone}. Walk-ins always welcome.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

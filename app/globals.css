@@ -139,17 +139,15 @@ body {
 }
 
 /* ── LOGO VISIBILITY PER THEME ─────────────────────────────────────────────── */
-.logo-bw   { display: block; }
-.logo-gold { display: none; }
-.logo-light{ display: none; }
+/* White logo (bw) used for all themes — inverted to dark on lavender */
+.logo-bw    { display: block; }
+.logo-light { display: none; }
 
-html[data-theme="gold"] .logo-bw    { display: none; }
-html[data-theme="gold"] .logo-gold  { display: block; }
-html[data-theme="gold"] .logo-light { display: none; }
-
-html[data-theme="light"] .logo-bw    { display: none; }
-html[data-theme="light"] .logo-gold  { display: none; }
-html[data-theme="light"] .logo-light { display: block; }
+/* Lavender: invert white logo to black, blend away the white background */
+html[data-theme="light"] .logo-bw {
+  filter: invert(1);
+  mix-blend-mode: multiply;
+}
 
 /* ── LIGHT MODE BG OVERRIDES ───────────────────────────────────────────────── */
 html[data-theme="light"] .bg-black {

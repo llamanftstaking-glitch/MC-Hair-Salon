@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -76,8 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Prevents theme flash on load */}
-        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('mc-theme')||'bw';if(t!=='bw')document.documentElement.setAttribute('data-theme',t);}catch(e){}` }} />
+        <Script id="theme-init" strategy="beforeInteractive">{`try{var t=localStorage.getItem('mc-theme')||'bw';if(t!=='bw')document.documentElement.setAttribute('data-theme',t);}catch(e){}`}</Script>
       </head>
       <body>
         <JsonLd />

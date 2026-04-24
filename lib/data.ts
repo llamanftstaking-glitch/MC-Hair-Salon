@@ -109,6 +109,87 @@ export const TEAM = [
   },
 ];
 
+export const WEDDING_SERVICES = [
+  {
+    category: "Bridal Hair",
+    icon: "💍",
+    services: [
+      { name: "Bridal Updo & Style", price: 150, note: "Day-of styling, includes consultation" },
+      { name: "Bridal Hair Trial", price: 120, note: "Recommended 4–8 weeks before the wedding" },
+      { name: "Bridesmaid Hair (each)", price: 85, note: "Updo or blowout styling" },
+      { name: "Mother of the Bride / Groom", price: 100, note: "Updo or elegant styling" },
+      { name: "Flower Girl Style", price: 45, note: "Simple updo or curls, ages 3–12" },
+    ],
+  },
+  {
+    category: "Bridal Makeup",
+    icon: "✨",
+    services: [
+      { name: "Bridal Makeup", price: 200, note: "Full glam application, long-lasting" },
+      { name: "Bridal Makeup Trial", price: 150, note: "Preview your look before the big day" },
+      { name: "Airbrush Bridal Makeup", price: 225, note: "Ultra-smooth, camera-ready finish" },
+      { name: "Bridesmaid Makeup (each)", price: 125, note: "Coordinated looks for the whole party" },
+      { name: "Mother of the Bride Makeup", price: 125, note: "Elegant, age-appropriate artistry" },
+      { name: "Flower Girl Makeup", price: 50, note: "Light, natural look for young ones" },
+    ],
+  },
+  {
+    category: "Pre-Wedding Prep",
+    icon: "🌿",
+    services: [
+      { name: "Bridal Facial", price: 120, note: "Glow-boosting treatment, 2 weeks before" },
+      { name: "Eyelash Extensions (bridal)", price: 150, note: "Full set for a wide-eyed, lush look" },
+      { name: "Bridal Balayage / Color", price: 150, note: "Dimensional color for the big day" },
+      { name: "Deep Conditioning Treatment", price: 60, note: "Silky, healthy hair for styling day" },
+    ],
+  },
+  {
+    category: "On-Location Services",
+    icon: "🏨",
+    services: [
+      { name: "On-Location Travel Fee", price: 150, note: "We come to your venue — NYC area" },
+      { name: "On-Location Bridal Style", price: 175, note: "Hair at your venue or hotel" },
+      { name: "On-Location Bridal Makeup", price: 225, note: "Makeup at your venue or hotel" },
+    ],
+  },
+];
+
+export const WEDDING_TESTIMONIALS = [
+  {
+    name: "Alexandra M.",
+    wedding: "September 2023",
+    review: "MC Hair Salon made my wedding morning absolutely magical. Kato did my updo — I cried happy tears when I saw myself. The entire team was calm, professional, and made every bridesmaid feel beautiful.",
+    rating: 5,
+  },
+  {
+    name: "Danielle R.",
+    wedding: "June 2023",
+    review: "Isabella's bridal makeup was flawless. We did a trial 6 weeks before and she nailed my vision on the first try. I looked like myself — but the most radiant version. Cannot recommend enough.",
+    rating: 5,
+  },
+  {
+    name: "Priya S.",
+    wedding: "October 2022",
+    review: "We had 8 people in the bridal party and the team handled everything seamlessly. They came to our hotel in the Upper East Side and were done in 3 hours flat. Impeccable service.",
+    rating: 5,
+  },
+  {
+    name: "Melissa C.",
+    wedding: "April 2024",
+    review: "The bridal hair trial was one of the most enjoyable appointments I've ever had. Megan listened to exactly what I wanted and even improved on my inspiration photos. Book them — you won't regret it.",
+    rating: 5,
+  },
+];
+
+export const WEDDING_GALLERY = [
+  { src: "/instagram/mchairsalonspa_1774207263_3858649997122708575_509340228.jpg", alt: "Bridal updo" },
+  { src: "/instagram/mchairsalonspa_1732646348_3510014434303531709_509340228.jpg", alt: "Wedding day styling" },
+  { src: "/instagram/mchairsalonspa_1708007392_3303327885522806092_509340228.jpg", alt: "Bridal hair" },
+  { src: "/instagram/mchairsalonspa_1672866306_3008543095357388367_509340228.jpg", alt: "Bridal glam" },
+  { src: "/instagram/mchairsalonspa_1664479225_2938187155735434916_509340228.jpg", alt: "Bridal makeup" },
+  { src: "/instagram/mchairsalonspa_1645811757_2781593085253597123_509340228.jpg", alt: "Bridal party styling" },
+];
+
 export const MAKEUP_GALLERY = [
   { src: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg", alt: "Makeup artistry by Isabella", label: "Glam" },
   { src: "/instagram/mchairsalonspa_1594335004_2349774783581733215_509340228.jpg", alt: "Special event look", label: "Event" },

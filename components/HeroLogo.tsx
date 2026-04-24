@@ -9,7 +9,8 @@ export default function HeroLogo() {
   const sweepControls = useAnimation();
 
   useEffect(() => {
-    setReady(true);
+    const t = setTimeout(() => setReady(true), 200);
+    return () => clearTimeout(t);
   }, []);
 
   /* Light sweep repeats every 8s */

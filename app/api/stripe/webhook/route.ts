@@ -46,8 +46,24 @@ export async function POST(req: NextRequest) {
         }
 
         if (type === "gift_card") {
-          // TODO: generate and email a gift card code to the customer
-          console.log(`[stripe/webhook] Gift card purchased — amount=$${session.metadata?.amount}, session=${session.id}`);
+          const m = session.metadata ?? {};
+          const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+          await fetch(`${BASE}/api/gift-card`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "create",
+              amount: Number(m.amount ?? 0),
+              recipientName:  m.recipientName  ?? "",
+              recipientEmail: m.recipientEmail ?? "",
+              recipientPhone: m.recipientPhone ?? "",
+              senderName:     m.senderName     ?? "",
+              message:        m.message        ?? "",
+              deliveryMethod: m.deliveryMethod ?? "email",
+              stripeSessionId: session.id,
+            }),
+          });
+          console.log(`[stripe/webhook] Gift card created and sent for session=${session.id}`);
         }
 
         if (type === "service" && bookingId) {

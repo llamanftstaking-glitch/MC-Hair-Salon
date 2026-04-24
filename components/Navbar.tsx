@@ -16,8 +16,9 @@ const navLinks = [
 ];
 
 const secondaryLinks = [
-  { href: "/book",    label: "Book Appointment" },
-  { href: "/account", label: "My Account"       },
+  { href: "/book",      label: "Book Appointment" },
+  { href: "/gift-card", label: "Gift Cards"        },
+  { href: "/account",   label: "My Account"        },
 ];
 
 const THEMES: { id: Theme; label: string; color: string; ring: string }[] = [

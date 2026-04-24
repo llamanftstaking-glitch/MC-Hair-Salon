@@ -6,7 +6,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { type, bookingId, bookingDetails, giftCardAmount, customerEmail, customerName } = body;
+    const { type, bookingId, bookingDetails, giftCardAmount, customerEmail, customerName,
+            recipientName, recipientEmail, recipientPhone, senderName, message, deliveryMethod } = body;
 
     if (!type) {
       return NextResponse.json({ error: "Missing checkout type" }, { status: 400 });
@@ -80,8 +81,12 @@ export async function POST(req: NextRequest) {
         metadata: {
           type: "gift_card",
           amount: String(giftCardAmount),
-          recipientName: customerName ?? "",
-          customerEmail: customerEmail ?? "",
+          recipientName:  recipientName  ?? customerName ?? "",
+          recipientEmail: recipientEmail ?? customerEmail ?? "",
+          recipientPhone: recipientPhone ?? "",
+          senderName:     senderName     ?? customerName ?? "",
+          message:        (message ?? "").slice(0, 490),
+          deliveryMethod: deliveryMethod ?? "email",
         },
         success_url: `${BASE_URL}/gift-card/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url:  `${BASE_URL}/gift-card?cancelled=true`,

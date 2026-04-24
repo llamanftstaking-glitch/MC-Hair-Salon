@@ -7,7 +7,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { type, bookingId, bookingDetails, giftCardAmount, customerEmail, customerName,
-            recipientName, recipientEmail, recipientPhone, senderName, message, deliveryMethod } = body;
+            recipientName, recipientEmail, recipientPhone, senderName, message, deliveryMethod,
+            packageId, customerId } = body;
 
     if (!type) {
       return NextResponse.json({ error: "Missing checkout type" }, { status: 400 });
@@ -127,6 +128,42 @@ export async function POST(req: NextRequest) {
         },
         success_url: `${BASE_URL}/account?payment=success`,
         cancel_url:  `${BASE_URL}/book`,
+      });
+
+      return NextResponse.json({ url: session.url, sessionId: session.id });
+    }
+
+    // ── Package Purchase ─────────────────────────────────────────────────────
+    if (type === "package") {
+      const { PACKAGES } = await import("@/lib/data");
+      const pkg = PACKAGES.find(p => p.id === packageId);
+      if (!pkg) return NextResponse.json({ error: "Package not found" }, { status: 404 });
+
+      const session = await (await getStripe()).checkout.sessions.create({
+        mode: "payment",
+        payment_method_types: ["card"],
+        customer_email: customerEmail,
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: "usd",
+              unit_amount: pkg.price * 100,
+              product_data: {
+                name: `MC Hair Salon — ${pkg.name}`,
+                description: `${pkg.tagline} · ${pkg.sessions} sessions · Valid ${pkg.validityDays} days`,
+              },
+            },
+          },
+        ],
+        metadata: {
+          type: "package",
+          packageId: pkg.id,
+          customerId: customerId ?? "",
+          customerName: customerName ?? "",
+        },
+        success_url: `${BASE_URL}/account/packages?purchased=true`,
+        cancel_url:  `${BASE_URL}/packages`,
       });
 
       return NextResponse.json({ url: session.url, sessionId: session.id });

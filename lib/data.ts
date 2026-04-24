@@ -109,6 +109,122 @@ export const TEAM = [
   },
 ];
 
+export interface PackageDef {
+  id: string;
+  name: string;
+  tagline: string;
+  price: number;
+  originalValue: number;
+  sessions: number;
+  services: string[];
+  highlight: string;
+  badge?: string;
+  validityDays: number;
+}
+
+export const PACKAGES: PackageDef[] = [
+  {
+    id: "pkg_blowout_5",
+    name: "Blowout Bundle",
+    tagline: "Your weekly glow, locked in",
+    price: 149,
+    originalValue: 165,
+    sessions: 5,
+    services: ["5 × Blow Out & Style"],
+    highlight: "Save $16 — perfect for busy New Yorkers",
+    validityDays: 180,
+  },
+  {
+    id: "pkg_color_3",
+    name: "Color Club",
+    tagline: "Vibrant, dimensional color all year",
+    price: 235,
+    originalValue: 255,
+    sessions: 3,
+    services: ["3 × Full Color (L'Oréal Majerel/Inoa)"],
+    highlight: "Save $20 — stay fresh between seasons",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_glam_3",
+    name: "Glam Pack",
+    tagline: "Look your best for every occasion",
+    price: 199,
+    originalValue: 225,
+    sessions: 3,
+    services: ["3 × Makeup Application by Isabella"],
+    highlight: "Save $26 — events, date nights, and more",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_bridal_prep",
+    name: "Bridal Prep",
+    tagline: "Everything you need before the big day",
+    price: 449,
+    originalValue: 500,
+    sessions: 4,
+    services: [
+      "1 × Bridal Hair Trial",
+      "1 × Bridal Updo (wedding day)",
+      "1 × Bridal Makeup Trial",
+      "1 × Bridal Makeup (wedding day)",
+    ],
+    highlight: "Save $51 — the complete bridal beauty plan",
+    badge: "Most Popular",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_full_experience",
+    name: "The Full Experience",
+    tagline: "Head-to-toe luxury in one package",
+    price: 279,
+    originalValue: 325,
+    sessions: 4,
+    services: [
+      "1 × Women's Cut & Style",
+      "1 × Full Color",
+      "1 × Blow Out & Style",
+      "1 × Facial",
+    ],
+    highlight: "Save $46 — the ultimate refresh",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_lash_love",
+    name: "Lash Love",
+    tagline: "Full, lush lashes every month",
+    price: 269,
+    originalValue: 300,
+    sessions: 3,
+    services: ["1 × Full Eyelash Extension Set", "2 × Lash Fills"],
+    highlight: "Save $31 — always camera-ready",
+    validityDays: 180,
+  },
+  {
+    id: "pkg_vip_blowout",
+    name: "VIP Year",
+    tagline: "A whole year of flawless hair",
+    price: 329,
+    originalValue: 396,
+    sessions: 12,
+    services: ["12 × Blow Out & Style (monthly)"],
+    highlight: "Save $67 — our best blowout value",
+    badge: "Best Value",
+    validityDays: 365,
+  },
+  {
+    id: "pkg_wellness",
+    name: "Wellness Ritual",
+    tagline: "Skincare that transforms",
+    price: 210,
+    originalValue: 240,
+    sessions: 3,
+    services: ["3 × Revitalizing Facial"],
+    highlight: "Save $30 — glow year-round",
+    validityDays: 365,
+  },
+];
+
 export const WEDDING_SERVICES = [
   {
     category: "Bridal Hair",

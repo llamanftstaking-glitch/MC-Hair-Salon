@@ -71,6 +71,19 @@ export async function POST(req: NextRequest) {
           console.log(`[stripe/webhook] Booking ${bookingId} confirmed after full payment`);
         }
 
+        if (type === "package") {
+          const { packageId, customerId } = session.metadata ?? {};
+          if (packageId && customerId) {
+            const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+            await fetch(`${BASE}/api/packages`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ customerId, packageId, stripeSessionId: session.id }),
+            });
+            console.log(`[stripe/webhook] Package ${packageId} assigned to customer ${customerId}`);
+          }
+        }
+
         break;
       }
 

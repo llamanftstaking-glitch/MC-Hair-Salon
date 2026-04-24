@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
 import {
   Calendar, Users, TrendingUp, Clock, Check, X, Trash2,
   RefreshCw, Mail, Send, Bell, UserCheck, BarChart2, Plus, Loader
@@ -165,7 +164,7 @@ export default function AdminPage() {
 
         {/* ── RESERVATIONS ── */}
         {tab === "reservations" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <div>
             <div className="flex gap-3 mb-6 flex-wrap">
               {(["all", "pending", "confirmed", "cancelled"] as const).map(f => (
                 <button key={f} onClick={() => setFilter(f)}
@@ -238,12 +237,12 @@ export default function AdminPage() {
                 ))}
               </div>
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* ── CLIENTS ── */}
         {tab === "clients" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <div>
             <div className="mb-6 flex items-center justify-between">
               <p className="text-[#555] text-sm">{uniqueClients.length} unique client{uniqueClients.length !== 1 ? "s" : ""}</p>
             </div>
@@ -292,12 +291,12 @@ export default function AdminPage() {
                 })}
               </div>
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* ── NEWSLETTER ── */}
         {tab === "newsletter" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div>
 
             {/* Left — Compose */}
             <div className="space-y-6">
@@ -394,12 +393,12 @@ export default function AdminPage() {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* ── REPORTS ── */}
         {tab === "reports" && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+          <div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 { icon: <TrendingUp size={22} />, label: "Est. Revenue", value: `$${(confirmed * 85).toLocaleString()}`, sub: "Based on confirmed bookings" },
@@ -456,7 +455,7 @@ export default function AdminPage() {
                 )}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

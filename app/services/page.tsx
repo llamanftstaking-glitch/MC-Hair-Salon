@@ -1,13 +1,8 @@
 "use client";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Scissors, Wind, Palette, Sparkles, Check } from "lucide-react";
 import { SERVICES } from "@/lib/data";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.1, ease: "easeOut" } }),
-};
 
 const iconMap: Record<string, React.ReactNode> = {
   scissors: <Scissors size={24} />,
@@ -21,18 +16,11 @@ export default function ServicesPage() {
     <>
       {/* Header */}
       <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
-        <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={0}
-          className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
-          What We Offer
-        </motion.p>
-        <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1}
-          className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">
-          Services & Pricing
-        </motion.h1>
-        <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2}
-          className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed text-sm sm:text-base">
+        <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">What We Offer</p>
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Services & Pricing</h1>
+        <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed text-sm sm:text-base">
           All prices listed are starting rates. Final pricing may vary based on hair length, density, and complexity.
-        </motion.p>
+        </p>
       </section>
 
       {/* Gold divider */}
@@ -42,8 +30,7 @@ export default function ServicesPage() {
       <section className="py-14 sm:py-20 px-4 sm:px-6 bg-black">
         <div className="max-w-5xl mx-auto space-y-14 sm:space-y-20">
           {SERVICES.map((category, ci) => (
-            <motion.div key={category.category}
-              variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={ci}>
+            <div key={category.category}>
               {/* Category header */}
               <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10 pb-4 border-b border-[var(--mc-border)]">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 border border-[var(--mc-accent)] flex items-center justify-center text-[var(--mc-accent)] shrink-0">
@@ -55,8 +42,7 @@ export default function ServicesPage() {
               {/* Items */}
               <div className="space-y-3 sm:space-y-4">
                 {category.items.map((item, ii) => (
-                  <motion.div key={item.name}
-                    variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={ii * 0.1}
+                  <div key={item.name}
                     className="flex items-center justify-between p-4 sm:p-6 luxury-card group gap-3">
                     <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
                       <div className="w-5 h-5 border border-[var(--mc-accent)] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[var(--mc-accent)] transition-colors">
@@ -70,10 +56,10 @@ export default function ServicesPage() {
                     <div className="text-right shrink-0 ml-2 sm:ml-8">
                       <p className="gold-gradient font-serif text-xl sm:text-2xl font-bold">${item.price}+</p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>

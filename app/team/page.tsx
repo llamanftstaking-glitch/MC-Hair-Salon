@@ -1,10 +1,12 @@
-"use client";
 import Image from "next/image";
 import Link from "next/link";
-import { TEAM } from "@/lib/data";
+import { getAllStaff } from "@/lib/staff-data";
 
+export const dynamic = "force-dynamic";
 
-export default function TeamPage() {
+export default async function TeamPage() {
+  const team = getAllStaff();
+
   return (
     <>
       <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-black text-center">
@@ -17,14 +19,21 @@ export default function TeamPage() {
 
       <section className="py-20 px-6 bg-black">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
-          {TEAM.map((member, i) => (
-            <div key={member.name}
-              className="luxury-card overflow-hidden group">
-              <div className="relative h-64 sm:h-80 overflow-hidden">
-                <Image
-                  src={member.image} alt={member.name} fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+          {team.map((member) => (
+            <div key={member.id} className="luxury-card overflow-hidden group">
+              <div className="relative h-64 sm:h-80 overflow-hidden bg-[var(--mc-surface-dark)]">
+                {member.image ? (
+                  <Image
+                    src={member.image} alt={member.name} fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-6xl text-[var(--mc-accent)] font-serif font-bold">
+                      {member.name.charAt(0)}
+                    </span>
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                 <div className="absolute bottom-6 left-6">
                   <p className="font-serif text-2xl font-bold text-white">{member.name}</p>
@@ -33,6 +42,24 @@ export default function TeamPage() {
               </div>
               <div className="p-6 sm:p-8">
                 <p className="text-[var(--mc-muted)] text-sm leading-relaxed mb-6">{member.bio}</p>
+
+                {member.portfolio && member.portfolio.length > 0 && (
+                  <div className="mb-6">
+                    <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">Portfolio</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {member.portfolio.slice(0, 4).map((item, i) => (
+                        <div key={i} className="aspect-square overflow-hidden bg-[var(--mc-surface-dark)] relative">
+                          {item.type === "video" ? (
+                            <video src={item.src} className="w-full h-full object-cover" muted playsInline />
+                          ) : (
+                            <Image src={item.src} alt={item.caption || member.name} fill className="object-cover" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">Specialties</p>
                   <div className="flex flex-wrap gap-2">

@@ -1,0 +1,100 @@
+import fs from "fs";
+import path from "path";
+
+export interface PortfolioItem {
+  src: string;
+  type: "image" | "video";
+  caption?: string;
+}
+
+export interface StaffMember {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  specialties: string[];
+  image: string;
+  portfolio: PortfolioItem[];
+  isMakeupArtist?: boolean;
+  order?: number;
+}
+
+const FILE = path.join(process.cwd(), "data/staff.json");
+
+const DEFAULT: StaffMember[] = [
+  {
+    id: "kato", name: "Kato", role: "Master Stylist",
+    bio: "With over a decade of experience, Kato specializes in precision cuts and advanced color techniques. A client favorite known for attention to detail.",
+    specialties: ["Precision Cuts", "Balayage", "Color Correction"],
+    image: "/instagram/mchairsalonspa_1550078255_1978522269296608933_509340228.jpg",
+    portfolio: [], isMakeupArtist: false, order: 0,
+  },
+  {
+    id: "megan", name: "Megan", role: "Senior Stylist & Color Expert",
+    bio: "Megan brings artistry and technical excellence to every appointment. Her expertise in L'Oréal color systems makes her our go-to for transformational color.",
+    specialties: ["Hair Color", "Highlights", "Blowouts"],
+    image: "/instagram/mchairsalonspa_1533145637_1836481173825515947_509340228.jpg",
+    portfolio: [], isMakeupArtist: false, order: 1,
+  },
+  {
+    id: "sofia", name: "Sofia", role: "Spa Specialist",
+    bio: "Sofia creates a serene luxury experience for every guest. Specializing in spa treatments, lash extensions, and makeup artistry.",
+    specialties: ["Lash Extensions", "Facials", "Makeup"],
+    image: "/instagram/mchairsalonspa_1528578580_1798169924515305526_509340228.jpg",
+    portfolio: [], isMakeupArtist: false, order: 2,
+  },
+  {
+    id: "marcus", name: "Marcus", role: "Men's Grooming Expert",
+    bio: "Marcus is the Upper East Side's top choice for men's cuts and grooming. Precise, efficient, and always on trend.",
+    specialties: ["Men's Cuts", "Fades", "Styling"],
+    image: "/instagram/mchairsalonspa_1526678565_1782231439342285913_509340228.jpg",
+    portfolio: [], isMakeupArtist: false, order: 3,
+  },
+  {
+    id: "isabella", name: "Isabella", role: "Resident Makeup Artist",
+    bio: "Isabella is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry.",
+    specialties: ["Bridal Makeup", "Airbrush", "Special Events", "Makeup Lessons"],
+    image: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
+    portfolio: [], isMakeupArtist: true, order: 4,
+  },
+];
+
+function read(): StaffMember[] {
+  try {
+    if (!fs.existsSync(FILE)) return DEFAULT;
+    return JSON.parse(fs.readFileSync(FILE, "utf-8"));
+  } catch { return DEFAULT; }
+}
+
+function write(data: StaffMember[]): void {
+  fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
+}
+
+export function getAllStaff(): StaffMember[] {
+  return read().sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+}
+
+export function getStaffById(id: string): StaffMember | undefined {
+  return read().find(s => s.id === id);
+}
+
+export function createStaff(data: Omit<StaffMember, "id">): StaffMember {
+  const all = read();
+  const member: StaffMember = { ...data, id: `staff_${Date.now()}`, portfolio: data.portfolio ?? [], order: all.length };
+  all.push(member);
+  write(all);
+  return member;
+}
+
+export function updateStaff(id: string, updates: Partial<StaffMember>): StaffMember {
+  const all = read();
+  const idx = all.findIndex(s => s.id === id);
+  if (idx === -1) throw new Error(`Staff member ${id} not found`);
+  all[idx] = { ...all[idx], ...updates };
+  write(all);
+  return all[idx];
+}
+
+export function deleteStaff(id: string): void {
+  write(read().filter(s => s.id !== id));
+}

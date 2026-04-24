@@ -2,13 +2,16 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   Calendar, Users, TrendingUp, Clock, Check, X, Trash2,
-  RefreshCw, Mail, Send, Bell, UserCheck, BarChart2, Plus, Loader
+  RefreshCw, Mail, Send, Bell, UserCheck, BarChart2, Plus, Loader,
+  MessageSquare, MailCheck
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
+import type { ContactMessage } from "@/lib/messages";
 
-type Tab = "reservations" | "clients" | "newsletter" | "reports";
+type Tab = "reservations" | "clients" | "newsletter" | "reports" | "messages";
 
 interface Subscriber { id: string; email: string; name?: string; subscribedAt: string; active: boolean; }
+
 
 const statusColors: Record<string, string> = {
   pending: "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",
@@ -20,6 +23,7 @@ export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("reservations");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "cancelled">("all");
   const [emailStatus, setEmailStatus] = useState<Record<string, string>>({});
@@ -45,7 +49,12 @@ export default function AdminPage() {
     setSubscribers(await res.json());
   }, []);
 
-  useEffect(() => { fetchBookings(); fetchSubscribers(); }, [fetchBookings, fetchSubscribers]);
+  const fetchMessages = useCallback(async () => {
+    const res = await fetch("/api/contact");
+    setMessages(await res.json());
+  }, []);
+
+  useEffect(() => { fetchBookings(); fetchSubscribers(); fetchMessages(); }, [fetchBookings, fetchSubscribers, fetchMessages]);
 
   const updateStatus = async (id: string, status: Booking["status"]) => {
     await fetch("/api/bookings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }) });
@@ -66,6 +75,17 @@ export default function AdminPage() {
     if (!confirm("Delete this booking?")) return;
     await fetch("/api/bookings", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     fetchBookings();
+  };
+
+  const markMessageRead = async (id: string) => {
+    await fetch("/api/contact", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    fetchMessages();
+  };
+
+  const deleteMessage = async (id: string) => {
+    if (!confirm("Delete this message?")) return;
+    await fetch("/api/contact", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    fetchMessages();
   };
 
   const addManualSubscriber = async () => {
@@ -99,6 +119,7 @@ export default function AdminPage() {
   const confirmed = bookings.filter(b => b.status === "confirmed").length;
   const uniqueClients = [...new Map(bookings.map(b => [b.email, b])).values()];
   const activeSubscribers = subscribers.filter(s => s.active).length;
+  const unreadMessages = messages.filter(m => !m.read).length;
 
   const clientMap: Record<string, Booking[]> = {};
   bookings.forEach(b => { if (!clientMap[b.email]) clientMap[b.email] = []; clientMap[b.email].push(b); });
@@ -110,15 +131,16 @@ export default function AdminPage() {
   const stylistCount: Record<string, number> = {};
   bookings.forEach(b => { if (b.stylist) stylistCount[b.stylist] = (stylistCount[b.stylist] || 0) + 1; });
 
-  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
     { id: "reservations", label: "Reservations", icon: <Calendar size={15} /> },
     { id: "clients", label: "Clients", icon: <Users size={15} /> },
+    { id: "messages", label: "Messages", icon: <MessageSquare size={15} />, badge: unreadMessages },
     { id: "newsletter", label: "Newsletter", icon: <Mail size={15} /> },
     { id: "reports", label: "Reports", icon: <BarChart2 size={15} /> },
   ];
 
   return (
-    <div className="min-h-screen bg-black pt-20">
+    <div className="min-h-screen bg-black pt-28">
       {/* Header */}
       <div className="border-b border-[var(--mc-border)] bg-[var(--mc-surface-dark)]">
         <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between flex-wrap gap-4">
@@ -139,7 +161,7 @@ export default function AdminPage() {
           {[
             { icon: <Calendar size={20} />, label: "Total Bookings", value: bookings.length },
             { icon: <Clock size={20} />, label: "Pending", value: pending },
-            { icon: <UserCheck size={20} />, label: "Confirmed", value: confirmed },
+            { icon: <MessageSquare size={20} />, label: "Unread Messages", value: unreadMessages },
             { icon: <Bell size={20} />, label: "Subscribers", value: activeSubscribers },
           ].map((s) => (
             <div key={s.label} className="luxury-card p-5">
@@ -158,6 +180,11 @@ export default function AdminPage() {
                 tab === t.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
               }`}>
               {t.icon} {t.label}
+              {t.badge && t.badge > 0 ? (
+                <span className="ml-1 bg-[var(--mc-accent)] text-black text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0">
+                  {t.badge}
+                </span>
+              ) : null}
             </button>
           ))}
         </div>
@@ -228,6 +255,70 @@ export default function AdminPage() {
                           </button>
                         )}
                         <button onClick={() => deleteBooking(booking.id)}
+                          className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-red-500/50 hover:text-red-400 transition-all cursor-pointer">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── MESSAGES ── */}
+        {tab === "messages" && (
+          <div>
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+              <div>
+                <p className="text-white font-semibold text-lg flex items-center gap-2">
+                  <MessageSquare size={18} className="text-[var(--mc-accent)]" /> Help Desk
+                </p>
+                <p className="text-[#555] text-sm mt-1">{messages.length} total · {unreadMessages} unread</p>
+              </div>
+              <button onClick={fetchMessages}
+                className="flex items-center gap-2 border border-[var(--mc-border)] text-[var(--mc-text-dim)] px-4 py-2 text-sm hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                <RefreshCw size={14} /> Refresh
+              </button>
+            </div>
+
+            {messages.length === 0 ? (
+              <div className="text-center py-20 luxury-card">
+                <MessageSquare size={48} className="text-[#333] mx-auto mb-4" />
+                <p className="text-[#555]">No messages yet</p>
+                <p className="text-[#333] text-sm mt-1">Messages from the Contact page will appear here</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {[...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(msg => (
+                  <div key={msg.id} className={`luxury-card p-5 border-l-2 ${msg.read ? "border-l-[var(--mc-border)] opacity-70" : "border-l-[var(--mc-accent)]"}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <p className="text-white font-semibold">{msg.name}</p>
+                          {!msg.read && <span className="text-[10px] px-2 py-0.5 bg-[var(--mc-accent)]/15 border border-[var(--mc-accent)]/30 text-[var(--mc-accent)] uppercase tracking-wider">New</span>}
+                        </div>
+                        <p className="text-[var(--mc-text-dim)] text-sm mb-1">
+                          <a href={`mailto:${msg.email}`} className="hover:text-[var(--mc-accent)] transition-colors cursor-pointer">{msg.email}</a>
+                        </p>
+                        <p className="text-[#333] text-xs mb-3">{new Date(msg.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+                        <div className="bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] p-4 text-[var(--mc-muted)] text-sm leading-relaxed whitespace-pre-wrap">
+                          {msg.message}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {!msg.read && (
+                          <button onClick={() => markMessageRead(msg.id)} title="Mark as read"
+                            className="w-9 h-9 flex items-center justify-center border border-green-500/30 text-green-400 hover:bg-green-500/10 transition-colors cursor-pointer">
+                            <MailCheck size={16} />
+                          </button>
+                        )}
+                        <a href={`mailto:${msg.email}?subject=Re: Your message to MC Hair Salon`}
+                          className="w-9 h-9 flex items-center justify-center border border-[var(--mc-accent)]/30 text-[var(--mc-accent)] hover:bg-[var(--mc-accent)]/10 transition-colors cursor-pointer" title="Reply via email">
+                          <Send size={14} />
+                        </a>
+                        <button onClick={() => deleteMessage(msg.id)} title="Delete"
                           className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-red-500/50 hover:text-red-400 transition-all cursor-pointer">
                           <Trash2 size={16} />
                         </button>

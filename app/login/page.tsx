@@ -36,7 +36,7 @@ export default function LoginPage() {
   const labelClass = "block text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2";
 
   return (
-    <section className="min-h-screen flex items-center justify-center px-6 bg-[var(--mc-bg)] pt-20">
+    <section className="min-h-screen flex items-center justify-center px-6 bg-[var(--mc-bg)] pt-28">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-10">

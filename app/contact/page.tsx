@@ -7,11 +7,22 @@ import { SALON_INFO } from "@/lib/data";
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
-    setForm({ name: "", email: "", message: "" });
+    setSending(true);
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      setSent(true);
+      setForm({ name: "", email: "", message: "" });
+    } finally {
+      setSending(false);
+    }
   };
 
   const inputClass = "w-full bg-[var(--mc-surface)] border border-[var(--mc-border)] text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444]";
@@ -19,7 +30,7 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-black text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Get in Touch</p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Contact Us</h1>
       </section>
@@ -136,9 +147,9 @@ export default function ContactPage() {
                     placeholder="How can we help you?"
                     className={`${inputClass} resize-none`} />
                 </div>
-                <button type="submit"
-                  className="w-full gold-gradient-bg text-black font-bold py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity cursor-pointer">
-                  Send Message
+                <button type="submit" disabled={sending}
+                  className="w-full gold-gradient-bg text-black font-bold py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer">
+                  {sending ? "Sending..." : "Send Message"}
                 </button>
               </form>
             )}

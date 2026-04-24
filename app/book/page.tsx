@@ -47,7 +47,7 @@ export default function BookPage() {
 
   return (
     <>
-      <section className="pt-24 sm:pt-32 pb-12 sm:pb-16 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-black text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Reserve Your Visit</p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Book Appointment</h1>
         <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">

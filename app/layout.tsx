@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
+import CurlyBot from "@/components/CurlyBot";
 
 const SITE_URL = "https://mchairsalon.com";
 
@@ -83,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 <Navbar />
         <main>{children}</main>
         <Footer />
+        <CurlyBot />
       </body>
     </html>
   );

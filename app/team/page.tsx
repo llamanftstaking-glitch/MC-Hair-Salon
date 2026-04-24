@@ -1,8 +1,26 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getAllStaff } from "@/lib/staff-data";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Meet Our Team",
+  description:
+    "Meet the expert stylists and spa specialists at MC Hair Salon & Spa on the Upper East Side. Kato, Megan, Sofia, Marcus, and Isabella — each with years of luxury salon experience.",
+  keywords: [
+    "hair stylist Upper East Side NYC", "balayage specialist Manhattan",
+    "best hair colorist NYC", "makeup artist Upper East Side",
+    "lash specialist NYC", "hair salon team Manhattan",
+  ],
+  openGraph: {
+    title: "Meet Our Team | MC Hair Salon & Spa",
+    description: "Expert stylists and spa specialists serving the Upper East Side. Precision cuts, color, lashes, and makeup artistry.",
+    url: "https://mchairsalon.com/team",
+  },
+  alternates: { canonical: "https://mchairsalon.com/team" },
+};
 
 export default async function TeamPage() {
   const team = getAllStaff();

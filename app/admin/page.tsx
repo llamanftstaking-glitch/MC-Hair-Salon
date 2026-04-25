@@ -5,6 +5,7 @@ import {
   RefreshCw, Mail, Send, Bell, UserCheck, BarChart2, Plus, Loader,
   MessageSquare, MailCheck, Upload, Film, Pencil, User, Settings,
   Building2, Globe, Phone, ChevronRight, Image as ImageIcon, Save,
+  CreditCard, AlertTriangle, ShieldCheck,
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
@@ -33,6 +34,7 @@ const statusColors: Record<string, string> = {
   pending:   "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",
   confirmed: "text-green-400 border-green-400/30 bg-green-400/10",
   cancelled: "text-red-400 border-red-400/30 bg-red-400/10",
+  no_show:   "text-orange-400 border-orange-400/30 bg-orange-400/10",
 };
 
 const inputCls = "w-full bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444]";
@@ -46,7 +48,7 @@ export default function AdminPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "cancelled">("all");
+  const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "cancelled" | "no_show">("all");
   const [emailStatus, setEmailStatus] = useState<Record<string, string>>({});
   const [newsletter, setNewsletter] = useState({ subject: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -98,6 +100,9 @@ export default function AdminPage() {
   }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings]);
 
   // ── Booking handlers ────────────────────────────────────────────────────────
+  const [noshowLoading, setNoshowLoading] = useState<Record<string, boolean>>({});
+  const [noshowResult,  setNoshowResult]  = useState<Record<string, "charged" | "error">>({});
+
   const updateStatus = async (id: string, status: Booking["status"]) => {
     await fetch("/api/bookings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }) });
     if (status === "confirmed") await sendConfirmationEmail(id);
@@ -111,6 +116,27 @@ export default function AdminPage() {
       setEmailStatus(p => ({ ...p, [bookingId]: data.success ? "sent" : "failed" }));
     } catch { setEmailStatus(p => ({ ...p, [bookingId]: "failed" })); }
   };
+  const chargeNoShow = async (id: string) => {
+    if (!confirm("Charge the $20 no-show fee to the card on file?")) return;
+    setNoshowLoading(p => ({ ...p, [id]: true }));
+    try {
+      const res = await fetch("/api/stripe/charge-noshow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId: id }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setNoshowResult(p => ({ ...p, [id]: "charged" }));
+        fetchBookings();
+      } else {
+        alert(data.error ?? "Charge failed");
+        setNoshowResult(p => ({ ...p, [id]: "error" }));
+      }
+    } catch { setNoshowResult(p => ({ ...p, [id]: "error" })); }
+    finally   { setNoshowLoading(p => ({ ...p, [id]: false })); }
+  };
+
   const deleteBooking = async (id: string) => {
     if (!confirm("Delete this booking?")) return;
     await fetch("/api/bookings", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
@@ -313,7 +339,7 @@ export default function AdminPage() {
         {tab === "reservations" && (
           <div>
             <div className="flex gap-3 mb-6 flex-wrap">
-              {(["all", "pending", "confirmed", "cancelled"] as const).map(f => (
+              {(["all", "pending", "confirmed", "cancelled", "no_show"] as const).map(f => (
                 <button key={f} onClick={() => setFilter(f)}
                   className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all ${
                     filter === f ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
@@ -345,6 +371,19 @@ export default function AdminPage() {
                         </div>
                         <p className="text-[#555] text-sm">{booking.service}</p>
                         {booking.notes && <p className="text-[var(--mc-text-dim)] text-xs mt-1 italic">"{booking.notes}"</p>}
+                        {/* Card on file */}
+                        {booking.stripePaymentMethodId && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <CreditCard size={12} className={noshowResult[booking.id] === "charged" ? "text-orange-400" : "text-[#555]"} />
+                            <span className="text-[10px] uppercase tracking-wider text-[#555]">
+                              {booking.cardBrand ? `${booking.cardBrand.charAt(0).toUpperCase()}${booking.cardBrand.slice(1)} ` : "Card "}
+                              {booking.cardLast4 ? `·· ${booking.cardLast4}` : "on file"}
+                            </span>
+                            {noshowResult[booking.id] === "charged" && (
+                              <span className="text-[10px] text-orange-400 uppercase tracking-wider">$20 charged</span>
+                            )}
+                          </div>
+                        )}
                         {emailStatus[booking.id] && (
                           <p className={`text-xs mt-2 ${emailStatus[booking.id] === "sent" ? "text-green-400" : emailStatus[booking.id] === "sending" ? "text-yellow-400" : "text-red-400"}`}>
                             {emailStatus[booking.id] === "sending" ? "Sending email…" : emailStatus[booking.id] === "sent" ? "✓ Confirmation sent" : "✗ Email failed"}
@@ -368,6 +407,22 @@ export default function AdminPage() {
                           <button onClick={() => updateStatus(booking.id, "cancelled")}
                             className="w-9 h-9 flex items-center justify-center border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer">
                             <X size={16} />
+                          </button>
+                        )}
+                        {/* No-show charge button — shows when card is on file and booking is not already charged */}
+                        {booking.stripePaymentMethodId && booking.status !== "no_show" && !noshowResult[booking.id] && (
+                          <button
+                            onClick={() => chargeNoShow(booking.id)}
+                            disabled={noshowLoading[booking.id]}
+                            title="Charge $20 no-show fee"
+                            className="h-9 px-3 flex items-center gap-1.5 border border-orange-500/30 text-orange-400 hover:bg-orange-500/10 transition-colors cursor-pointer text-xs font-semibold uppercase tracking-wider disabled:opacity-50"
+                          >
+                            {noshowLoading[booking.id] ? (
+                              <Loader size={12} className="animate-spin" />
+                            ) : (
+                              <AlertTriangle size={13} />
+                            )}
+                            No-Show $20
                           </button>
                         )}
                         <button onClick={() => deleteBooking(booking.id)}

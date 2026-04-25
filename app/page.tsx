@@ -47,6 +47,30 @@ export default function Home() {
         </div>
       </section>
 
+      {/* PRICING CALLOUT */}
+      <section className="py-4 px-6 bg-[var(--mc-surface-dark)] border-b border-[var(--mc-border)]">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <span className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest hidden sm:block shrink-0">Starting from</span>
+          {[
+            { label: "Children's Cuts", price: "$20" },
+            { label: "Men's Cuts",      price: "$30" },
+            { label: "Blowouts",        price: "$33" },
+            { label: "Women's Cuts",    price: "$45" },
+            { label: "Color",           price: "$85" },
+            { label: "Balayage",        price: "$120" },
+          ].map((item, i, arr) => (
+            <div key={i} className="flex items-center gap-2 sm:gap-3">
+              <span className="font-serif text-xl gold-gradient font-bold">{item.price}</span>
+              <span className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-wider">{item.label}</span>
+              {i < arr.length - 1 && <span className="text-[var(--mc-border)] text-sm hidden sm:block">·</span>}
+            </div>
+          ))}
+          <Link href="/services" className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest hover:underline shrink-0 hidden sm:block cursor-pointer">
+            Full Menu →
+          </Link>
+        </div>
+      </section>
+
       {/* SERVICES PREVIEW */}
       <section className="py-16 sm:py-24 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
@@ -81,21 +105,39 @@ export default function Home() {
         </div>
       </section>
 
-      {/* GALLERY PREVIEW */}
+      {/* TRANSFORMATIONS GRID */}
       <section className="py-16 sm:py-24 px-6 bg-[var(--mc-surface-dark)]">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-10 sm:mb-16">
-            <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Our Work</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">Gallery</h2>
+            <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Client Transformations</p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">The Work</h2>
+            <p className="text-[var(--mc-muted)] text-sm mt-4 max-w-lg mx-auto">Every look is personal. Every result is intentional.</p>
           </FadeIn>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
-            {GALLERY_IMAGES.slice(0, 6).map((img, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+            {[
+              { ...GALLERY_IMAGES[2],  label: "Balayage",        service: "from $120" },
+              { ...GALLERY_IMAGES[7],  label: "Cut & Style",     service: "from $45"  },
+              { ...GALLERY_IMAGES[0],  label: "Bridal Updo",     service: "from $150" },
+              { ...GALLERY_IMAGES[12], label: "Makeup",          service: "from $75"  },
+              { ...GALLERY_IMAGES[9],  label: "Color",           service: "from $85"  },
+              { ...GALLERY_IMAGES[4],  label: "Lash Extensions", service: "from $150" },
+            ].map((item, i) => (
               <FadeIn key={i} delay={i * 60}>
-                <div className="relative overflow-hidden aspect-square group cursor-pointer">
-                  <Image src={img.src} alt={img.alt} fill sizes="(max-width: 640px) 50vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300" />
-                </div>
+                <Link href="/services" className="block relative overflow-hidden aspect-square group cursor-pointer">
+                  <Image
+                    src={item.src}
+                    alt={`${item.label} transformation at MC Hair Salon Upper East Side NYC`}
+                    fill
+                    sizes="(max-width: 640px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <p className="text-white font-serif font-bold text-lg leading-tight">{item.label}</p>
+                    <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest mt-0.5">{item.service}</p>
+                  </div>
+                </Link>
               </FadeIn>
             ))}
           </div>
@@ -120,16 +162,24 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {TESTIMONIALS.map((t, i) => (
               <FadeIn key={i} delay={i * 80}>
-                <div className="luxury-card p-6 sm:p-8 h-full">
-                  <div className="flex gap-1 mb-6">
+                <div className="luxury-card p-6 sm:p-8 h-full flex flex-col">
+                  <div className="flex gap-1 mb-4">
                     {Array.from({ length: t.rating }).map((_, j) => (
-                      <Star key={j} size={16} className="fill-[var(--mc-accent)] text-[var(--mc-accent)]" />
+                      <Star key={j} size={14} className="fill-[var(--mc-accent)] text-[var(--mc-accent)]" />
                     ))}
                   </div>
-                  <p className="text-[var(--mc-muted)] text-sm leading-relaxed mb-6 italic">&ldquo;{t.text}&rdquo;</p>
-                  <div>
+                  <p className="text-[var(--mc-muted)] text-sm leading-relaxed mb-6 italic flex-1">&ldquo;{t.text}&rdquo;</p>
+                  <div className="border-t border-[var(--mc-border)] pt-4">
                     <p className="text-white font-semibold text-sm">{t.name}</p>
-                    <p className="text-[#555] text-xs mt-1">{t.service}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <p className="text-[#555] text-xs">{t.service}</p>
+                      {"date" in t && t.date && (
+                        <>
+                          <span className="text-[#333] text-xs">·</span>
+                          <p className="text-[#444] text-xs">{String(t.date)}</p>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </FadeIn>

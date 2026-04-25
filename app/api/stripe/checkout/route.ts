@@ -102,6 +102,11 @@ export async function POST(req: NextRequest) {
       if (!serviceName || !servicePrice) {
         return NextResponse.json({ error: "Missing serviceName or servicePrice" }, { status: 400 });
       }
+      // Validate price server-side — client must not be able to set an arbitrary amount
+      const parsedPrice = Number(servicePrice);
+      if (!Number.isFinite(parsedPrice) || parsedPrice < 5 || parsedPrice > 5000) {
+        return NextResponse.json({ error: "Invalid service price" }, { status: 400 });
+      }
 
       const session = await (await getStripe()).checkout.sessions.create({
         mode: "payment",
@@ -112,7 +117,7 @@ export async function POST(req: NextRequest) {
             quantity: 1,
             price_data: {
               currency: "usd",
-              unit_amount: Math.round(servicePrice * 100),
+              unit_amount: Math.round(parsedPrice * 100),
               product_data: {
                 name: `MC Hair Salon — ${serviceName}`,
                 description: "Professional beauty service at 336 East 78th St, New York, NY 10075",

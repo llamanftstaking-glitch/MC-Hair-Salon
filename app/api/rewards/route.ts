@@ -1,8 +1,12 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { getAllCustomers, updateCustomer, calcTier } from "@/lib/customers";
+import { requireAdmin } from "@/lib/auth";
 
+// GET — admin only (returns all customer data)
 export async function GET() {
+  const err = await requireAdmin();
+  if (err) return err;
   try {
     const customers = getAllCustomers().map(({ passwordHash: _pw, ...rest }) => rest);
     return NextResponse.json(customers);
@@ -11,7 +15,10 @@ export async function GET() {
   }
 }
 
+// POST — admin only (manual points adjustment)
 export async function POST(req: NextRequest) {
+  const err = await requireAdmin();
+  if (err) return err;
   try {
     const { customerId, delta, reason } = await req.json();
 
@@ -20,16 +27,13 @@ export async function POST(req: NextRequest) {
     }
 
     const customers = getAllCustomers();
-    const customer = customers.find((c) => c.id === customerId);
+    const customer  = customers.find((c) => c.id === customerId);
     if (!customer) return NextResponse.json({ error: "Customer not found" }, { status: 404 });
 
     const newPoints = Math.max(0, customer.points + delta);
     const newTier   = calcTier(newPoints);
 
-    const updated = updateCustomer(customerId, {
-      points: newPoints,
-      tier:   newTier,
-    });
+    updateCustomer(customerId, { points: newPoints, tier: newTier });
 
     return NextResponse.json({ success: true, points: newPoints, tier: newTier, reason });
   } catch {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { requireAdmin } from "@/lib/auth";
 
 export const maxDuration = 60;
 
@@ -10,7 +11,13 @@ const ALLOWED_TYPES = [
   "video/x-msvideo", "video/x-ms-wmv",
 ];
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+
+// POST — admin only
 export async function POST(req: NextRequest) {
+  const err = await requireAdmin();
+  if (err) return err;
+
   try {
     const formData = await req.formData();
     const file     = formData.get("file")     as File   | null;
@@ -21,10 +28,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json(
-        { error: `File type '${file.type}' is not allowed` },
-        { status: 415 }
-      );
+      return NextResponse.json({ error: `File type '${file.type}' is not allowed` }, { status: 415 });
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: "File too large (max 50 MB)" }, { status: 413 });
     }
 
     const bytes  = await file.arrayBuffer();

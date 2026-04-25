@@ -23,8 +23,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { action } = body;
 
-    // Create + send (called from Stripe webhook after payment)
+    // Create + send (called internally from Stripe webhook after payment)
     if (action === "create") {
+      // Must supply the internal webhook token — prevents public gift card creation without payment
+      const internalToken = req.headers.get("x-internal-token");
+      const expectedToken = process.env.INTERNAL_API_TOKEN ?? "dev-token";
+      if (internalToken !== expectedToken) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
       const { amount, recipientName, recipientEmail, recipientPhone,
               senderName, message, deliveryMethod, stripeSessionId } = body;
 

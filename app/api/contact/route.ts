@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMessages, addMessage, markRead, deleteMessage } from "@/lib/messages";
+import { requireAdmin } from "@/lib/auth";
 
+// GET — admin only
 export async function GET() {
+  const err = await requireAdmin();
+  if (err) return err;
   try {
     return NextResponse.json(getMessages());
   } catch {
@@ -9,20 +13,31 @@ export async function GET() {
   }
 }
 
+// POST — public (contact form submission)
 export async function POST(req: NextRequest) {
   try {
     const { name, email, message } = await req.json();
     if (!name || !email || !message) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
-    const msg = addMessage({ name, email, message });
+    if (name.length > 120 || email.length > 254 || message.length > 5000) {
+      return NextResponse.json({ error: "Input too long" }, { status: 400 });
+    }
+    const msg = addMessage({
+      name:    name.trim(),
+      email:   email.trim().toLowerCase(),
+      message: message.trim(),
+    });
     return NextResponse.json(msg, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to save message" }, { status: 500 });
   }
 }
 
+// PATCH — admin only
 export async function PATCH(req: NextRequest) {
+  const err = await requireAdmin();
+  if (err) return err;
   try {
     const { id } = await req.json();
     const ok = markRead(id);
@@ -33,7 +48,10 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
+// DELETE — admin only
 export async function DELETE(req: NextRequest) {
+  const err = await requireAdmin();
+  if (err) return err;
   try {
     const { id } = await req.json();
     const ok = deleteMessage(id);

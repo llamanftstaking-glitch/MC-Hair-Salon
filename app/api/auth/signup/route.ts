@@ -9,6 +9,12 @@ export async function POST(req: NextRequest) {
   if (!name || !email || !password)
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
+  if (password.length < 8)
+    return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
+
+  if (name.length > 120 || email.length > 254)
+    return NextResponse.json({ error: "Input too long" }, { status: 400 });
+
   if (getCustomerByEmail(email))
     return NextResponse.json({ error: "An account with this email already exists" }, { status: 409 });
 

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSettings, updateSettings } from "@/lib/settings";
+import { requireAdmin } from "@/lib/auth";
 
+// GET — public (site settings like hours are read by the frontend)
 export async function GET() {
   try {
     return NextResponse.json(getSettings());
@@ -9,13 +11,16 @@ export async function GET() {
   }
 }
 
+// POST — admin only
 export async function POST(req: NextRequest) {
+  const err = await requireAdmin();
+  if (err) return err;
   try {
     const body    = await req.json();
     const updated = updateSettings(body);
     return NextResponse.json(updated);
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to save settings";
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to save settings";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

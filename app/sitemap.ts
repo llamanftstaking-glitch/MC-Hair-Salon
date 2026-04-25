@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Discovery / trust
     { url: `${BASE}/gallery`,          lastModified: new Date(), changeFrequency: "weekly",  priority: 0.80 },
     { url: `${BASE}/team`,             lastModified: new Date(), changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/visit`,            lastModified: new Date(), changeFrequency: "yearly",  priority: 0.72 },
     { url: `${BASE}/contact`,          lastModified: new Date(), changeFrequency: "monthly", priority: 0.70 },
 
     // Loyalty

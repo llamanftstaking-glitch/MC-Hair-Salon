@@ -33,7 +33,7 @@ export default function Footer() {
           <div>
             <h4 className="text-[var(--mc-accent)] uppercase tracking-widest text-xs font-semibold mb-6">Quick Links</h4>
             <ul className="space-y-3">
-              {[["Services", "/services"], ["Gallery", "/gallery"], ["Makeup", "/makeup"], ["Weddings", "/weddings"], ["Packages", "/packages"], ["Our Team", "/team"], ["Rewards", "/rewards"], ["Book Appointment", "/book"], ["Gift Cards", "/gift-card"], ["Contact", "/contact"]].map(([label, href]) => (
+              {[["Services", "/services"], ["Gallery", "/gallery"], ["Makeup", "/makeup"], ["Weddings", "/weddings"], ["Packages", "/packages"], ["Our Team", "/team"], ["Rewards", "/rewards"], ["How to Get Here", "/visit"], ["Book Appointment", "/book"], ["Gift Cards", "/gift-card"], ["Contact", "/contact"]].map(([label, href]) => (
                 <li key={href}>
                   <Link href={href} className="text-[var(--mc-text-dim)] hover:text-[var(--mc-accent)] transition-colors text-sm cursor-pointer">{label}</Link>
                 </li>

@@ -6,12 +6,26 @@ import {
   MessageSquare, MailCheck, Upload, Film, Pencil, User, Settings,
   Building2, Globe, Phone, ChevronRight, Image as ImageIcon, Save,
   CreditCard, AlertTriangle, ShieldCheck,
+  Gift, Star, Crown, Zap, Minus,
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-type Tab = "reservations" | "clients" | "newsletter" | "reports" | "messages" | "staff" | "settings";
+type Tab = "reservations" | "clients" | "newsletter" | "reports" | "messages" | "staff" | "settings" | "rewards";
+
+interface RewardCustomer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  points: number;
+  visits: number;
+  totalSpent: number;
+  tier: "Bronze" | "Silver" | "Gold" | "Platinum";
+  rewards: { id: string; name: string; pointsCost: number; redeemedAt: string }[];
+  createdAt: string;
+}
 
 interface Subscriber { id: string; email: string; name?: string; subscribedAt: string; active: boolean; }
 
@@ -74,6 +88,15 @@ export default function AdminPage() {
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [settingsTab, setSettingsTab] = useState<"business" | "hours" | "hero">("business");
 
+  // ── Rewards state ────────────────────────────────────────────────────────────
+  const [rewardsData,    setRewardsData]    = useState<RewardCustomer[]>([]);
+  const [adjustTarget,   setAdjustTarget]   = useState<string | null>(null);
+  const [adjustAmount,   setAdjustAmount]   = useState("");
+  const [adjustMode,     setAdjustMode]     = useState<"add" | "subtract">("add");
+  const [adjustReason,   setAdjustReason]   = useState("");
+  const [adjusting,      setAdjusting]      = useState(false);
+  const [adjustSuccess,  setAdjustSuccess]  = useState<string | null>(null);
+
   // ── Fetch functions ─────────────────────────────────────────────────────────
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -95,9 +118,14 @@ export default function AdminPage() {
     setSettings(data); setSettingsForm(data);
   }, []);
 
+  const fetchRewards = useCallback(async () => {
+    try { const res = await fetch("/api/rewards"); setRewardsData(await res.json()); }
+    catch { /* non-fatal */ }
+  }, []);
+
   useEffect(() => {
-    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings();
-  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings]);
+    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards();
+  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards]);
 
   // ── Booking handlers ────────────────────────────────────────────────────────
   const [noshowLoading, setNoshowLoading] = useState<Record<string, boolean>>({});
@@ -141,6 +169,30 @@ export default function AdminPage() {
     if (!confirm("Delete this booking?")) return;
     await fetch("/api/bookings", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     fetchBookings();
+  };
+
+  // ── Rewards handlers ─────────────────────────────────────────────────────────
+  const applyPointAdjustment = async (customerId: string) => {
+    const amount = parseInt(adjustAmount, 10);
+    if (!amount || isNaN(amount)) return;
+    const delta = adjustMode === "add" ? amount : -amount;
+    setAdjusting(true);
+    try {
+      const res = await fetch("/api/rewards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId, delta, reason: adjustReason }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAdjustSuccess(`Points updated — new balance: ${data.points.toLocaleString()} (${data.tier})`);
+        setAdjustTarget(null);
+        setAdjustAmount("");
+        setAdjustReason("");
+        fetchRewards();
+        setTimeout(() => setAdjustSuccess(null), 4000);
+      }
+    } finally { setAdjusting(false); }
   };
 
   // ── Message handlers ────────────────────────────────────────────────────────
@@ -279,6 +331,7 @@ export default function AdminPage() {
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
     { id: "reservations", label: "Reservations", icon: <Calendar size={15} /> },
     { id: "clients",      label: "Clients",      icon: <Users size={15} /> },
+    { id: "rewards",      label: "Rewards",      icon: <Gift size={15} /> },
     { id: "messages",     label: "Messages",     icon: <MessageSquare size={15} />, badge: unreadMessages },
     { id: "newsletter",   label: "Newsletter",   icon: <Mail size={15} /> },
     { id: "reports",      label: "Reports",      icon: <BarChart2 size={15} /> },
@@ -858,6 +911,271 @@ export default function AdminPage() {
             )}
           </div>
         )}
+
+        {/* ── REWARDS ──────────────────────────────────────────────────────── */}
+        {tab === "rewards" && (() => {
+          const sorted       = [...rewardsData].sort((a, b) => b.points - a.points);
+          const totalPoints  = rewardsData.reduce((s, c) => s + c.points, 0);
+          const totalRedeem  = rewardsData.reduce((s, c) => s + c.rewards.length, 0);
+          const tierCount    = { Bronze: 0, Silver: 0, Gold: 0, Platinum: 0 } as Record<string, number>;
+          rewardsData.forEach(c => { tierCount[c.tier] = (tierCount[c.tier] || 0) + 1; });
+
+          const TIER_META: Record<string, { color: string; bg: string; border: string; icon: React.ReactNode }> = {
+            Bronze:   { color: "#CD7F32", bg: "bg-[#CD7F32]/10",  border: "border-[#CD7F32]/30", icon: <Star size={13} />   },
+            Silver:   { color: "#C0C0C0", bg: "bg-[#C0C0C0]/10",  border: "border-[#C0C0C0]/30", icon: <Star size={13} />   },
+            Gold:     { color: "#FFD700", bg: "bg-[#FFD700]/10",   border: "border-[#FFD700]/30", icon: <Crown size={13} />  },
+            Platinum: { color: "#E8E8E8", bg: "bg-[#E8E8E8]/10",  border: "border-[#E8E8E8]/30", icon: <Zap size={13} />    },
+          };
+
+          return (
+            <div>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+                <div>
+                  <p className="text-white font-semibold text-lg flex items-center gap-2">
+                    <Gift size={18} className="text-[var(--mc-accent)]" /> MC Rewards Program
+                  </p>
+                  <p className="text-[#555] text-sm mt-1">
+                    {rewardsData.length} members &nbsp;·&nbsp; {totalPoints.toLocaleString()} points issued &nbsp;·&nbsp; {totalRedeem} rewards redeemed
+                  </p>
+                </div>
+                <button onClick={fetchRewards}
+                  className="flex items-center gap-2 border border-[var(--mc-border)] text-[var(--mc-text-dim)] px-4 py-2 text-sm hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                  <RefreshCw size={14} /> Refresh
+                </button>
+              </div>
+
+              {/* Success toast */}
+              {adjustSuccess && (
+                <div className="mb-4 flex items-center gap-2 border border-green-500/30 bg-green-950/20 px-4 py-3 text-green-400 text-sm">
+                  <Check size={15} /> {adjustSuccess}
+                </div>
+              )}
+
+              {/* Stat cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {[
+                  { label: "Total Members",    value: rewardsData.length,         icon: <Users size={18} />    },
+                  { label: "Points Issued",    value: totalPoints.toLocaleString(), icon: <Star size={18} />    },
+                  { label: "Rewards Redeemed", value: totalRedeem,                icon: <Gift size={18} />     },
+                  { label: "Platinum Members", value: tierCount.Platinum || 0,    icon: <Crown size={18} />    },
+                ].map(({ label, value, icon }) => (
+                  <div key={label} className="luxury-card p-5">
+                    <div className="text-[var(--mc-accent)] mb-3">{icon}</div>
+                    <p className="font-serif text-2xl font-bold text-white">{value}</p>
+                    <p className="text-[#555] text-xs uppercase tracking-widest mt-1">{label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Tier breakdown */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                {(["Bronze", "Silver", "Gold", "Platinum"] as const).map((tier) => {
+                  const meta = TIER_META[tier];
+                  const count = tierCount[tier] || 0;
+                  const pct = rewardsData.length ? Math.round((count / rewardsData.length) * 100) : 0;
+                  return (
+                    <div key={tier} className={`border ${meta.border} ${meta.bg} p-4`}>
+                      <div className="flex items-center gap-2 mb-2" style={{ color: meta.color }}>
+                        {meta.icon}
+                        <span className="text-xs uppercase tracking-widest font-bold">{tier}</span>
+                      </div>
+                      <p className="font-serif text-3xl font-bold text-white">{count}</p>
+                      <p className="text-[#555] text-xs mt-1">{pct}% of members</p>
+                      <div className="mt-3 h-1 bg-[#111]">
+                        <div className="h-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: meta.color }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Member leaderboard */}
+              <div>
+                <p className="text-white font-semibold mb-4 flex items-center gap-2">
+                  <TrendingUp size={15} className="text-[var(--mc-accent)]" /> Member Leaderboard
+                </p>
+
+                {sorted.length === 0 ? (
+                  <div className="text-center py-20 luxury-card">
+                    <Gift size={40} className="text-[#333] mx-auto mb-4" />
+                    <p className="text-[#555]">No members yet. Clients who sign up will appear here.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {sorted.map((customer, idx) => {
+                      const meta      = TIER_META[customer.tier];
+                      const isOpen    = adjustTarget === customer.id;
+                      const maxPoints = 2000;
+                      const barPct    = Math.min(100, Math.round((customer.points / maxPoints) * 100));
+
+                      return (
+                        <div key={customer.id} className="luxury-card overflow-hidden">
+                          {/* Main row */}
+                          <div className="p-4 flex items-center gap-4 flex-wrap">
+                            {/* Rank */}
+                            <span className="text-[#333] font-mono text-sm w-7 shrink-0 text-center">
+                              {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`}
+                            </span>
+
+                            {/* Name + email */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white font-semibold text-sm truncate">{customer.name}</p>
+                              <p className="text-[#555] text-xs truncate">{customer.email}</p>
+                            </div>
+
+                            {/* Tier badge */}
+                            <span className={`text-[10px] px-2.5 py-1 border uppercase tracking-widest font-bold shrink-0 ${meta.border} ${meta.bg}`}
+                              style={{ color: meta.color }}>
+                              {customer.tier}
+                            </span>
+
+                            {/* Points + bar */}
+                            <div className="w-32 shrink-0 hidden sm:block">
+                              <div className="flex justify-between text-[10px] mb-1">
+                                <span className="text-white font-semibold">{customer.points.toLocaleString()} pts</span>
+                                <span className="text-[#444]">{customer.visits} visits</span>
+                              </div>
+                              <div className="h-1.5 bg-[#111]">
+                                <div className="h-full transition-all" style={{ width: `${barPct}%`, backgroundColor: meta.color }} />
+                              </div>
+                            </div>
+
+                            {/* Redeemed count */}
+                            <span className="text-[#555] text-xs shrink-0 hidden md:block">
+                              {customer.rewards.length} redeemed
+                            </span>
+
+                            {/* Joined */}
+                            <span className="text-[#444] text-xs shrink-0 hidden lg:block">
+                              {new Date(customer.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                            </span>
+
+                            {/* Adjust button */}
+                            <button
+                              onClick={() => {
+                                setAdjustTarget(isOpen ? null : customer.id);
+                                setAdjustAmount("");
+                                setAdjustMode("add");
+                                setAdjustReason("");
+                              }}
+                              className={`shrink-0 h-8 px-3 border text-xs uppercase tracking-wider font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                                isOpen
+                                  ? "border-[var(--mc-accent)] text-[var(--mc-accent)] bg-[var(--mc-accent)]/10"
+                                  : "border-[#222] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)]"
+                              }`}
+                            >
+                              <Star size={11} /> Adjust
+                            </button>
+                          </div>
+
+                          {/* Inline adjustment panel */}
+                          {isOpen && (
+                            <div className="border-t border-[#1a1a1a] bg-[#060606] p-4">
+                              <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">
+                                Adjust Points for {customer.name}
+                              </p>
+                              <div className="flex flex-wrap items-end gap-3">
+                                {/* Add / Subtract toggle */}
+                                <div className="flex border border-[#222]">
+                                  <button
+                                    onClick={() => setAdjustMode("add")}
+                                    className={`flex items-center gap-1 px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                                      adjustMode === "add" ? "bg-green-500/20 text-green-400 border-r border-[#222]" : "text-[#555] border-r border-[#222]"
+                                    }`}
+                                  >
+                                    <Plus size={11} /> Add
+                                  </button>
+                                  <button
+                                    onClick={() => setAdjustMode("subtract")}
+                                    className={`flex items-center gap-1 px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                                      adjustMode === "subtract" ? "bg-red-500/20 text-red-400" : "text-[#555]"
+                                    }`}
+                                  >
+                                    <Minus size={11} /> Deduct
+                                  </button>
+                                </div>
+
+                                {/* Amount */}
+                                <div className="flex flex-col gap-1">
+                                  <label className="text-[#444] text-[10px] uppercase tracking-widest">Points</label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    placeholder="e.g. 100"
+                                    value={adjustAmount}
+                                    onChange={(e) => setAdjustAmount(e.target.value)}
+                                    className="w-28 bg-[#0a0a0a] border border-[#222] text-white px-3 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors"
+                                  />
+                                </div>
+
+                                {/* Reason */}
+                                <div className="flex flex-col gap-1 flex-1 min-w-40">
+                                  <label className="text-[#444] text-[10px] uppercase tracking-widest">Reason (optional)</label>
+                                  <input
+                                    type="text"
+                                    placeholder="Birthday bonus, service adjustment..."
+                                    value={adjustReason}
+                                    onChange={(e) => setAdjustReason(e.target.value)}
+                                    className="w-full bg-[#0a0a0a] border border-[#222] text-white px-3 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors"
+                                  />
+                                </div>
+
+                                {/* Apply */}
+                                <button
+                                  onClick={() => applyPointAdjustment(customer.id)}
+                                  disabled={!adjustAmount || adjusting}
+                                  className="gold-gradient-bg text-black font-bold px-5 py-2 text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-40 cursor-pointer flex items-center gap-2 transition-opacity"
+                                >
+                                  {adjusting ? <Loader size={12} className="animate-spin" /> : <Check size={12} />}
+                                  Apply
+                                </button>
+                                <button
+                                  onClick={() => setAdjustTarget(null)}
+                                  className="border border-[#222] text-[#555] px-4 py-2 text-xs hover:border-[#444] transition-colors cursor-pointer"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+
+                              {/* Preview */}
+                              {adjustAmount && (
+                                <p className="text-[#555] text-xs mt-3">
+                                  Current: <span className="text-white">{customer.points.toLocaleString()} pts</span>
+                                  {" → "}
+                                  New:{" "}
+                                  <span className={adjustMode === "add" ? "text-green-400" : "text-red-400"}>
+                                    {Math.max(0, customer.points + (adjustMode === "add" ? parseInt(adjustAmount || "0") : -parseInt(adjustAmount || "0"))).toLocaleString()} pts
+                                  </span>
+                                </p>
+                              )}
+
+                              {/* Redemption history */}
+                              {customer.rewards.length > 0 && (
+                                <div className="mt-4 border-t border-[#111] pt-3">
+                                  <p className="text-[#444] text-[10px] uppercase tracking-widest mb-2">Redemption History</p>
+                                  <div className="space-y-1.5">
+                                    {customer.rewards.slice(0, 5).map((r) => (
+                                      <div key={r.id} className="flex justify-between text-xs">
+                                        <span className="text-[#777]">{r.name}</span>
+                                        <span className="text-[var(--mc-accent)]">−{r.pointsCost} pts &nbsp;·&nbsp; {new Date(r.redeemedAt).toLocaleDateString()}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          );
+        })()}
 
         {/* ── SETTINGS ─────────────────────────────────────────────────────── */}
         {tab === "settings" && (

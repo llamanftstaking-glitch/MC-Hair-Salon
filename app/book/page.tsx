@@ -606,7 +606,9 @@ function CardFormStep({
           onChange={(e) => setAgreed(e.target.checked)}
         />
         <span className="text-[var(--mc-muted)] text-sm leading-relaxed">
-          I understand and agree to the MC Hair Salon &amp; Spa cancellation policy. A $20 fee may be charged if I no-show or cancel with less than 24 hours notice.
+          I understand and agree to the MC Hair Salon &amp; Spa{" "}
+          <a href="/terms#cancellation" target="_blank" className="text-[var(--mc-accent)] hover:underline">cancellation policy</a>.
+          {" "}A $20 fee may be charged if I no-show or cancel with less than 24 hours notice.
         </span>
       </label>
 

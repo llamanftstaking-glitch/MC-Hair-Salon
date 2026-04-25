@@ -1,0 +1,77 @@
+export interface PortfolioItem {
+  type: "image" | "video";
+  src: string;
+  caption?: string;
+}
+
+export interface StaffMember {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  image?: string;
+  specialties: string[];
+  portfolio?: PortfolioItem[];
+}
+
+const STAFF: StaffMember[] = [
+  {
+    id: "kato",
+    name: "Kato",
+    role: "Master Stylist",
+    bio: "With over a decade of experience, Kato specializes in precision cuts and advanced color techniques. A client favorite known for attention to detail.",
+    specialties: ["Precision Cuts", "Balayage", "Color Correction"],
+    image: "/instagram/mchairsalonspa_1550078255_1978522269296608933_509340228.jpg",
+    portfolio: [
+      { type: "image", src: "/instagram/mchairsalonspa_1550078255_1978522269296608933_509340228.jpg", caption: "Balayage" },
+      { type: "image", src: "/instagram/mchairsalonspa_1533145637_1836481173825515947_509340228.jpg", caption: "Color" },
+    ],
+  },
+  {
+    id: "megan",
+    name: "Megan",
+    role: "Senior Stylist & Color Expert",
+    bio: "Megan brings artistry and technical excellence to every appointment. Her expertise in L'Oréal color systems makes her our go-to for transformational color.",
+    specialties: ["Hair Color", "Highlights", "Blowouts"],
+    image: "/instagram/mchairsalonspa_1533145637_1836481173825515947_509340228.jpg",
+    portfolio: [
+      { type: "image", src: "/instagram/mchairsalonspa_1533145637_1836481173825515947_509340228.jpg", caption: "Highlights" },
+      { type: "image", src: "/instagram/mchairsalonspa_1528578580_1798169924515305526_509340228.jpg", caption: "Color" },
+    ],
+  },
+  {
+    id: "sofia",
+    name: "Sofia",
+    role: "Spa Specialist",
+    bio: "Sofia creates a serene luxury experience for every guest. Specializing in spa treatments, lash extensions, and makeup artistry.",
+    specialties: ["Lash Extensions", "Facials", "Makeup"],
+    image: "/instagram/mchairsalonspa_1528578580_1798169924515305526_509340228.jpg",
+  },
+  {
+    id: "marcus",
+    name: "Marcus",
+    role: "Men's Grooming Expert",
+    bio: "Marcus is the Upper East Side's top choice for men's cuts and grooming. Precise, efficient, and always on trend.",
+    specialties: ["Men's Cuts", "Fades", "Styling"],
+    image: "/instagram/mchairsalonspa_1526678565_1782231439342285913_509340228.jpg",
+  },
+  {
+    id: "isabella",
+    name: "Isabella",
+    role: "Resident Makeup Artist",
+    bio: "Isabella is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry, she tailors every look to your unique features and personal style.",
+    specialties: ["Bridal Makeup", "Airbrush", "Special Events", "Makeup Lessons"],
+    image: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
+    portfolio: [
+      { type: "image", src: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg", caption: "Bridal Glam" },
+    ],
+  },
+];
+
+export function getAllStaff(): StaffMember[] {
+  return STAFF;
+}
+
+export function getStaffById(id: string): StaffMember | undefined {
+  return STAFF.find((s) => s.id === id);
+}

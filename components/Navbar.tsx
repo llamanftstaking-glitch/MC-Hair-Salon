@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/makeup",   label: "Makeup"      },
   { href: "/weddings", label: "Weddings"    },
   { href: "/team",     label: "Our Team"    },
+  { href: "/rewards",  label: "Rewards"     },
   { href: "/contact",  label: "Contact"     },
 ];
 

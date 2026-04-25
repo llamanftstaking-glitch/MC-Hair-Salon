@@ -34,6 +34,7 @@ const SECTIONS = [
   { id: "changes",             label: "15. Changes to These Terms"        },
   { id: "governing-law",       label: "16. Governing Law"                 },
   { id: "contact",             label: "17. Contact Us"                    },
+  { id: "rewards",             label: "18. MC Rewards Program"            },
 ];
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
@@ -498,6 +499,110 @@ export default function TermsPage() {
               </div>
               <P>
                 We aim to respond to all inquiries within 2 business days.
+              </P>
+            </Section>
+
+            {/* ── 18. MC Rewards Program ──────────────────────────────────── */}
+            <Section id="rewards" title="18. MC Rewards Program">
+              <P>
+                The MC Rewards program (&ldquo;Program&rdquo;) is a complimentary loyalty program offered by MC Hair Salon & Spa
+                to eligible clients. Participation in the Program constitutes acceptance of these Program Terms, which
+                supplement the rest of these Terms &amp; Conditions.
+              </P>
+
+              <h3 className="text-white font-semibold mt-6 mb-3">18.1 Enrollment &amp; Eligibility</h3>
+              <Ul items={[
+                <>Enrollment in MC Rewards is free and open to any client who creates an account on our website at{" "}
+                  <Link href="/rewards" className="text-[var(--mc-accent)] hover:underline">mchairsalon.com/rewards</Link>.
+                </>,
+                <>Participants must be 13 years of age or older. Participants under 18 must have parental or guardian consent.</>,
+                <>One rewards account per person. Duplicate accounts may be merged or cancelled at our discretion.</>,
+                <>The Program is available to clients in the United States only.</>,
+              ]} />
+
+              <h3 className="text-white font-semibold mt-6 mb-3">18.2 Membership Tiers</h3>
+              <P>Members are automatically assigned to a tier based on their lifetime points balance:</P>
+              <div className="border border-[#1a1a1a] bg-[#080808] rounded-sm overflow-hidden my-4">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-[#1a1a1a]">
+                      <th className="text-left px-4 py-3 text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold">Tier</th>
+                      <th className="text-left px-4 py-3 text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold">Minimum Points</th>
+                      <th className="text-left px-4 py-3 text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold">Points Earned per Visit</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#111]">
+                    {[
+                      ["Bronze",   "0",     "10 pts"],
+                      ["Silver",   "400",   "12 pts"],
+                      ["Gold",     "1,000", "15 pts"],
+                      ["Platinum", "2,000", "20 pts"],
+                    ].map(([tier, min, rate]) => (
+                      <tr key={tier}>
+                        <td className="px-4 py-2.5 text-white font-semibold">{tier}</td>
+                        <td className="px-4 py-2.5 text-[var(--mc-muted)]">{min} pts</td>
+                        <td className="px-4 py-2.5 text-[var(--mc-muted)]">{rate}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <P>
+                Tier status is calculated in real time based on your accumulated lifetime points and is updated automatically
+                after each qualifying visit. Tier status is not transferable between accounts.
+              </P>
+
+              <h3 className="text-white font-semibold mt-6 mb-3">18.3 Earning Points</h3>
+              <Ul items={[
+                <>Points are awarded for each qualifying service visit recorded at MC Hair Salon & Spa. The number of points
+                  earned per visit is determined by your current membership tier (see Section 18.2).</>,
+                <>Points are recorded at the time of service by salon staff via our on-site scan system or manual entry.</>,
+                <>Points are not awarded for gift card purchases, product retail purchases, gratuities, or no-show fees.</>,
+                <>Points have no cash value and cannot be transferred, sold, or combined with another member&apos;s account.</>,
+                <>Bonus point promotions may be offered periodically at our sole discretion and are subject to separate terms announced at the time of the promotion.</>,
+              ]} />
+
+              <h3 className="text-white font-semibold mt-6 mb-3">18.4 Punch Card — Complimentary Blowout</h3>
+              <P>
+                In addition to point earning, every MC Rewards member participates in the Hair Service Punch Card:
+              </P>
+              <Ul items={[
+                <>Every <strong className="text-white">Hair Service</strong> (cut, color, blowout, highlights, styling, etc.) adds one punch to your card.</>,
+                <>After completing <strong className="text-white">10 Hair Services</strong>, you earn one (1) complimentary Blow Out &amp; Style, automatically credited to your account.</>,
+                <>The punch counter resets to zero after each earned blowout reward. There is no limit to the number of blowout rewards you may earn over your lifetime.</>,
+                <>Complimentary blowouts must be redeemed in-salon. They have no cash value and cannot be transferred or combined with other offers.</>,
+                <>&ldquo;Other Services&rdquo; (spa, makeup, eyelash extensions) earn points but do <strong className="text-white">not</strong> count toward the punch card.</>,
+                <>Complimentary blowout rewards expire <strong className="text-white">12 months</strong> from the date they are credited if not redeemed. To redeem, mention your reward at the time of booking.</>,
+              ]} />
+
+              <h3 className="text-white font-semibold mt-6 mb-3">18.5 On-Site QR Scan System</h3>
+              <Ul items={[
+                <>Members may present their personal QR code (found in the MC Rewards section of their online account) for staff to scan at the point of service.</>,
+                <>Scanning the QR code allows salon staff to instantly verify membership, record the visit, and credit points and punches to the correct account.</>,
+                <>Members are responsible for presenting their QR code at the time of service. Retroactive crediting of points or punches is at the sole discretion of salon management.</>,
+                <>QR codes are tied to individual accounts. Do not share your QR code with other clients.</>,
+              ]} />
+
+              <h3 className="text-white font-semibold mt-6 mb-3">18.6 Points Expiration</h3>
+              <Ul items={[
+                <>Points expire after <strong className="text-white">24 months of account inactivity</strong>. An account is considered active if at least one qualifying service visit is recorded within any 24-month rolling window.</>,
+                <>We will send a reminder email to your registered address 30 days before points are scheduled to expire, where reasonably practicable.</>,
+                <>Expired points are permanently forfeited and cannot be reinstated.</>,
+              ]} />
+
+              <h3 className="text-white font-semibold mt-6 mb-3">18.7 Program Changes &amp; Termination</h3>
+              <Ul items={[
+                <>MC Hair Salon &amp; Spa reserves the right to modify, suspend, or terminate the MC Rewards program at any time, with or without notice.</>,
+                <>We reserve the right to change the points structure, tier thresholds, reward catalog, and redemption rules at our sole discretion.</>,
+                <>We reserve the right to terminate or suspend any member&apos;s account if we determine, in our sole discretion, that the member has violated these Terms, engaged in fraud, or abused the Program.</>,
+                <>Upon program termination, we will provide at least <strong className="text-white">30 days&apos; notice</strong> via email to allow members to redeem outstanding rewards where reasonably practicable.</>,
+                <>Points and rewards have no cash value. We are not responsible for any losses resulting from Program termination or modification.</>,
+              ]} />
+
+              <P>
+                For questions about your rewards balance, punch card status, or redeemed rewards, please visit your{" "}
+                <Link href="/account/rewards" className="text-[var(--mc-accent)] hover:underline">Account Rewards page</Link>{" "}
+                or contact us at <a href="mailto:info@mchairsalon.com" className="text-[var(--mc-accent)] hover:underline">info@mchairsalon.com</a>.
               </P>
             </Section>
 

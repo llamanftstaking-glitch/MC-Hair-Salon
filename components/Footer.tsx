@@ -33,7 +33,7 @@ export default function Footer() {
           <div>
             <h4 className="text-[var(--mc-accent)] uppercase tracking-widest text-xs font-semibold mb-6">Quick Links</h4>
             <ul className="space-y-3">
-              {[["Services", "/services"], ["Gallery", "/gallery"], ["Makeup", "/makeup"], ["Weddings", "/weddings"], ["Packages", "/packages"], ["Our Team", "/team"], ["Book Appointment", "/book"], ["Gift Cards", "/gift-card"], ["Contact", "/contact"]].map(([label, href]) => (
+              {[["Services", "/services"], ["Gallery", "/gallery"], ["Makeup", "/makeup"], ["Weddings", "/weddings"], ["Packages", "/packages"], ["Our Team", "/team"], ["About Us", "/about"], ["Journal", "/blog"], ["Rewards", "/rewards"], ["How to Get Here", "/visit"], ["Book Appointment", "/book"], ["Gift Cards", "/gift-card"], ["Contact", "/contact"]].map(([label, href]) => (
                 <li key={href}>
                   <Link href={href} className="text-[var(--mc-text-dim)] hover:text-[var(--mc-accent)] transition-colors text-sm cursor-pointer">{label}</Link>
                 </li>
@@ -73,8 +73,11 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-[var(--mc-border)] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-[var(--mc-text-dim)] text-xs">© {new Date().getFullYear()} MC Hair Salon & Spa. All rights reserved.</p>
-          <Link href="/admin" className="flex items-center gap-2 px-4 py-2 border border-[var(--mc-accent)]/40 text-[var(--mc-accent)] text-xs uppercase tracking-widest hover:bg-[var(--mc-accent)/10] hover:border-[var(--mc-accent)] transition-all duration-200 cursor-pointer">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <p className="text-[var(--mc-text-dim)] text-xs">© {new Date().getFullYear()} MC Hair Salon & Spa. All rights reserved.</p>
+            <Link href="/terms" className="text-[#444] text-xs hover:text-[var(--mc-accent)] transition-colors uppercase tracking-widest">Terms & Conditions</Link>
+          </div>
+          <Link href="/admin" className="flex items-center gap-2 px-4 py-2 border border-[var(--mc-accent)]/40 text-[var(--mc-accent)] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] transition-all duration-200 cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="3" height="11" x="13" y="2" rx="1"/><rect width="3" height="7" x="18" y="6" rx="1"/><rect width="3" height="16" x="8" y="5" rx="1"/><rect width="3" height="11" x="3" y="11" rx="1"/></svg>
             Admin Panel
           </Link>

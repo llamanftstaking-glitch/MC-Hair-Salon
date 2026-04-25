@@ -13,11 +13,15 @@ const navLinks = [
   { href: "/makeup",   label: "Makeup"      },
   { href: "/weddings", label: "Weddings"    },
   { href: "/team",     label: "Our Team"    },
+  { href: "/rewards",  label: "Rewards"     },
   { href: "/contact",  label: "Contact"     },
 ];
 
 const secondaryLinks = [
   { href: "/book",      label: "Book Appointment" },
+  { href: "/about",     label: "About Us"          },
+  { href: "/blog",      label: "Journal"           },
+  { href: "/visit",     label: "How to Get Here"  },
   { href: "/packages",  label: "Packages"          },
   { href: "/gift-card", label: "Gift Cards"        },
   { href: "/account",   label: "My Account"        },

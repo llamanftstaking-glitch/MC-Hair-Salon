@@ -1,14 +1,37 @@
 import { MetadataRoute } from "next";
 
-const SITE_URL = "https://mchairsalon.com";
+const BASE = "https://mchairsalon.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    { url: SITE_URL,                      lastModified: new Date(), changeFrequency: "weekly",  priority: 1.0 },
-    { url: `${SITE_URL}/services`,        lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
-    { url: `${SITE_URL}/book`,            lastModified: new Date(), changeFrequency: "weekly",  priority: 0.9 },
-    { url: `${SITE_URL}/gallery`,         lastModified: new Date(), changeFrequency: "weekly",  priority: 0.8 },
-    { url: `${SITE_URL}/team`,            lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITE_URL}/contact`,         lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
+    // Core — highest priority
+    { url: BASE,                       lastModified: new Date(), changeFrequency: "weekly",  priority: 1.0 },
+    { url: `${BASE}/book`,             lastModified: new Date(), changeFrequency: "weekly",  priority: 0.95 },
+    { url: `${BASE}/services`,         lastModified: new Date(), changeFrequency: "monthly", priority: 0.9  },
+
+    // Revenue pages
+    { url: `${BASE}/packages`,         lastModified: new Date(), changeFrequency: "monthly", priority: 0.88 },
+    { url: `${BASE}/gift-card`,        lastModified: new Date(), changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/weddings`,         lastModified: new Date(), changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE}/makeup`,           lastModified: new Date(), changeFrequency: "monthly", priority: 0.82 },
+
+    // Discovery / trust
+    { url: `${BASE}/gallery`,          lastModified: new Date(), changeFrequency: "weekly",  priority: 0.80 },
+    { url: `${BASE}/team`,             lastModified: new Date(), changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE}/about`,            lastModified: new Date(), changeFrequency: "monthly", priority: 0.74 },
+    { url: `${BASE}/visit`,            lastModified: new Date(), changeFrequency: "yearly",  priority: 0.72 },
+    { url: `${BASE}/contact`,          lastModified: new Date(), changeFrequency: "monthly", priority: 0.70 },
+
+    // Blog
+    { url: `${BASE}/blog`,             lastModified: new Date(), changeFrequency: "weekly",  priority: 0.68 },
+    { url: `${BASE}/blog/best-balayage-upper-east-side`,     lastModified: new Date(), changeFrequency: "monthly", priority: 0.65 },
+    { url: `${BASE}/blog/blowout-vs-keratin-treatment`,      lastModified: new Date(), changeFrequency: "monthly", priority: 0.65 },
+    { url: `${BASE}/blog/your-first-visit-guide`,            lastModified: new Date(), changeFrequency: "monthly", priority: 0.65 },
+
+    // Loyalty
+    { url: `${BASE}/rewards`,          lastModified: new Date(), changeFrequency: "monthly", priority: 0.75 },
+
+    // Legal
+    { url: `${BASE}/terms`,            lastModified: new Date(), changeFrequency: "yearly",  priority: 0.30 },
   ];
 }

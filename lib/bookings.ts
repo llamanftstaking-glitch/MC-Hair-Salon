@@ -11,8 +11,13 @@ export interface Booking {
   date: string;
   time: string;
   notes?: string;
-  status: "pending" | "confirmed" | "cancelled";
+  status: "pending" | "confirmed" | "cancelled" | "no_show";
   createdAt: string;
+  stripeCustomerId?: string;
+  stripePaymentMethodId?: string;
+  cardLast4?: string;
+  cardBrand?: string;
+  noshowChargeId?: string;
 }
 
 const DATA_FILE = path.join(process.cwd(), "data", "bookings.json");
@@ -42,13 +47,20 @@ export function addBooking(booking: Omit<Booking, "id" | "status" | "createdAt">
   return newBooking;
 }
 
-export function updateBookingStatus(id: string, status: Booking["status"]): boolean {
+export function updateBooking(
+  id: string,
+  updates: Partial<Omit<Booking, "id" | "createdAt">>
+): Booking | null {
   const bookings = getBookings();
   const idx = bookings.findIndex((b) => b.id === id);
-  if (idx === -1) return false;
-  bookings[idx].status = status;
+  if (idx === -1) return null;
+  bookings[idx] = { ...bookings[idx], ...updates };
   fs.writeFileSync(DATA_FILE, JSON.stringify(bookings, null, 2));
-  return true;
+  return bookings[idx];
+}
+
+export function updateBookingStatus(id: string, status: Booking["status"]): boolean {
+  return updateBooking(id, { status }) !== null;
 }
 
 export function deleteBooking(id: string): boolean {

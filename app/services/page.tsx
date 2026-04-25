@@ -33,11 +33,18 @@ export default function ServicesPage() {
           {SERVICES.map((category, ci) => (
             <div key={category.category}>
               {/* Category header */}
-              <div className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10 pb-4 border-b border-[var(--mc-border)]">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 border border-[var(--mc-accent)] flex items-center justify-center text-[var(--mc-accent)] shrink-0">
+              <div className="flex items-start gap-3 sm:gap-4 mb-8 sm:mb-10 pb-4 border-b border-[var(--mc-border)]">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 border border-[var(--mc-accent)] flex items-center justify-center text-[var(--mc-accent)] shrink-0 mt-0.5">
                   {iconMap[category.icon]}
                 </div>
-                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">{category.category}</h2>
+                <div>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">{category.category}</h2>
+                  {"tagline" in category && category.tagline && (
+                    <p className="text-[var(--mc-text-dim)] text-xs sm:text-sm mt-1 leading-relaxed max-w-2xl">
+                      {String(category.tagline)}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Items */}

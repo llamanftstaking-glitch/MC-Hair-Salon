@@ -44,7 +44,7 @@ export const metadata: Metadata = {
       "Upper East Side luxury salon since 2011. Expert cuts, color, balayage, eyelash extensions & spa services. 336 East 78th St, New York.",
     images: [
       {
-        url: "/mc-logo-gold.png",
+        url: "/mc-logo-bw.png",
         width: 1200,
         height: 630,
         alt: "MC Hair Salon & Spa — Upper East Side, New York City",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "MC Hair Salon & Spa | Upper East Side NYC",
     description: "Luxury salon & spa on the Upper East Side since 2011. Book your appointment online.",
-    images: ["/mc-logo-gold.png"],
+    images: ["/mc-logo-bw.png"],
   },
   robots: {
     index: true,

@@ -38,7 +38,7 @@ const ARTICLE_SCHEMA = {
   publisher: {
     "@type": "Organization",
     name: "MC Hair Salon & Spa",
-    logo: { "@type": "ImageObject", url: "https://mchairsalon.com/mc-logo-gold.png" },
+    logo: { "@type": "ImageObject", url: "https://mchairsalon.com/mc-logo-bw.png" },
   },
   datePublished: "2025-03-01",
   dateModified: "2025-03-01",

@@ -5,6 +5,18 @@ import { SERVICES, TESTIMONIALS, GALLERY_IMAGES, SALON_INFO } from "@/lib/data";
 import HeroLogo from "@/components/HeroLogo";
 import NewsletterStrip from "@/components/NewsletterStrip";
 import FadeIn from "@/components/FadeIn";
+import FaqSection from "@/components/FaqSection";
+
+const HOME_FAQS = [
+  { q: "Where is MC Hair Salon & Spa located?", a: "MC Hair Salon & Spa is located at 336 East 78th Street, between 1st and 2nd Avenues, on Manhattan's Upper East Side (zip code 10075). The nearest subway is the 6 train at 77th St (approximately 2 minutes away) or the Q train at 72nd St & 2nd Ave (approximately 6 minutes away)." },
+  { q: "How long has MC Hair Salon been open?", a: "MC Hair Salon & Spa has been serving the Upper East Side since 2011 — over 13 years. We have built a loyal base of more than 10,000 clients and maintain a consistent 5-star rating." },
+  { q: "What services does MC Hair Salon & Spa offer?", a: "We offer a full range of hair and beauty services including women's and men's haircuts, blowouts, balayage, highlights, full color, corrective color, updos, bridal styling, eyelash extensions, facials, and professional makeup artistry. We are one of the only salons on the Upper East Side that combines hair, spa, and makeup under one roof." },
+  { q: "How much does a haircut cost at MC Hair Salon?", a: "Women's cuts start at $45, men's cuts start at $30, and children's cuts start at $20. All prices are starting rates and may vary based on hair length and complexity. View our full pricing at mchairsalon.com/services." },
+  { q: "How much does balayage cost at MC Hair Salon?", a: "Balayage and highlights start at $120 at MC Hair Salon & Spa. Final pricing depends on hair length, density, and the complexity of the color design. Our colorists use L'Oréal professional color systems for all services." },
+  { q: "Does MC Hair Salon offer bridal hair and makeup?", a: "Yes — bridal services are one of our specialties. We offer complete wedding packages including bridal updos, trial sessions, hair and makeup for the full bridal party, and day-of coordination. Our resident makeup artist Isabella specializes in bridal looks. Contact us to discuss your wedding date and party size." },
+  { q: "Can I walk in without an appointment?", a: "Yes, walk-ins are always welcome at MC Hair Salon & Spa. We recommend calling ahead at (212) 988-5252 to confirm availability, especially on weekends and for color services. Online booking is also available 24/7 at mchairsalon.com/book." },
+  { q: "What are MC Hair Salon's hours?", a: "Monday: 10AM–5PM. Tuesday–Thursday: 10:30AM–7:30PM. Friday: 10AM–7PM. Saturday: 10AM–7PM. Sunday: 11AM–6PM." },
+];
 
 const iconMap: Record<string, React.ReactNode> = {
   scissors: <Scissors size={28} />,
@@ -127,6 +139,19 @@ export default function Home() {
       </section>
 
       <NewsletterStrip />
+
+      {/* FAQ */}
+      <section className="py-16 sm:py-24 px-6 bg-[var(--mc-surface-dark)]">
+        <div className="max-w-4xl mx-auto">
+          <FaqSection faqs={HOME_FAQS} title="Questions About MC Hair Salon" />
+          <div className="text-center mt-10">
+            <Link href="/about"
+              className="text-[var(--mc-accent)] text-xs uppercase tracking-widest hover:text-[var(--mc-accent-2)] transition-colors flex items-center justify-center gap-2 cursor-pointer">
+              Learn More About Us <ChevronRight size={14} />
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* BOOK CTA */}
       <section className="py-16 sm:py-24 px-6 relative overflow-hidden"

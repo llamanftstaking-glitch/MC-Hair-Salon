@@ -19,6 +19,8 @@ const navLinks = [
 
 const secondaryLinks = [
   { href: "/book",      label: "Book Appointment" },
+  { href: "/about",     label: "About Us"          },
+  { href: "/blog",      label: "Journal"           },
   { href: "/visit",     label: "How to Get Here"  },
   { href: "/packages",  label: "Packages"          },
   { href: "/gift-card", label: "Gift Cards"        },

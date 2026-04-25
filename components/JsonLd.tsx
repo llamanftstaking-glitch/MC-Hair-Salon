@@ -14,7 +14,7 @@ export default function JsonLd() {
     description:
       "Upper East Side's premier luxury hair salon and spa since 2011. Expert cuts, color, balayage, eyelash extensions, facials, and makeup artistry at 336 East 78th St, New York.",
     image: `${siteUrl}/opengraph-image`,
-    logo: `${siteUrl}/mc-logo-gold.png`,
+    logo: `${siteUrl}/mc-logo-bw.png`,
     priceRange: "$$",
     currenciesAccepted: "USD",
     paymentAccepted: "Cash, Credit Card, Debit Card, Gift Card",

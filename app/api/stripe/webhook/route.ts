@@ -50,7 +50,10 @@ export async function POST(req: NextRequest) {
           const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
           await fetch(`${BASE}/api/gift-card`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "x-internal-token": process.env.INTERNAL_API_TOKEN ?? "dev-token",
+            },
             body: JSON.stringify({
               action: "create",
               amount: Number(m.amount ?? 0),

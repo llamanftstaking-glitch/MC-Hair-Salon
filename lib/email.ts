@@ -3,6 +3,15 @@ import { Resend } from "resend";
 import type { Booking } from "./bookings";
 import type { GiftCard } from "./gift-cards";
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // Lazy singleton — throws only at send time, not at import/build time
 let _resend: Resend | null = null;
 function getResend(): Resend {
@@ -71,7 +80,7 @@ export async function sendNewsletterEmail(
     <div style="${baseStyle}">
       ${header}
       <div style="color:#f5f0e8;font-size:15px;line-height:1.8;">
-        ${body.replace(/\n/g, "<br/>")}
+        ${escapeHtml(body).replace(/\n/g, "<br/>")}
       </div>
       ${footer()}
     </div>`;
@@ -155,7 +164,7 @@ export async function sendContactReply(to: string, name: string, message: string
       <p style="color:#a89070;line-height:1.8;">We received your message and will get back to you within 24 hours.</p>
       <div style="background:#0f0f0f;border:1px solid #2a2a2a;padding:20px;margin:24px 0;border-left:3px solid #C9A84C;">
         <p style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;">Your message:</p>
-        <p style="color:#a89070;margin:0;">${message}</p>
+        <p style="color:#a89070;margin:0;">${escapeHtml(message)}</p>
       </div>
       <p style="color:#555;font-size:13px;">Call us: <a href="tel:2129885252" style="color:#C9A84C;">(212) 988-5252</a></p>
       ${footer()}

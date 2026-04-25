@@ -7,16 +7,20 @@ import {
   deleteBooking,
 } from "@/lib/bookings";
 import { getStripe } from "@/lib/stripe";
+import { requireAdmin } from "@/lib/auth";
 
+// GET — admin only
 export async function GET() {
+  const err = await requireAdmin();
+  if (err) return err;
   try {
-    const bookings = getBookings();
-    return NextResponse.json(bookings);
+    return NextResponse.json(getBookings());
   } catch {
     return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
   }
 }
 
+// POST — public (guests booking appointments)
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -29,7 +33,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Retrieve card details from Stripe when payment method is provided
+    // Basic length guards
+    if (name.length > 120 || email.length > 254 || phone.length > 30 || service.length > 200) {
+      return NextResponse.json({ error: "Input too long" }, { status: 400 });
+    }
+
     let cardLast4: string | undefined;
     let cardBrand: string | undefined;
 
@@ -37,24 +45,21 @@ export async function POST(req: NextRequest) {
       try {
         const stripe = getStripe();
         const pm = await stripe.paymentMethods.retrieve(stripePaymentMethodId);
-        if (pm.card) {
-          cardLast4 = pm.card.last4;
-          cardBrand = pm.card.brand;
-        }
+        if (pm.card) { cardLast4 = pm.card.last4; cardBrand = pm.card.brand; }
       } catch {
-        // Non-fatal — card details are cosmetic
+        // Non-fatal
       }
     }
 
     const booking = addBooking({
-      name,
-      email,
-      phone,
-      service,
-      stylist: stylist ?? "",
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone.trim(),
+      service: service.trim(),
+      stylist: stylist?.trim() ?? "",
       date,
       time,
-      notes: notes ?? "",
+      notes: (notes ?? "").slice(0, 1000),
       stripeCustomerId,
       stripePaymentMethodId,
       cardLast4,
@@ -67,17 +72,18 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// PATCH — admin only
 export async function PATCH(req: NextRequest) {
+  const err = await requireAdmin();
+  if (err) return err;
   try {
     const { id, status, ...rest } = await req.json();
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
-
     if (Object.keys(rest).length > 0) {
       const updated = updateBooking(id, { status, ...rest });
       if (!updated) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
       return NextResponse.json(updated);
     }
-
     const ok = updateBookingStatus(id, status);
     if (!ok) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     return NextResponse.json({ success: true });
@@ -86,7 +92,10 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
+// DELETE — admin only
 export async function DELETE(req: NextRequest) {
+  const err = await requireAdmin();
+  if (err) return err;
   try {
     const { id } = await req.json();
     const ok = deleteBooking(id);

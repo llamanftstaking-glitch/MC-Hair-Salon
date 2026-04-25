@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { getSession } from "@/lib/auth";
 import { getCustomerById, calcTier } from "@/lib/customers";
-import { Gift, Star, Crown, Zap, Check, Lock, Calendar } from "lucide-react";
+import { Gift, Star, Crown, Zap, Check, Lock, Calendar, Scissors, QrCode } from "lucide-react";
 
 // ── TIER CONFIG (update with client details) ─────────────────────────────────
 const TIERS = [
@@ -146,6 +147,91 @@ export default async function RewardsPage() {
                 <p className="text-[var(--mc-text-dim)] text-xs uppercase tracking-widest mt-1">{label}</p>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* ── Punch Card ──────────────────────────────────────────────────────── */}
+        <div className="luxury-card overflow-hidden">
+          <div className="p-6 sm:p-8">
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-1 flex items-center gap-2">
+                  <Scissors size={13} /> Hair Service Punch Card
+                </p>
+                <h2 className="font-serif text-2xl font-bold text-[var(--mc-text)]">
+                  10 Visits = Free Blowout
+                </h2>
+                <p className="text-[var(--mc-muted)] text-sm mt-1">
+                  Every hair service earns one punch. Collect 10 for a complimentary blowout — on us.
+                </p>
+              </div>
+              {(customer.blowoutsEarned ?? 0) > 0 && (
+                <div className="shrink-0 text-center border border-[var(--mc-accent)]/30 bg-[var(--mc-accent)]/5 px-4 py-3">
+                  <p className="font-serif text-2xl font-bold text-[var(--mc-accent)]">{customer.blowoutsEarned}</p>
+                  <p className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest mt-0.5">Earned</p>
+                </div>
+              )}
+            </div>
+
+            {/* 10 punch circles */}
+            <div className="flex flex-wrap gap-2 sm:gap-3 mb-4">
+              {Array.from({ length: 10 }).map((_, i) => {
+                const filled = i < (customer.visitStreak ?? 0);
+                return (
+                  <div key={i} className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center transition-all ${
+                    filled ? "bg-[var(--mc-accent)] border-[var(--mc-accent)]" : "border-[var(--mc-border)]"
+                  }`}>
+                    {filled
+                      ? <Check size={16} strokeWidth={3} className="text-black" />
+                      : <span className="text-[var(--mc-text-dim)] text-xs font-bold">{i + 1}</span>
+                    }
+                  </div>
+                );
+              })}
+              {/* Reward circle */}
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-[var(--mc-accent)]/50 bg-[var(--mc-accent)]/5 flex items-center justify-center">
+                <Gift size={16} className="text-[var(--mc-accent)]" />
+              </div>
+            </div>
+
+            {(customer.visitStreak ?? 0) === 9 ? (
+              <p className="text-[var(--mc-accent)] text-sm font-semibold">
+                ⚡ One more hair service unlocks your free blowout!
+              </p>
+            ) : (
+              <p className="text-[var(--mc-muted)] text-sm">
+                <span className="text-[var(--mc-text)] font-semibold">{customer.visitStreak ?? 0}/10</span> hair services completed
+                &nbsp;·&nbsp; {10 - (customer.visitStreak ?? 0)} more for your next free blowout
+              </p>
+            )}
+          </div>
+
+          {/* QR code section */}
+          <div className="border-t border-[var(--mc-border)] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6">
+            <div className="shrink-0">
+              {/* QR code rendered via API */}
+              <div className="w-32 h-32 border border-[var(--mc-border)] overflow-hidden bg-white">
+                <Image
+                  src={`/api/qr/${customer.id}`}
+                  alt="My loyalty QR code"
+                  width={128}
+                  height={128}
+                  className="w-full h-full"
+                  unoptimized
+                />
+              </div>
+            </div>
+            <div>
+              <p className="text-[var(--mc-text)] font-semibold flex items-center gap-2 mb-2">
+                <QrCode size={16} className="text-[var(--mc-accent)]" /> Your Loyalty QR Code
+              </p>
+              <p className="text-[var(--mc-muted)] text-sm leading-relaxed">
+                Show this QR code to your stylist at the start of every visit. They&apos;ll scan it to record your service and keep your punch card up to date.
+              </p>
+              <p className="text-[var(--mc-text-dim)] text-xs mt-2 uppercase tracking-wider">
+                Unique to your account · Cannot be transferred
+              </p>
+            </div>
           </div>
         </div>
 

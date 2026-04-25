@@ -6,7 +6,7 @@ import {
   MessageSquare, MailCheck, Upload, Film, Pencil, User, Settings,
   Building2, Globe, Phone, ChevronRight, Image as ImageIcon, Save,
   CreditCard, AlertTriangle, ShieldCheck,
-  Gift, Star, Crown, Zap, Minus,
+  Gift, Star, Crown, Zap, Minus, Scissors, QrCode,
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
@@ -952,13 +952,30 @@ export default function AdminPage() {
                 </div>
               )}
 
+              {/* Scan station quick-access */}
+              <div className="border border-[var(--mc-accent)]/30 bg-[#0a0800] p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+                <div>
+                  <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-1 flex items-center gap-2">
+                    <Scissors size={13} /> On-Site Scan Station
+                  </p>
+                  <p className="text-[var(--mc-muted)] text-sm">
+                    Open on any salon device to look up clients and record visits manually.
+                    Clients can also show their QR code to jump straight to their profile.
+                  </p>
+                </div>
+                <a href="/scan" target="_blank" rel="noopener noreferrer"
+                  className="shrink-0 gold-gradient-bg text-black font-bold px-6 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer">
+                  Open Station ↗
+                </a>
+              </div>
+
               {/* Stat cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
-                  { label: "Total Members",    value: rewardsData.length,         icon: <Users size={18} />    },
-                  { label: "Points Issued",    value: totalPoints.toLocaleString(), icon: <Star size={18} />    },
-                  { label: "Rewards Redeemed", value: totalRedeem,                icon: <Gift size={18} />     },
-                  { label: "Platinum Members", value: tierCount.Platinum || 0,    icon: <Crown size={18} />    },
+                  { label: "Total Members",      value: rewardsData.length,                                                    icon: <Users size={18} />    },
+                  { label: "Points Issued",       value: totalPoints.toLocaleString(),                                          icon: <Star size={18} />     },
+                  { label: "Blowouts Earned",     value: rewardsData.reduce((s, c) => s + (c.blowoutsEarned ?? 0), 0),          icon: <Scissors size={18} /> },
+                  { label: "Rewards Redeemed",    value: totalRedeem,                                                           icon: <Gift size={18} />     },
                 ].map(({ label, value, icon }) => (
                   <div key={label} className="luxury-card p-5">
                     <div className="text-[var(--mc-accent)] mb-3">{icon}</div>
@@ -1041,10 +1058,28 @@ export default function AdminPage() {
                               </div>
                             </div>
 
-                            {/* Redeemed count */}
-                            <span className="text-[#555] text-xs shrink-0 hidden md:block">
-                              {customer.rewards.length} redeemed
-                            </span>
+                            {/* Punch card mini-progress */}
+                            <div className="items-center gap-1 hidden md:flex shrink-0">
+                              {Array.from({ length: 10 }).map((_, i) => (
+                                <div key={i} className={`w-2 h-2 rounded-full ${i < (customer.visitStreak ?? 0) ? "bg-[var(--mc-accent)]" : "bg-[#1a1a1a]"}`} />
+                              ))}
+                              <span className="text-[#444] text-[10px] ml-1">{customer.visitStreak ?? 0}/10</span>
+                            </div>
+
+                            {/* Blowouts earned */}
+                            {(customer.blowoutsEarned ?? 0) > 0 && (
+                              <div className="items-center gap-1 hidden lg:flex shrink-0">
+                                <Scissors size={11} className="text-[var(--mc-accent)]" />
+                                <span className="text-[var(--mc-accent)] text-xs">{customer.blowoutsEarned}</span>
+                              </div>
+                            )}
+
+                            {/* QR link */}
+                            <a href={`/scan/${customer.id}`} target="_blank" rel="noopener noreferrer"
+                              title="Open scan page"
+                              className="w-8 h-8 shrink-0 border border-[#222] flex items-center justify-center text-[#444] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                              <QrCode size={13} />
+                            </a>
 
                             {/* Joined */}
                             <span className="text-[#444] text-xs shrink-0 hidden lg:block">

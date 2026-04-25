@@ -17,6 +17,9 @@ export interface Customer {
   appointments: Appointment[];
   packages: CustomerPackage[];
   rewards: RedeemedReward[];
+  // Punch card — 10 hair services = 1 free blowout
+  visitStreak:    number;   // current punches toward next blowout (resets at 10)
+  blowoutsEarned: number;   // lifetime complimentary blowouts earned
 }
 
 export interface Appointment {
@@ -87,6 +90,8 @@ export function createCustomer(data: Omit<Customer, "id" | "createdAt" | "points
     appointments: [],
     packages: [],
     rewards: [],
+    visitStreak: 0,
+    blowoutsEarned: 0,
   };
   customers.push(customer);
   write(customers);

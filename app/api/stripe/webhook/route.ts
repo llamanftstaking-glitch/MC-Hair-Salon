@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
               recipientEmail: m.recipientEmail ?? "",
               recipientPhone: m.recipientPhone ?? "",
               senderName:     m.senderName     ?? "",
+              senderEmail:    m.senderEmail    ?? session.customer_email ?? "",
               message:        m.message        ?? "",
               deliveryMethod: m.deliveryMethod ?? "email",
               stripeSessionId: session.id,

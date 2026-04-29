@@ -1,0 +1,50 @@
+{
+  "capturedAt": "2026-04-29T19:50:07.776Z",
+  "fromAddressUsed": "hello@mchairsalon.com",
+  "domainStatus": {
+    "httpStatus": 200,
+    "body": {
+      "object": "list",
+      "has_more": false,
+      "data": [
+        {
+          "id": "6a079b26-6be6-4af7-a0bc-94ba50d860fb",
+          "name": "mchairsalon.com",
+          "status": "verified",
+          "created_at": "2026-04-29 14:23:50.759198+00",
+          "region": "us-east-1",
+          "capabilities": {
+            "sending": "enabled",
+            "receiving": "disabled"
+          }
+        }
+      ]
+    }
+  },
+  "testSend": {
+    "httpStatus": 200,
+    "headers": {
+      "content-type": "application/json",
+      "ratelimit-limit": "5",
+      "ratelimit-policy": "5;w=1",
+      "ratelimit-remaining": "3",
+      "ratelimit-reset": "1",
+      "x-resend-daily-quota": "9",
+      "x-resend-monthly-quota": "9"
+    },
+    "body": {
+      "id": "316d4e4d-357e-42d5-824f-ea7f3b372e15"
+    }
+  },
+  "productionContactApi": {
+    "httpStatus": 201,
+    "body": {
+      "name": "Verification Artifact",
+      "email": "delivered@resend.dev",
+      "message": "Production code path verification at 2026-04-29T19:50:07.776Z",
+      "id": "MSG-1777492208181",
+      "read": false,
+      "createdAt": "2026-04-29T19:50:08.181Z"
+    }
+  }
+}

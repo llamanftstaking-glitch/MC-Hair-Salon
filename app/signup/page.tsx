@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Loader, Sparkles } from "lucide-react";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -101,6 +102,8 @@ export default function SignupPage() {
             className="w-full gold-gradient-bg text-black font-bold py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-60 cursor-pointer flex items-center justify-center gap-2 mt-2">
             {loading ? <><Loader size={16} className="animate-spin" /> Creating account...</> : "Create Account & Join Rewards"}
           </button>
+
+          <GoogleSignInButton mode="signup" />
 
           <p className="text-center text-[var(--mc-text-dim)] text-sm pt-2">
             Already have an account?{" "}

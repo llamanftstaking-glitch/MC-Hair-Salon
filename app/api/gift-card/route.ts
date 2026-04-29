@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createGiftCard, getGiftCards, getGiftCardByCode, redeemGiftCard } from "@/lib/gift-cards";
-import { sendGiftCardEmail } from "@/lib/email";
+import { sendGiftCardEmail, sendNewGiftCardNotification } from "@/lib/email";
 
 // GET — admin: list all, or ?code=XXXX to validate a single card
 export async function GET(req: NextRequest) {
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
       const { amount, recipientName, recipientEmail, recipientPhone,
-              senderName, message, deliveryMethod, stripeSessionId } = body;
+              senderName, senderEmail, message, deliveryMethod, stripeSessionId } = body;
 
       if (!amount || !recipientName || !senderName) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -44,12 +44,19 @@ export async function POST(req: NextRequest) {
         recipientEmail,
         recipientPhone,
         senderName,
+        senderEmail: senderEmail || undefined,
         message: message ?? "",
         deliveryMethod: deliveryMethod ?? "email",
         stripeSessionId,
       });
 
-      // Send via email
+      // Notify the salon inbox in parallel — fire-and-forget so the public
+      // POST flow returns immediately and isn't gated on Resend latency.
+      sendNewGiftCardNotification(card).catch(err =>
+        console.error("[gift-card] Salon notification failed:", err)
+      );
+
+      // Send via email to recipient
       if ((deliveryMethod === "email" || deliveryMethod === "both") && recipientEmail) {
         await sendGiftCardEmail(card).catch(err =>
           console.error("[gift-card] Email send failed:", err)

@@ -8,7 +8,8 @@ export interface Customer {
   name: string;
   email: string;
   phone: string;
-  passwordHash: string;
+  passwordHash?: string;
+  googleId?: string;
   createdAt: string;
   points: number;
   visits: number;
@@ -77,7 +78,7 @@ export function getCustomerById(id: string): Customer | undefined {
   return read().find((c) => c.id === id);
 }
 
-export function createCustomer(data: Omit<Customer, "id" | "createdAt" | "points" | "visits" | "totalSpent" | "tier" | "appointments" | "packages" | "rewards">): Customer {
+export function createCustomer(data: Omit<Customer, "id" | "createdAt" | "points" | "visits" | "totalSpent" | "tier" | "appointments" | "packages" | "rewards" | "visitStreak" | "blowoutsEarned">): Customer {
   const customers = read();
   const customer: Customer = {
     ...data,

@@ -19,6 +19,7 @@ Luxury hair salon website for MC Hair Salon & Spa, Upper East Side, New York.
 - `RESEND_API_KEY` — Resend API key for sending email
 - `RESEND_FROM_EMAIL` — Verified sender address, e.g. `MC Hair Salon <hello@mchairsalon.com>`
 - `SALON_INBOX_EMAIL` (optional) — Where new contact / booking / gift-card notifications are sent. Defaults to `hello@mchairsalon.com`.
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (optional) — Google OAuth Web Client ID. Enables the "Sign in with Google" button on `/login` and `/signup`. Without it the button is hidden and email/password still works.
 - Stripe keys (when payments are used) — handled via env vars in `lib/stripe.ts`
 
 ## Email — Resend Domain Verification
@@ -70,7 +71,21 @@ Notifications are fire-and-forget — failures are logged to the server console 
 - `lib/settings.ts` — Replit-only site settings module (defaults + JSON persistence)
 - `lib/data.ts` — TEAM array, services, packages
 - `lib/stripe.ts` — Stripe integration (env-keyed, lazy init)
+- `lib/customers.ts` — Customer JSON store. `passwordHash` is optional (Google-only accounts have none). `googleId` is set for Google-linked accounts.
 - `middleware.ts` — Auth guard for admin and scan routes
+
+## Authentication
+Customer accounts support two sign-in methods, both issuing the same `mc-session` JWT cookie (30-day, HS256 via `jose`):
+1. **Email + password** — `/api/auth/signup` and `/api/auth/login` (bcrypt).
+2. **Google Sign-In** — `/api/auth/google` verifies the GIS ID token with `google-auth-library` (`OAuth2Client.verifyIdToken`) against `NEXT_PUBLIC_GOOGLE_CLIENT_ID`. On first sign-in it creates a passwordless customer with full default rewards state; on subsequent sign-ins it backfills `googleId` onto the matching email account. Email/password login on a Google-only account returns a friendly "use Google" message.
+
+Front-end button is `components/GoogleSignInButton.tsx` (loads `https://accounts.google.com/gsi/client`, renders the official Google button, posts the credential, then `router.push("/account")`). Hidden when `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is not set.
+
+**Google Cloud setup** (one-time, done in Google Cloud Console):
+1. Create / select a project, configure the OAuth consent screen (External, app name "MC Hair Salon & Spa", support email).
+2. Create an OAuth Client ID of type "Web application".
+3. Authorized JavaScript origins: the current Replit dev URL (`https://<repl>.replit.dev`), the deployed `.replit.app` URL, and `https://mchairsalon.com`. No redirect URIs are required (Google Identity Services uses one-tap / popup, not a redirect flow).
+4. Save the Client ID into the `NEXT_PUBLIC_GOOGLE_CLIENT_ID` secret.
 
 ## GitHub Sync Workflow
 The site is pushed from GitHub repo `llamanftstaking-glitch/MC-Hair-Salon`.

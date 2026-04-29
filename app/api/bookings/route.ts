@@ -8,6 +8,7 @@ import {
 } from "@/lib/bookings";
 import { getStripe } from "@/lib/stripe";
 import { requireAdmin } from "@/lib/auth";
+import { sendBookingConfirmation } from "@/lib/email";
 
 // GET — admin only
 export async function GET() {
@@ -65,6 +66,9 @@ export async function POST(req: NextRequest) {
       cardLast4,
       cardBrand,
     });
+
+    // Auto-confirm email — non-fatal if Resend key isn't configured yet
+    sendBookingConfirmation(booking).catch(() => {});
 
     return NextResponse.json(booking, { status: 201 });
   } catch {

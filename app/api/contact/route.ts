@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMessages, addMessage, markRead, deleteMessage } from "@/lib/messages";
 import { requireAdmin } from "@/lib/auth";
+import { sendContactReply } from "@/lib/email";
 
 // GET — admin only
 export async function GET() {
@@ -23,11 +24,15 @@ export async function POST(req: NextRequest) {
     if (name.length > 120 || email.length > 254 || message.length > 5000) {
       return NextResponse.json({ error: "Input too long" }, { status: 400 });
     }
-    const msg = addMessage({
-      name:    name.trim(),
-      email:   email.trim().toLowerCase(),
-      message: message.trim(),
-    });
+    const trimmedName    = name.trim();
+    const trimmedEmail   = email.trim().toLowerCase();
+    const trimmedMessage = message.trim();
+
+    const msg = addMessage({ name: trimmedName, email: trimmedEmail, message: trimmedMessage });
+
+    // Auto-reply — non-fatal if Resend key isn't configured yet
+    sendContactReply(trimmedEmail, trimmedName, trimmedMessage).catch(() => {});
+
     return NextResponse.json(msg, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to save message" }, { status: 500 });

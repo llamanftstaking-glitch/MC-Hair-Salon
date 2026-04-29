@@ -22,7 +22,7 @@ Luxury hair salon website for MC Hair Salon & Spa, Upper East Side, New York.
 
 ## Email — Resend Domain Verification
 
-**Status: VERIFIED & LIVE** (confirmed 2026-04-29)
+**Status: VERIFIED on Resend, accepting sends from `hello@mchairsalon.com`** (confirmed 2026-04-29)
 
 | Field | Value |
 |---|---|
@@ -33,12 +33,18 @@ Luxury hair salon website for MC Hair Salon & Spa, Upper East Side, New York.
 | Sending | `enabled` |
 | Verified FROM address | `hello@mchairsalon.com` |
 
-End-to-end verification evidence:
-- `GET /domains` (Resend API) → `status: verified`, `capabilities.sending: enabled`
-- Direct test send from `hello@mchairsalon.com` → HTTP 200, delivery accepted (sample IDs: `95499f79-...`, `a52d7bb8-...`)
+End-to-end verification evidence (raw API responses captured in `verification-evidence/resend-domain-verified.json`):
+- `GET https://api.resend.com/domains` → `status: verified`, `capabilities.sending: enabled`
+- Direct send from `hello@mchairsalon.com` → HTTP 200 with Resend message IDs accepted
 - Production code path `POST /api/contact` → HTTP 201, fires `sendContactReply` via `lib/email.ts` using the verified sender
 
-The salon can now send live booking confirmations, contact form replies, gift card deliveries, and newsletter emails to real client inboxes — no longer limited to the 2/day testing tier.
+What this confirms (server-side):
+- Resend has accepted the domain and DKIM/SPF/DMARC DNS records
+- Resend accepts outbound sends from the verified address with a returned message ID
+- The production email code path runs without errors
+
+What still requires user-side confirmation:
+- That a real client email (Gmail/Outlook/etc.) lands in the inbox, not spam — the user should send themselves a booking confirmation or contact form submission and verify placement, then optionally raise their Resend plan if needed.
 
 ## Important Files
 - `lib/email.ts` — Resend integration (booking confirmations, contact replies, gift card delivery, newsletter blasts)

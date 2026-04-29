@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Google account is missing required information" }, { status: 401 });
   }
 
-  if (payload.email_verified === false) {
+  if (payload.email_verified !== true) {
     return NextResponse.json(
       { error: "Your Google email is not verified. Please verify it with Google and try again." },
       { status: 401 }
@@ -51,6 +51,13 @@ export async function POST(req: NextRequest) {
   let customer = getCustomerByEmail(email);
 
   if (customer) {
+    if (customer.googleId && customer.googleId !== googleId) {
+      // The email is already linked to a different Google account — refuse to issue a session.
+      return NextResponse.json(
+        { error: "This account is linked to a different Google profile. Please contact the salon for help." },
+        { status: 409 }
+      );
+    }
     if (!customer.googleId) {
       const updated = updateCustomer(customer.id, { googleId });
       if (updated) customer = updated;

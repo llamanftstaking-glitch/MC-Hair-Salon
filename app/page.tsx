@@ -48,24 +48,25 @@ export default function Home() {
       </section>
 
       {/* PRICING CALLOUT */}
-      <section className="py-4 px-6 bg-[var(--mc-surface-dark)] border-b border-[var(--mc-border)]">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+      <section className="py-5 px-6 bg-[var(--mc-surface-dark)] border-b border-[var(--mc-border)]">
+        <p className="text-center text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest mb-3 sm:hidden">Starting from</p>
+        <div className="max-w-7xl mx-auto grid grid-cols-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center gap-3 sm:gap-x-6 sm:gap-y-2">
           <span className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest hidden sm:block shrink-0">Starting from</span>
           {[
-            { label: "Children's Cuts", price: "$20" },
-            { label: "Men's Cuts",      price: "$30" },
-            { label: "Blowouts",        price: "$33" },
-            { label: "Women's Cuts",    price: "$45" },
-            { label: "Color",           price: "$85" },
-            { label: "Balayage",        price: "$120" },
+            { label: "Kids Cut",    price: "$20" },
+            { label: "Men's Cut",   price: "$30" },
+            { label: "Blowout",     price: "$33" },
+            { label: "Women's Cut", price: "$45" },
+            { label: "Color",       price: "$85" },
+            { label: "Balayage",    price: "$120" },
           ].map((item, i, arr) => (
-            <div key={i} className="flex items-center gap-2 sm:gap-3">
-              <span className="font-serif text-xl gold-gradient font-bold">{item.price}</span>
-              <span className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-wider">{item.label}</span>
+            <div key={i} className="flex flex-col sm:flex-row items-center sm:items-center gap-0.5 sm:gap-3 text-center sm:text-left">
+              <span className="font-serif text-2xl sm:text-xl gold-gradient font-bold">{item.price}</span>
+              <span className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-wider leading-tight">{item.label}</span>
               {i < arr.length - 1 && <span className="text-[var(--mc-border)] text-sm hidden sm:block">·</span>}
             </div>
           ))}
-          <Link href="/services" className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest hover:underline shrink-0 hidden sm:block cursor-pointer">
+          <Link href="/services" className="text-[var(--mc-accent)] text-xs uppercase tracking-widest hover:underline col-span-3 text-center mt-1 sm:mt-0 sm:col-span-1 cursor-pointer">
             Full Menu →
           </Link>
         </div>

@@ -61,7 +61,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface BookingForm {
-  service: string;
+  services: string[];
   servicePrice: number;
   stylist: string;
   date: string;
@@ -110,61 +110,222 @@ function StepBar({ current }: { current: number }) {
 
 // ── Step 1 — Service Selection ────────────────────────────────────────────────
 function Step1Service({
-  onSelect,
+  selected,
+  onDone,
 }: {
-  onSelect: (service: string, price: number) => void;
+  selected: string[];
+  onDone: (services: string[], totalPrice: number) => void;
 }) {
   const [activeCategory, setActiveCategory] = useState(SERVICES[0].category);
+  const [picked, setPicked] = useState<string[]>(selected);
 
   const active = SERVICES.find((c) => c.category === activeCategory);
+  const MAX = 3;
+
+  function toggle(name: string) {
+    setPicked((prev) => {
+      if (prev.includes(name)) return prev.filter((s) => s !== name);
+      if (prev.length >= MAX) return prev;
+      return [...prev, name];
+    });
+  }
+
+  function handleNext() {
+    const allItems = SERVICES.flatMap((c) => c.items);
+    const total = picked.reduce((sum, name) => {
+      const item = allItems.find((i) => i.name === name);
+      return sum + (item?.price ?? 0);
+    }, 0);
+    onDone(picked, total);
+  }
 
   return (
     <div>
-      <p className="text-[var(--mc-muted)] text-center mb-8 text-sm">
-        Select the service you&apos;d like to book
-      </p>
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-[var(--mc-muted)] text-sm">
+          Select up to <span className="text-white font-semibold">{MAX} services</span>
+        </p>
+        {picked.length > 0 && (
+          <span className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold">
+            {picked.length} of {MAX} selected
+          </span>
+        )}
+      </div>
+
+      {/* Selected services summary */}
+      {picked.length > 0 && (
+        <div className="mb-6 flex flex-wrap gap-2">
+          {picked.map((name) => (
+            <button
+              key={name}
+              onClick={() => toggle(name)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-[var(--mc-accent)]/10 border border-[var(--mc-accent)] text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold cursor-pointer hover:bg-[var(--mc-accent)]/20 transition-colors"
+            >
+              {name} <span className="text-[var(--mc-accent)]/60">✕</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Category tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-8 scrollbar-hide justify-center flex-wrap">
-        {SERVICES.map((cat) => (
-          <button
-            key={cat.category}
-            onClick={() => setActiveCategory(cat.category)}
-            className={`flex items-center gap-2 px-4 py-2.5 border text-xs uppercase tracking-widest font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              activeCategory === cat.category
-                ? "border-[var(--mc-accent)] text-black bg-[var(--mc-accent)]"
-                : "border-[#222] text-[var(--mc-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)]"
-            }`}
-          >
-            <span className="hidden sm:inline">{CATEGORY_ICONS[cat.category]}</span>
-            {cat.category}
-          </button>
-        ))}
+      <div className="relative mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide sm:justify-center sm:flex-wrap">
+          {SERVICES.map((cat) => (
+            <button
+              key={cat.category}
+              onClick={() => setActiveCategory(cat.category)}
+              className={`flex items-center gap-2 px-4 py-2.5 border text-xs uppercase tracking-widest font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                activeCategory === cat.category
+                  ? "border-[var(--mc-accent)] text-black bg-[var(--mc-accent)]"
+                  : "border-[#222] text-[var(--mc-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)]"
+              }`}
+            >
+              <span className="hidden sm:inline">{CATEGORY_ICONS[cat.category]}</span>
+              {cat.category}
+            </button>
+          ))}
+        </div>
+        {/* Fade edge hint on mobile */}
+        <div className="pointer-events-none absolute top-0 right-0 bottom-2 w-10 bg-gradient-to-l from-black to-transparent sm:hidden" />
       </div>
 
       {/* Service cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {active?.items.map((item) => (
-          <button
-            key={item.name}
-            onClick={() => onSelect(item.name, item.price)}
-            className="group text-left border border-[#1a1a1a] hover:border-[var(--mc-accent)] bg-[#080808] hover:bg-[#0f0f0f] p-5 transition-all duration-200 cursor-pointer"
-          >
-            <div className="flex justify-between items-start mb-2">
-              <span className="font-serif font-bold text-white text-base leading-tight group-hover:text-[var(--mc-accent)] transition-colors">
-                {item.name}
-              </span>
-              <span className="text-[var(--mc-accent)] font-bold text-sm ml-3 shrink-0">
-                from ${item.price}
-              </span>
-            </div>
-            <p className="text-[var(--mc-muted)] text-xs leading-relaxed">{item.description}</p>
-            <div className="mt-3 flex items-center gap-1 text-[#333] group-hover:text-[var(--mc-accent)] transition-colors text-xs uppercase tracking-widest font-semibold">
-              Select <Check size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-          </button>
-        ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+        {active?.items.map((item) => {
+          const isSelected = picked.includes(item.name);
+          const isDisabled = !isSelected && picked.length >= MAX;
+          return (
+            <button
+              key={item.name}
+              onClick={() => !isDisabled && toggle(item.name)}
+              className={`group text-left border p-5 transition-all duration-200 cursor-pointer ${
+                isSelected
+                  ? "border-[var(--mc-accent)] bg-[#0d0900]"
+                  : isDisabled
+                  ? "border-[#111] bg-[#050505] opacity-40 cursor-not-allowed"
+                  : "border-[#1a1a1a] hover:border-[var(--mc-accent)] bg-[#080808] hover:bg-[#0f0f0f]"
+              }`}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <span className={`font-serif font-bold text-base leading-tight transition-colors ${isSelected ? "text-[var(--mc-accent)]" : "text-white group-hover:text-[var(--mc-accent)]"}`}>
+                  {item.name}
+                </span>
+                <div className="flex items-center gap-2 ml-3 shrink-0">
+                  <span className="text-[var(--mc-accent)] font-bold text-sm">from ${item.price}</span>
+                  {isSelected && (
+                    <div className="w-5 h-5 bg-[var(--mc-accent)] flex items-center justify-center shrink-0">
+                      <Check size={11} strokeWidth={3} className="text-black" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <p className="text-[var(--mc-muted)] text-xs leading-relaxed">{item.description}</p>
+              <div className={`mt-3 text-xs uppercase tracking-widest font-semibold transition-colors ${isSelected ? "text-[var(--mc-accent)]" : "text-[#333] group-hover:text-[var(--mc-accent)]"}`}>
+                {isSelected ? "Selected ✓" : "Select"}
+              </div>
+            </button>
+          );
+        })}
       </div>
+
+      {/* Always-visible Next button */}
+      <button
+        onClick={handleNext}
+        disabled={picked.length === 0}
+        className="w-full gold-gradient-bg text-black font-bold py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+      >
+        {picked.length === 0
+          ? "Select at least one service"
+          : `Continue with ${picked.length} service${picked.length > 1 ? "s" : ""} →`}
+      </button>
+    </div>
+  );
+}
+
+// ── Mini Calendar ─────────────────────────────────────────────────────────────
+function MonthCalendar({ selected, onSelect }: { selected: string; onSelect: (d: string) => void }) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const [cursor, setCursor] = useState(() => {
+    const d = selected ? new Date(selected + "T00:00:00") : new Date();
+    return { year: d.getFullYear(), month: d.getMonth() };
+  });
+  const { year, month } = cursor;
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const DAYS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const pad = (n: number) => String(n).padStart(2,"0");
+  const toStr = (d: number) => `${year}-${pad(month+1)}-${pad(d)}`;
+  const isClosed = (d: number) => !SALON_HOURS[new Date(year, month, d).getDay()];
+  const isPast = (d: number) => new Date(year, month, d) < today;
+  const cells: (number|null)[] = [...Array(firstDay).fill(null), ...Array.from({length: daysInMonth}, (_,i) => i+1)];
+  const prevMonth = () => setCursor(c => { const d = new Date(c.year, c.month-1, 1); return {year: d.getFullYear(), month: d.getMonth()}; });
+  const nextMonth = () => setCursor(c => { const d = new Date(c.year, c.month+1, 1); return {year: d.getFullYear(), month: d.getMonth()}; });
+
+  return (
+    <div className="border border-[#1a1a1a] bg-[#080808] p-4 select-none">
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer">
+          <ChevronLeft size={16} />
+        </button>
+        <p className="font-serif text-white font-bold text-sm tracking-wide">{MONTHS[month]} {year}</p>
+        <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer">
+          <ChevronLeft size={16} className="rotate-180" />
+        </button>
+      </div>
+      <div className="grid grid-cols-7 mb-1">
+        {DAYS.map(d => <div key={d} className="text-center text-[#444] text-[10px] uppercase tracking-widest py-1 font-semibold">{d}</div>)}
+      </div>
+      <div className="grid grid-cols-7 gap-0.5">
+        {cells.map((day, i) => {
+          if (!day) return <div key={`e-${i}`} />;
+          const str = toStr(day);
+          const isSelected = str === selected;
+          const disabled = isPast(day) || isClosed(day);
+          return (
+            <button key={str} disabled={disabled} onClick={() => onSelect(str)}
+              className={`h-9 w-full flex items-center justify-center text-sm font-medium transition-all duration-150 rounded-sm
+                ${isSelected ? "bg-[var(--mc-accent)] text-black font-bold"
+                  : disabled ? "text-[#252525] cursor-not-allowed"
+                  : "text-[#aaa] hover:bg-[#1a1a1a] hover:text-white cursor-pointer"}`}>
+              {day}
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[#2a2a2a] text-[10px] mt-3 text-center uppercase tracking-widest">Tap a date to see available times</p>
+    </div>
+  );
+}
+
+// ── Time Suggestions ──────────────────────────────────────────────────────────
+function TimeSuggestions({ dateStr, selected, onSelect }: { dateStr: string; selected: string; onSelect: (t: string) => void }) {
+  const slots = generateTimeSlots(dateStr);
+  if (!slots.length) return <p className="text-[var(--mc-muted)] text-sm text-center py-4">We&apos;re closed on this day — please choose another date.</p>;
+
+  const groups = [
+    { label: "Morning",   slots: slots.filter(s => s.includes("AM")) },
+    { label: "Afternoon", slots: slots.filter(s => { const h = parseInt(s); return s.includes("PM") && (h < 5 || h === 12); }) },
+    { label: "Evening",   slots: slots.filter(s => { const h = parseInt(s); return s.includes("PM") && h >= 5 && h !== 12; }) },
+  ].filter(g => g.slots.length > 0);
+
+  return (
+    <div className="space-y-5">
+      {groups.map(({ label, slots: gs }) => (
+        <div key={label}>
+          <p className="text-[#444] text-[10px] uppercase tracking-widest font-semibold mb-2">{label}</p>
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            {gs.map(slot => (
+              <button key={slot} onClick={() => onSelect(slot)}
+                className={`py-3 text-xs border font-semibold transition-all duration-150 cursor-pointer ${
+                  selected === slot ? "bg-[var(--mc-accent)] border-[var(--mc-accent)] text-black"
+                    : "border-[#1a1a1a] text-[#888] hover:border-[var(--mc-accent)] hover:text-white bg-[#080808]"}`}>
+                {slot}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -181,19 +342,21 @@ function Step2Schedule({
   onNext: () => void;
   onBack: () => void;
 }) {
-  const timeSlots = generateTimeSlots(form.date);
-  const today = new Date().toISOString().split("T")[0];
   const can = form.date && form.time;
 
   return (
     <div>
-      {/* Selected service callout */}
-      <div className="border border-[#1a1a1a] bg-[#080808] p-4 mb-8 flex items-center justify-between">
-        <div>
-          <p className="text-[var(--mc-muted)] text-xs uppercase tracking-widest mb-1">Selected Service</p>
-          <p className="text-white font-serif font-bold">{form.service}</p>
+      {/* Selected services callout */}
+      <div className="border border-[#1a1a1a] bg-[#080808] p-4 mb-8">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-[var(--mc-muted)] text-xs uppercase tracking-widest">Selected Services</p>
+          <span className="text-[var(--mc-accent)] font-bold text-sm">from ${form.servicePrice}</span>
         </div>
-        <span className="text-[var(--mc-accent)] font-bold">from ${form.servicePrice}</span>
+        <div className="flex flex-wrap gap-2">
+          {form.services.map((s) => (
+            <span key={s} className="text-white text-xs font-semibold border border-[#2a2a2a] px-2 py-1">{s}</span>
+          ))}
+        </div>
       </div>
 
       {/* Stylist selection */}
@@ -264,53 +427,29 @@ function Step2Schedule({
         </div>
       </div>
 
-      {/* Date picker */}
-      <div className="mb-8">
-        <label className="flex items-center gap-2 text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">
+      {/* Monthly calendar */}
+      <div className="mb-6">
+        <p className="flex items-center gap-2 text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">
           <Calendar size={14} /> Select Date
-        </label>
-        <input
-          type="date"
-          value={form.date}
-          min={today}
-          onChange={(e) => { onChange("date", e.target.value); onChange("time", ""); }}
-          className="w-full bg-[#080808] border border-[#1a1a1a] text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors cursor-pointer"
-          style={{ colorScheme: "dark" }}
+        </p>
+        <MonthCalendar
+          selected={form.date}
+          onSelect={(d) => { onChange("date", d); onChange("time", ""); }}
         />
         {form.date && (
-          <p className="text-[#555] text-xs mt-2 uppercase tracking-wider">
-            {new Date(form.date + "T00:00:00").toLocaleDateString("en-US", {
-              weekday: "long", month: "long", day: "numeric",
-            })}
+          <p className="text-[var(--mc-accent)] text-xs mt-3 uppercase tracking-wider font-semibold text-center">
+            {new Date(form.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
           </p>
         )}
       </div>
 
-      {/* Time slots */}
+      {/* Time suggestions */}
       {form.date && (
         <div className="mb-8">
-          <label className="flex items-center gap-2 text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">
+          <p className="flex items-center gap-2 text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">
             <Clock size={14} /> Select Time
-          </label>
-          {timeSlots.length === 0 ? (
-            <p className="text-[var(--mc-muted)] text-sm">We&apos;re closed on this day. Please choose another date.</p>
-          ) : (
-            <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-              {timeSlots.map((slot) => (
-                <button
-                  key={slot}
-                  onClick={() => onChange("time", slot)}
-                  className={`py-2.5 text-xs border font-semibold transition-all duration-150 cursor-pointer ${
-                    form.time === slot
-                      ? "bg-[var(--mc-accent)] border-[var(--mc-accent)] text-black"
-                      : "border-[#1a1a1a] text-[#888] hover:border-[var(--mc-accent)] hover:text-white"
-                  }`}
-                >
-                  {slot}
-                </button>
-              ))}
-            </div>
-          )}
+          </p>
+          <TimeSuggestions dateStr={form.date} selected={form.time} onSelect={(t) => onChange("time", t)} />
         </div>
       )}
 
@@ -325,7 +464,9 @@ function Step2Schedule({
           disabled={!can}
           className="flex-1 gold-gradient-bg text-black font-bold py-3 uppercase tracking-widest text-xs hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer"
         >
-          Continue
+          {can
+            ? `Continue — ${new Date(form.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })} at ${form.time}`
+            : "Select a date & time to continue"}
         </button>
       </div>
     </div>
@@ -354,7 +495,7 @@ function Step3Details({
       <div className="border border-[#1a1a1a] bg-[#080808] p-4 grid grid-cols-3 gap-4 text-center">
         <div>
           <p className="text-[#444] text-[10px] uppercase tracking-widest mb-1">Service</p>
-          <p className="text-white text-xs font-semibold truncate">{form.service}</p>
+          <p className="text-white text-xs font-semibold truncate">{form.services.join(", ")}</p>
         </div>
         <div>
           <p className="text-[#444] text-[10px] uppercase tracking-widest mb-1">Date</p>
@@ -520,7 +661,7 @@ function CardFormStep({
           name: form.name,
           email: form.email,
           phone: form.phone,
-          service: form.service,
+          service: form.services.join(", "),
           stylist: form.stylist,
           date: form.date,
           time: form.time,
@@ -545,7 +686,7 @@ function CardFormStep({
         <p className="text-[#444] text-[10px] uppercase tracking-widest mb-3">Booking Summary</p>
         <div className="grid grid-cols-2 gap-y-2 text-sm">
           <span className="text-[#555]">Service</span>
-          <span className="text-white font-medium">{form.service}</span>
+          <span className="text-white font-medium">{form.services.join(", ")}</span>
           <span className="text-[#555]">Stylist</span>
           <span className="text-white font-medium">{form.stylist || "Any available"}</span>
           <span className="text-[#555]">Date</span>
@@ -720,7 +861,7 @@ function SuccessScreen({
         <div className="border border-[#1a1a1a] bg-[#080808] p-6 text-left max-w-sm mx-auto mb-6">
           <div className="grid grid-cols-2 gap-y-3 text-sm">
             <span className="text-[#555]">Service</span>
-            <span className="text-white font-medium">{form.service}</span>
+            <span className="text-white font-medium">{form.services.join(", ")}</span>
             {form.stylist && (
               <>
                 <span className="text-[#555]">Stylist</span>
@@ -767,7 +908,7 @@ function SuccessScreen({
 
 // ── Main booking wizard ───────────────────────────────────────────────────────
 const initialForm: BookingForm = {
-  service: "", servicePrice: 0, stylist: "",
+  services: [], servicePrice: 0, stylist: "",
   date: "", time: "", name: "", email: "", phone: "", notes: "",
 };
 
@@ -821,8 +962,9 @@ function BookingWizard() {
                 {step === 1 && (
                   <motion.div key="step1" variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.22 }}>
                     <Step1Service
-                      onSelect={(svc, price) => {
-                        setForm((f) => ({ ...f, service: svc, servicePrice: price }));
+                      selected={form.services}
+                      onDone={(svcs, total) => {
+                        setForm((f) => ({ ...f, services: svcs, servicePrice: total }));
                         setStep(2);
                       }}
                     />

@@ -34,36 +34,37 @@ export default function HeroLogo() {
         </p>
 
         {/* Headline — both lines share the same gradient, no half-shimmer bug */}
-        <h1 className="font-serif font-bold mt-6 leading-[1.05] px-4">
-          <span className="gold-gradient block text-5xl sm:text-6xl md:text-8xl">Every Service.</span>
+        <h1 className="font-serif font-bold mt-6 leading-[1.25] px-4 overflow-visible">
+          <span className="gold-gradient block text-5xl sm:text-6xl md:text-8xl pb-4">Every Service.</span>
           <span className="gold-gradient block text-5xl sm:text-6xl md:text-8xl">One Studio.</span>
         </h1>
 
         {/* Service list */}
-        <p className="text-[var(--mc-muted)] text-xs sm:text-sm mt-6 leading-relaxed tracking-widest uppercase max-w-lg">
-          Hair · Color · Balayage · Blowouts · Lash Extensions · Facials · Makeup
-        </p>
-
-        {/* Social proof */}
-        <p className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest mt-3">
-          10,000+ Clients · 5-Star Rated · Serving New York Since 2011
-        </p>
-
-        {/* Price anchors */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
-          {[
-            { label: "Cuts", price: "from $20" },
-            { label: "Blowouts", price: "from $33" },
-            { label: "Color", price: "from $85" },
-          ].map((p, i) => (
-            <span key={i} className="text-[10px] uppercase tracking-widest px-3 py-1.5 border border-[var(--mc-border)] text-[var(--mc-text-dim)]">
-              {p.label} <span style={{ color: "var(--mc-accent)" }}>{p.price}</span>
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mt-8 max-w-xl">
+          {["Hair", "Color", "Balayage", "Blowouts", "Lash Extensions", "Facials", "Makeup"].map((s, i) => (
+            <span key={s} className="flex items-center gap-2 whitespace-nowrap">
+              {i > 0 && <span className="text-[var(--mc-border)] text-[10px]">·</span>}
+              <span className="text-[var(--mc-muted)] text-[10px] sm:text-xs uppercase tracking-widest">{s}</span>
             </span>
           ))}
         </div>
 
+        {/* Social proof */}
+        <p className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest mt-4">
+          10,000+ Clients · 5-Star Rated · Serving New York Since 2011
+        </p>
+
+        {/* Mother's Day banner */}
+        <div className="mt-10 flex items-center gap-3 px-5 py-3 border border-[var(--mc-accent)]/40 bg-[var(--mc-accent)]/5">
+          <span className="text-base">🌸</span>
+          <p className="text-[11px] sm:text-xs uppercase tracking-widest font-semibold" style={{ color: "var(--mc-accent)" }}>
+            Mother&apos;s Day — Gift a luxury experience.&nbsp;
+            <a href="/gift-card" className="underline underline-offset-2 hover:opacity-80 transition-opacity">Send a Gift Card →</a>
+          </p>
+        </div>
+
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-4 mt-10">
+        <div className="flex flex-col sm:flex-row gap-4 mt-6">
           <Link
             href="/book"
             className="gold-gradient-bg text-black font-bold px-12 py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity cursor-pointer text-center"

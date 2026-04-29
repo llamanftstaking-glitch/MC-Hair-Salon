@@ -13,14 +13,18 @@ export default function FadeIn({ children, className = "", delay = 0 }: Props) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const play = () => { el.style.animationPlayState = "running"; };
+
+    // If already in or near the viewport on mount, animate immediately
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 1.1) {
+      play();
+      return;
+    }
+
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.style.animationPlayState = "running";
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1, rootMargin: "-30px" }
+      ([entry]) => { if (entry.isIntersecting) { play(); observer.disconnect(); } },
+      { threshold: 0.05 }
     );
     observer.observe(el);
     return () => observer.disconnect();

@@ -1,0 +1,128 @@
+{
+  "capturedAt": "2026-04-29T20:09:22.665Z",
+  "description": "Salon-bound notification smoke-test results for Task #8 — confirms three notification flows (contact, booking, gift card) deliver to hello@mchairsalon.com with the corrected gift card path that includes buyer email and uses buyer email as Reply-To.",
+  "salonNotifications": [
+    {
+      "id": "1373d578-f39a-4885-ae90-1df3d171bbc9",
+      "to": [
+        "hello@mchairsalon.com"
+      ],
+      "from": "hello@mchairsalon.com",
+      "created_at": "2026-04-29 20:09:07.426268+00",
+      "subject": "New gift card sale — $50 from Buyer Name to Birthday Friend",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "buyer@example.com"
+      ],
+      "last_event": "delivered",
+      "scheduled_at": null
+    },
+    {
+      "id": "3f9671e2-ef2b-42e5-90da-5161c8fa6c60",
+      "to": [
+        "hello@mchairsalon.com"
+      ],
+      "from": "hello@mchairsalon.com",
+      "created_at": "2026-04-29 20:05:48.742453+00",
+      "subject": "New gift card sale — $100 from Smoke Sender to Smoke Recipient",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "recipient@example.com"
+      ],
+      "last_event": "delivered",
+      "scheduled_at": null
+    },
+    {
+      "id": "7e884ca5-0a0d-4532-a9f8-2300d598713e",
+      "to": [
+        "hello@mchairsalon.com"
+      ],
+      "from": "hello@mchairsalon.com",
+      "created_at": "2026-04-29 20:05:48.19325+00",
+      "subject": "New booking — Smoke Test Client • Cut & Style • 2026-05-15 3:00 PM",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "smoketest@example.com"
+      ],
+      "last_event": "delivered",
+      "scheduled_at": null
+    },
+    {
+      "id": "ea3295fe-c070-451b-a92a-ae92e44f9df5",
+      "to": [
+        "hello@mchairsalon.com"
+      ],
+      "from": "hello@mchairsalon.com",
+      "created_at": "2026-04-29 20:05:47.340934+00",
+      "subject": "New contact message from Smoke Test Client",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [
+        "smoketest@example.com"
+      ],
+      "last_event": "delivered",
+      "scheduled_at": null
+    }
+  ],
+  "clientFacingEmails": [
+    {
+      "id": "97cb026d-a7f2-4c09-a1f7-791c900bcb08",
+      "to": [
+        "recipient@example.com"
+      ],
+      "from": "hello@mchairsalon.com",
+      "created_at": "2026-04-29 20:09:07.161034+00",
+      "subject": "You've received a $50 MC Hair Salon Gift Card from Buyer Name!",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "last_event": "sent",
+      "scheduled_at": null
+    },
+    {
+      "id": "82aff4e5-5d02-4180-93fa-20291cb6785a",
+      "to": [
+        "recipient@example.com"
+      ],
+      "from": "hello@mchairsalon.com",
+      "created_at": "2026-04-29 20:05:48.599181+00",
+      "subject": "You've received a $100 MC Hair Salon Gift Card from Smoke Sender!",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "last_event": "sent",
+      "scheduled_at": null
+    },
+    {
+      "id": "ccfe362a-6a66-442f-89af-f8ba4a3b4d58",
+      "to": [
+        "smoketest@example.com"
+      ],
+      "from": "hello@mchairsalon.com",
+      "created_at": "2026-04-29 20:05:48.30693+00",
+      "subject": "Appointment Confirmed — 2026-05-15 at 3:00 PM",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "last_event": "sent",
+      "scheduled_at": null
+    },
+    {
+      "id": "016ba6d9-e48c-480f-8acd-8f51808aeeff",
+      "to": [
+        "smoketest@example.com"
+      ],
+      "from": "hello@mchairsalon.com",
+      "created_at": "2026-04-29 20:05:47.311232+00",
+      "subject": "We received your message — MC Hair Salon & Spa",
+      "bcc": [],
+      "cc": [],
+      "reply_to": [],
+      "last_event": "sent",
+      "scheduled_at": null
+    }
+  ]
+}

@@ -18,6 +18,7 @@ Luxury hair salon website for MC Hair Salon & Spa, Upper East Side, New York.
 ## Required Secrets
 - `RESEND_API_KEY` — Resend API key for sending email
 - `RESEND_FROM_EMAIL` — Verified sender address, e.g. `MC Hair Salon <hello@mchairsalon.com>`
+- `SALON_INBOX_EMAIL` (optional) — Where new contact / booking / gift-card notifications are sent. Defaults to `hello@mchairsalon.com`.
 - Stripe keys (when payments are used) — handled via env vars in `lib/stripe.ts`
 
 ## Email — Resend Domain Verification
@@ -45,6 +46,23 @@ What this confirms (server-side):
 
 What still requires user-side confirmation:
 - That a real client email (Gmail/Outlook/etc.) lands in the inbox, not spam — the user should send themselves a booking confirmation or contact form submission and verify placement, then optionally raise their Resend plan if needed.
+
+## Salon-Bound Notification Emails
+
+When a client takes action on the website, the salon owner receives a notification email at `SALON_INBOX_EMAIL` (default `hello@mchairsalon.com`):
+
+| Trigger | Subject pattern | Reply-To |
+|---|---|---|
+| New contact form submission | `New contact message from <Name>` | client's email |
+| New booking | `New booking — <Name> • <Service> • <Date> <Time>` | client's email |
+| New gift card sale | `New gift card sale — $<Amount> from <Sender> to <Recipient>` | recipient's email (if provided) |
+
+Wired in:
+- `app/api/contact/route.ts` → `sendNewContactNotification`
+- `app/api/bookings/route.ts` → `sendNewBookingNotification`
+- `app/api/gift-card/route.ts` → `sendNewGiftCardNotification`
+
+Notifications are fire-and-forget — failures are logged to the server console and do not break the public POST flow. Smoke-test evidence: `verification-evidence/salon-notifications-smoke-test.json`.
 
 ## Important Files
 - `lib/email.ts` — Resend integration (booking confirmations, contact replies, gift card delivery, newsletter blasts)

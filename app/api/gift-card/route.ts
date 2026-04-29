@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createGiftCard, getGiftCards, getGiftCardByCode, redeemGiftCard } from "@/lib/gift-cards";
-import { sendGiftCardEmail } from "@/lib/email";
+import { sendGiftCardEmail, sendNewGiftCardNotification } from "@/lib/email";
 
 // GET — admin: list all, or ?code=XXXX to validate a single card
 export async function GET(req: NextRequest) {
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
       const { amount, recipientName, recipientEmail, recipientPhone,
-              senderName, message, deliveryMethod, stripeSessionId } = body;
+              senderName, senderEmail, message, deliveryMethod, stripeSessionId } = body;
 
       if (!amount || !recipientName || !senderName) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
         recipientEmail,
         recipientPhone,
         senderName,
+        senderEmail: senderEmail || undefined,
         message: message ?? "",
         deliveryMethod: deliveryMethod ?? "email",
         stripeSessionId,
@@ -62,6 +63,11 @@ export async function POST(req: NextRequest) {
           console.error("[gift-card] SMS send failed:", err)
         );
       }
+
+      // Notify the salon inbox so the owner sees the new gift card sale
+      sendNewGiftCardNotification(card).catch(err =>
+        console.error("[gift-card] Salon notification failed:", err)
+      );
 
       return NextResponse.json(card, { status: 201 });
     }

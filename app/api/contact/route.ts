@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMessages, addMessage, markRead, deleteMessage } from "@/lib/messages";
 import { requireAdmin } from "@/lib/auth";
-import { sendContactReply } from "@/lib/email";
+import { sendContactReply, sendNewContactNotification } from "@/lib/email";
 
 // GET — admin only
 export async function GET() {
@@ -30,8 +30,14 @@ export async function POST(req: NextRequest) {
 
     const msg = addMessage({ name: trimmedName, email: trimmedEmail, message: trimmedMessage });
 
-    // Auto-reply — non-fatal if Resend key isn't configured yet
-    sendContactReply(trimmedEmail, trimmedName, trimmedMessage).catch(() => {});
+    // Auto-reply to client — non-fatal if Resend key isn't configured yet
+    sendContactReply(trimmedEmail, trimmedName, trimmedMessage).catch(err =>
+      console.error("[contact] Auto-reply failed:", err)
+    );
+    // Notify the salon inbox so the owner sees the message in their email
+    sendNewContactNotification(msg).catch(err =>
+      console.error("[contact] Salon notification failed:", err)
+    );
 
     return NextResponse.json(msg, { status: 201 });
   } catch {

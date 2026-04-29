@@ -8,7 +8,7 @@ import {
 } from "@/lib/bookings";
 import { getStripe } from "@/lib/stripe";
 import { requireAdmin } from "@/lib/auth";
-import { sendBookingConfirmation } from "@/lib/email";
+import { sendBookingConfirmation, sendNewBookingNotification } from "@/lib/email";
 
 // GET — admin only
 export async function GET() {
@@ -67,8 +67,14 @@ export async function POST(req: NextRequest) {
       cardBrand,
     });
 
-    // Auto-confirm email — non-fatal if Resend key isn't configured yet
-    sendBookingConfirmation(booking).catch(() => {});
+    // Confirmation to client — non-fatal if Resend key isn't configured yet
+    sendBookingConfirmation(booking).catch(err =>
+      console.error("[bookings] Confirmation failed:", err)
+    );
+    // Notify the salon inbox so the owner sees the new booking in their email
+    sendNewBookingNotification(booking).catch(err =>
+      console.error("[bookings] Salon notification failed:", err)
+    );
 
     return NextResponse.json(booking, { status: 201 });
   } catch {

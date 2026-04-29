@@ -10,6 +10,7 @@ export interface GiftCard {
   recipientEmail?: string;
   recipientPhone?: string;
   senderName: string;
+  senderEmail?: string;
   message: string;
   deliveryMethod: "email" | "sms" | "both";
   status: "active" | "redeemed" | "expired";

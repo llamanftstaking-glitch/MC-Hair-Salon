@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
           recipientEmail: recipientEmail ?? customerEmail ?? "",
           recipientPhone: recipientPhone ?? "",
           senderName:     senderName     ?? customerName ?? "",
+          senderEmail:    customerEmail ?? "",
           message:        (message ?? "").slice(0, 490),
           deliveryMethod: deliveryMethod ?? "email",
         },

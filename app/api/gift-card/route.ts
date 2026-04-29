@@ -50,7 +50,13 @@ export async function POST(req: NextRequest) {
         stripeSessionId,
       });
 
-      // Send via email
+      // Notify the salon inbox in parallel — fire-and-forget so the public
+      // POST flow returns immediately and isn't gated on Resend latency.
+      sendNewGiftCardNotification(card).catch(err =>
+        console.error("[gift-card] Salon notification failed:", err)
+      );
+
+      // Send via email to recipient
       if ((deliveryMethod === "email" || deliveryMethod === "both") && recipientEmail) {
         await sendGiftCardEmail(card).catch(err =>
           console.error("[gift-card] Email send failed:", err)
@@ -63,11 +69,6 @@ export async function POST(req: NextRequest) {
           console.error("[gift-card] SMS send failed:", err)
         );
       }
-
-      // Notify the salon inbox so the owner sees the new gift card sale
-      sendNewGiftCardNotification(card).catch(err =>
-        console.error("[gift-card] Salon notification failed:", err)
-      );
 
       return NextResponse.json(card, { status: 201 });
     }

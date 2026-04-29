@@ -55,7 +55,7 @@ When a client takes action on the website, the salon owner receives a notificati
 |---|---|---|
 | New contact form submission | `New contact message from <Name>` | client's email |
 | New booking | `New booking — <Name> • <Service> • <Date> <Time>` | client's email |
-| New gift card sale | `New gift card sale — $<Amount> from <Sender> to <Recipient>` | recipient's email (if provided) |
+| New gift card sale | `New gift card sale — $<Amount> from <Sender> to <Recipient>` | buyer's email (falls back to recipient if no buyer email captured) |
 
 Wired in:
 - `app/api/contact/route.ts` → `sendNewContactNotification`

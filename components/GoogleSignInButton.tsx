@@ -125,6 +125,9 @@ export default function GoogleSignInButton({ mode = "signin" }: { mode?: "signin
         <p className="text-center text-[var(--mc-text-dim)] text-xs">Signing you in…</p>
       )}
       {error && <p className="text-center text-red-400 text-sm">{error}</p>}
+      <p className="text-center text-[var(--mc-text-dim)] text-[11px] leading-snug">
+        If the Google window doesn&apos;t appear, allow pop-ups for this site and try again.
+      </p>
     </div>
   );
 }

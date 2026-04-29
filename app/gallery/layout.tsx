@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Gallery",
+  title: "Hair Color & Balayage Gallery | Upper East Side NYC",
   description:
-    "Browse MC Hair Salon & Spa's photo gallery — stunning color transformations, precision cuts, balayage, updos, and spa results from our Upper East Side salon.",
+    "Color transformations, precision cuts, balayage, updos & spa results from MC Hair Salon & Spa — Upper East Side, New York City.",
   keywords: [
     "hair salon gallery NYC", "balayage before after", "hair color transformation",
     "Upper East Side salon photos", "blowout results NYC", "bridal hair NYC",

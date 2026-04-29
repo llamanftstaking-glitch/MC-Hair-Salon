@@ -4,9 +4,9 @@ import { Star, Award, Users, Calendar, MapPin, ChevronRight, Scissors, Palette, 
 import FaqSection from "@/components/FaqSection";
 
 export const metadata: Metadata = {
-  title: "About MC Hair Salon & Spa — 13 Years on the Upper East Side",
+  title: "About MC Hair Salon & Spa | Upper East Side Since 2011",
   description:
-    "Since 2011, MC Hair Salon & Spa has served over 10,000 clients on Manhattan's Upper East Side. Learn our story, meet our team, and discover why we're the neighborhood's most trusted full-service salon and spa at 336 East 78th St.",
+    "Since 2011, MC Hair Salon & Spa has served 10,000+ clients on the Upper East Side. Learn our story and discover why we're the neighborhood's most trusted full-service salon at 336 E 78th St.",
   keywords: [
     "about MC Hair Salon Upper East Side",
     "Upper East Side hair salon history",

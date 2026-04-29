@@ -65,15 +65,15 @@ export default function GalleryPage() {
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  {/* Category tag */}
-                  <div className="absolute top-2 right-2 px-2 py-1 bg-black/50 backdrop-blur-sm border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="text-[var(--mc-accent)] text-[9px] tracking-[0.3em] uppercase">{img.category}</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Service label sliding up on hover */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
+                    <p className="text-white font-serif font-semibold text-sm leading-tight">{img.category}</p>
                   </div>
                   {/* Expand icon */}
-                  <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="w-8 h-8 bg-black/60 backdrop-blur-sm border border-[var(--mc-accent)]/30 flex items-center justify-center">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" className="w-4 h-4">
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="w-7 h-7 bg-black/70 backdrop-blur-sm border border-[var(--mc-accent)]/40 flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" className="w-3.5 h-3.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
                       </svg>
                     </div>

@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import CurlyBot from "@/components/CurlyBot";
+import MobileBookBar from "@/components/MobileBookBar";
 
 const SITE_URL = "https://mchairsalon.com";
 
@@ -84,6 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 <Navbar />
         <main>{children}</main>
         <Footer />
+        <MobileBookBar />
         <CurlyBot />
       </body>
     </html>

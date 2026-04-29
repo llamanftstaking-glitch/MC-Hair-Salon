@@ -29,16 +29,28 @@ export default function ServicesPage() {
 
       {/* Services */}
       <section className="py-14 sm:py-20 px-4 sm:px-6 bg-black">
-        <div className="max-w-5xl mx-auto space-y-14 sm:space-y-20">
+        <div className="max-w-5xl mx-auto space-y-16 sm:space-y-24">
           {SERVICES.map((category, ci) => (
             <div key={category.category}>
-              {/* Category header */}
-              <div className="flex items-start gap-3 sm:gap-4 mb-8 sm:mb-10 pb-4 border-b border-[var(--mc-border)]">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 border border-[var(--mc-accent)] flex items-center justify-center text-[var(--mc-accent)] shrink-0 mt-0.5">
-                  {iconMap[category.icon]}
+              {/* Ornamental divider (skip first) */}
+              {ci > 0 && (
+                <div className="flex items-center gap-4 mb-12 sm:mb-16 -mt-2">
+                  <div className="flex-1 h-px bg-[var(--mc-border)]" />
+                  <span className="text-[var(--mc-accent)] text-[10px] tracking-[0.4em] opacity-60">✦</span>
+                  <div className="flex-1 h-px bg-[var(--mc-border)]" />
                 </div>
-                <div>
-                  <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">{category.category}</h2>
+              )}
+
+              {/* Category header */}
+              <div className="flex items-start gap-4 sm:gap-6 mb-8 sm:mb-10">
+                <span className="font-serif text-4xl sm:text-5xl font-bold text-[var(--mc-border)] leading-none select-none pt-1 shrink-0">
+                  {String(ci + 1).padStart(2, "0")}
+                </span>
+                <div className="flex-1 border-b border-[var(--mc-border)] pb-4">
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="text-[var(--mc-accent)]">{iconMap[category.icon]}</span>
+                    <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white">{category.category}</h2>
+                  </div>
                   {"tagline" in category && category.tagline && (
                     <p className="text-[var(--mc-text-dim)] text-xs sm:text-sm mt-1 leading-relaxed max-w-2xl">
                       {String(category.tagline)}
@@ -48,21 +60,23 @@ export default function ServicesPage() {
               </div>
 
               {/* Items */}
-              <div className="space-y-3 sm:space-y-4">
-                {category.items.map((item, ii) => (
+              <div className="space-y-2 sm:space-y-3">
+                {category.items.map((item) => (
                   <div key={item.name}
-                    className="flex items-center justify-between p-4 sm:p-6 luxury-card group gap-3">
+                    className="flex items-center justify-between p-4 sm:p-5 bg-[#080808] border border-[#141414] border-l-2 border-l-transparent group gap-3 transition-all duration-200 hover:border-[var(--mc-accent)]/25 hover:bg-[#0c0c0c] hover:border-l-[var(--mc-accent)]">
                     <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
-                      <div className="w-5 h-5 border border-[var(--mc-accent)] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[var(--mc-accent)] transition-colors">
-                        <Check size={12} className="text-[var(--mc-accent)] group-hover:text-black transition-colors" />
+                      <div className="w-4 h-4 border border-[#2a2a2a] flex items-center justify-center shrink-0 mt-1 group-hover:border-[var(--mc-accent)] transition-colors">
+                        <Check size={9} className="text-[#3a3a3a] group-hover:text-[var(--mc-accent)] transition-colors" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-white font-semibold text-sm sm:text-base">{item.name}</p>
-                        <p className="text-[var(--mc-text-dim)] text-xs sm:text-sm mt-1 leading-relaxed">{item.description}</p>
+                        <p className="text-white font-semibold text-sm sm:text-base leading-snug">{item.name}</p>
+                        <p className="text-[#444] text-xs mt-0.5 leading-relaxed group-hover:text-[#555] transition-colors">{item.description}</p>
                       </div>
                     </div>
-                    <div className="text-right shrink-0 ml-2 sm:ml-8">
-                      <p className="gold-gradient font-serif text-xl sm:text-2xl font-bold">${item.price}+</p>
+                    <div className="shrink-0 ml-4 sm:ml-8 text-right">
+                      <span className="inline-block gold-gradient font-serif text-lg sm:text-xl font-bold tabular-nums">
+                        ${item.price}+
+                      </span>
                     </div>
                   </div>
                 ))}

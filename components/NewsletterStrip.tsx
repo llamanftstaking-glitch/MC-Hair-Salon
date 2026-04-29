@@ -34,6 +34,15 @@ export default function NewsletterStrip() {
 
   return (
     <section className="relative py-20 px-6 overflow-hidden bg-[var(--mc-surface-dark)]">
+      {/* Subtle botanical diagonal pattern */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        backgroundImage: "repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(201,168,76,0.025) 28px, rgba(201,168,76,0.025) 29px)",
+      }} />
+      {/* Corner bracket ornaments */}
+      <div className="absolute top-6 left-6 w-10 h-10 border-t border-l border-[var(--mc-accent)]/15 pointer-events-none" />
+      <div className="absolute top-6 right-6 w-10 h-10 border-t border-r border-[var(--mc-accent)]/15 pointer-events-none" />
+      <div className="absolute bottom-6 left-6 w-10 h-10 border-b border-l border-[var(--mc-accent)]/15 pointer-events-none" />
+      <div className="absolute bottom-6 right-6 w-10 h-10 border-b border-r border-[var(--mc-accent)]/15 pointer-events-none" />
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--mc-accent)]/20 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--mc-accent)]/10 to-transparent" />
 

@@ -3,9 +3,12 @@ import Image from "next/image";
 import { Star, ChevronRight, Scissors, Wind, Palette, Sparkles } from "lucide-react";
 import { SERVICES, TESTIMONIALS, GALLERY_IMAGES, SALON_INFO } from "@/lib/data";
 import HeroLogo from "@/components/HeroLogo";
+import MarqueeStrip from "@/components/MarqueeStrip";
+import SectionDivider from "@/components/SectionDivider";
 import NewsletterStrip from "@/components/NewsletterStrip";
 import FadeIn from "@/components/FadeIn";
 import FaqSection from "@/components/FaqSection";
+import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 
 const HOME_FAQS = [
   { q: "Where is MC Hair Salon & Spa located?", a: "MC Hair Salon & Spa is located at 336 East 78th Street, between 1st and 2nd Avenues, on Manhattan's Upper East Side (zip code 10075). The nearest subway is the 6 train at 77th St (approximately 2 minutes away) or the Q train at 72nd St & 2nd Ave (approximately 6 minutes away)." },
@@ -29,6 +32,7 @@ export default function Home() {
   return (
     <>
       <HeroLogo />
+      <MarqueeStrip />
 
       {/* STATS BAR */}
       <section className="bg-[var(--mc-surface)] border-y border-[var(--mc-border)] py-6 sm:py-8">
@@ -106,6 +110,8 @@ export default function Home() {
         </div>
       </section>
 
+      <SectionDivider />
+
       {/* TRANSFORMATIONS GRID */}
       <section className="py-16 sm:py-24 px-6 bg-[var(--mc-surface-dark)]">
         <div className="max-w-7xl mx-auto">
@@ -152,6 +158,8 @@ export default function Home() {
         </div>
       </section>
 
+      <SectionDivider bg="bg-[var(--mc-surface-dark)]" />
+
       {/* TESTIMONIALS */}
       <section className="py-16 sm:py-24 px-6 bg-black">
         <div className="max-w-7xl mx-auto">
@@ -160,32 +168,7 @@ export default function Home() {
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">What They Say</h2>
           </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-            {TESTIMONIALS.map((t, i) => (
-              <FadeIn key={i} delay={i * 80}>
-                <div className="luxury-card p-6 sm:p-8 h-full flex flex-col">
-                  <div className="flex gap-1 mb-4">
-                    {Array.from({ length: t.rating }).map((_, j) => (
-                      <Star key={j} size={14} className="fill-[var(--mc-accent)] text-[var(--mc-accent)]" />
-                    ))}
-                  </div>
-                  <p className="text-[var(--mc-muted)] text-sm leading-relaxed mb-6 italic flex-1">&ldquo;{t.text}&rdquo;</p>
-                  <div className="border-t border-[var(--mc-border)] pt-4">
-                    <p className="text-white font-semibold text-sm">{t.name}</p>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <p className="text-[#555] text-xs">{t.service}</p>
-                      {"date" in t && t.date && (
-                        <>
-                          <span className="text-[#333] text-xs">·</span>
-                          <p className="text-[#444] text-xs">{String(t.date)}</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
+          <TestimonialsCarousel />
         </div>
       </section>
 

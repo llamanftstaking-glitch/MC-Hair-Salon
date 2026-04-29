@@ -14,6 +14,7 @@ interface GoogleAccountsId {
     client_id: string;
     callback: (response: GoogleCredentialResponse) => void;
     auto_select?: boolean;
+    error_callback?: (err: { type?: string; message?: string }) => void;
   }) => void;
   renderButton: (
     parent: HTMLElement,
@@ -70,7 +71,21 @@ export default function GoogleSignInButton({ mode = "signin" }: { mode?: "signin
           setSubmitting(false);
         }
       },
+      error_callback: (err) => {
+        setSubmitting(false);
+        if (err?.type === "popup_closed") {
+          setError("Sign-in was cancelled. Please try again.");
+        } else if (err?.type === "popup_failed_to_open") {
+          setError("Couldn't open the Google sign-in window. Please allow pop-ups for this site and try again.");
+        } else {
+          setError(err?.message || "Google Sign-In failed. Please try again.");
+        }
+      },
     });
+
+    // Size the official Google button to fit the parent (Google requires 200–400px).
+    const containerWidth = containerRef.current.clientWidth || 360;
+    const buttonWidth = Math.max(200, Math.min(400, Math.round(containerWidth)));
 
     containerRef.current.innerHTML = "";
     window.google.accounts.id.renderButton(containerRef.current, {
@@ -80,7 +95,7 @@ export default function GoogleSignInButton({ mode = "signin" }: { mode?: "signin
       text: mode === "signup" ? "signup_with" : "continue_with",
       shape: "rectangular",
       logo_alignment: "center",
-      width: 360,
+      width: buttonWidth,
     });
   }, [scriptLoaded, clientId, mode, router]);
 

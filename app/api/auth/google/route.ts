@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
   const email = payload.email;
   const googleId = payload.sub;
   const name = payload.name || payload.given_name || email.split("@")[0];
+  const avatarUrl = payload.picture || undefined;
 
   let customer = getCustomerByEmail(email);
 
@@ -58,12 +59,15 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
-    if (!customer.googleId) {
-      const updated = updateCustomer(customer.id, { googleId });
+    const updates: { googleId?: string; avatarUrl?: string } = {};
+    if (!customer.googleId) updates.googleId = googleId;
+    if (avatarUrl && customer.avatarUrl !== avatarUrl) updates.avatarUrl = avatarUrl;
+    if (Object.keys(updates).length > 0) {
+      const updated = updateCustomer(customer.id, updates);
       if (updated) customer = updated;
     }
   } else {
-    customer = createCustomer({ name, email, phone: "", googleId });
+    customer = createCustomer({ name, email, phone: "", googleId, avatarUrl });
   }
 
   const token = await signToken({ id: customer.id, email: customer.email, name: customer.name });

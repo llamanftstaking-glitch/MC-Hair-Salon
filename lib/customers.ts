@@ -10,6 +10,7 @@ export interface Customer {
   phone: string;
   passwordHash?: string;
   googleId?: string;
+  avatarUrl?: string;
   createdAt: string;
   points: number;
   visits: number;

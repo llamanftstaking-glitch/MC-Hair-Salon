@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Services & Pricing",
+  title: "Hair Services & Pricing — Upper East Side NYC",
   description:
-    "Full service menu at MC Hair Salon & Spa — women's and men's cuts, balayage, highlights, full color, blowouts, eyelash extensions, facials, and makeup. Upper East Side, NYC. Prices from $20.",
+    "Full service menu at MC Hair Salon & Spa — cuts, balayage, color, blowouts, lash extensions, facials & makeup. Upper East Side, NYC. From $20.",
   keywords: [
     "hair salon services NYC", "balayage Upper East Side", "highlights Manhattan",
     "blowout NYC", "women's haircut Upper East Side", "men's haircut NYC",

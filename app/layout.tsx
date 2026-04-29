@@ -11,11 +11,11 @@ const SITE_URL = "https://mchairsalon.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "MC Hair Salon & Spa | Upper East Side NYC",
+    default: "Hair Salon Upper East Side NYC | MC Hair Salon & Spa",
     template: "%s | MC Hair Salon & Spa",
   },
   description:
-    "Upper East Side's premier luxury hair salon and spa since 2011. Expert cuts, balayage, color, eyelash extensions, and facials at 336 East 78th St, New York. Book online today.",
+    "Upper East Side hair salon & spa since 2011. Expert cuts, balayage, color, lash extensions & facials at 336 E 78th St, NYC. Book online.",
   keywords: [
     "hair salon Upper East Side",
     "luxury hair salon NYC",

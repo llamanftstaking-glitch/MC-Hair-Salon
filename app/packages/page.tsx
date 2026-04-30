@@ -1,20 +1,31 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Check, Sparkles, Loader, ChevronRight, Star } from "lucide-react";
+import { Check, Sparkles, Loader, ChevronRight, Star, Plus, Minus } from "lucide-react";
 import { PACKAGES } from "@/lib/data";
 
 export default function PackagesPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [guestCounts, setGuestCounts] = useState<Record<string, number>>(() => {
+    const defaults: Record<string, number> = {};
+    PACKAGES.forEach(p => { if (p.baseGuests) defaults[p.id] = p.baseGuests; });
+    return defaults;
+  });
+
+  function adjustGuests(packageId: string, delta: number) {
+    setGuestCounts(prev => ({ ...prev, [packageId]: Math.max(1, (prev[packageId] ?? 1) + delta) }));
+  }
 
   async function handleBuy(packageId: string) {
     setLoading(packageId);
     setError("");
     try {
-      // Get current user session
       const meRes = await fetch("/api/auth/me");
       const me = meRes.ok ? await meRes.json() : null;
+
+      const pkg = PACKAGES.find(p => p.id === packageId);
+      const guestCount = pkg?.baseGuests ? guestCounts[packageId] : undefined;
 
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -22,6 +33,7 @@ export default function PackagesPage() {
         body: JSON.stringify({
           type: "package",
           packageId,
+          guestCount,
           customerId: me?.id ?? "",
           customerEmail: me?.email ?? "",
           customerName: me?.name ?? "",
@@ -68,7 +80,11 @@ export default function PackagesPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {PACKAGES.map(pkg => {
-              const savePct = Math.round(((pkg.originalValue - pkg.price) / pkg.originalValue) * 100);
+              const isGuest = !!pkg.baseGuests && !!pkg.pricePerGuest;
+              const guestCount = isGuest ? (guestCounts[pkg.id] ?? pkg.baseGuests!) : null;
+              const displayPrice = isGuest ? pkg.pricePerGuest! * guestCount! : pkg.price;
+              const displayOriginal = isGuest ? Math.round(pkg.originalValue / pkg.baseGuests!) * guestCount! : pkg.originalValue;
+              const savePct = Math.round(((displayOriginal - displayPrice) / displayOriginal) * 100);
               const isLoading = loading === pkg.id;
               return (
                 <div key={pkg.id}
@@ -105,20 +121,55 @@ export default function PackagesPage() {
                       ))}
                     </div>
 
+                    {/* Guest count stepper */}
+                    {isGuest && (
+                      <div className="mb-5 pb-5 border-b border-[var(--mc-border)]">
+                        <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-3">Number of Guests</p>
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => adjustGuests(pkg.id, -1)}
+                            disabled={guestCount! <= 1}
+                            className="w-9 h-9 border border-[var(--mc-border)] flex items-center justify-center text-[var(--mc-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-colors disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                          >
+                            <Minus size={14} />
+                          </button>
+                          <span className="font-serif text-2xl font-bold gold-gradient w-8 text-center">{guestCount}</span>
+                          <button
+                            onClick={() => adjustGuests(pkg.id, 1)}
+                            className="w-9 h-9 border border-[var(--mc-border)] flex items-center justify-center text-[var(--mc-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer"
+                          >
+                            <Plus size={14} />
+                          </button>
+                          <span className="text-[#555] text-xs">guests</span>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Highlight */}
-                    <p className="text-[var(--mc-accent)] text-xs mb-5 pb-5 border-b border-[var(--mc-border)]">
-                      {pkg.highlight}
-                    </p>
+                    {!isGuest && (
+                      <p className="text-[var(--mc-accent)] text-xs mb-5 pb-5 border-b border-[var(--mc-border)]">
+                        {pkg.highlight}
+                      </p>
+                    )}
 
                     {/* Pricing */}
                     <div className="flex items-end justify-between mb-5">
                       <div>
-                        <p className="font-serif text-3xl font-bold gold-gradient">${pkg.price}</p>
-                        <p className="text-[#555] text-xs line-through mt-0.5">Value ${pkg.originalValue}</p>
+                        <p className="font-serif text-3xl font-bold gold-gradient">${displayPrice}</p>
+                        <p className="text-[#555] text-xs line-through mt-0.5">Value ${displayOriginal}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[var(--mc-accent)] text-sm font-semibold">{pkg.sessions} sessions</p>
-                        <p className="text-[#555] text-xs">${Math.round(pkg.price / pkg.sessions)}/each</p>
+                        {isGuest ? (
+                          <>
+                            <p className="text-[var(--mc-accent)] text-sm font-semibold">${pkg.pricePerGuest}/guest</p>
+                            <p className="text-[#555] text-xs">{guestCount} guest{guestCount! > 1 ? "s" : ""}</p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-[var(--mc-accent)] text-sm font-semibold">{pkg.sessions} sessions</p>
+                            <p className="text-[#555] text-xs">${Math.round(pkg.price / pkg.sessions)}/each</p>
+                          </>
+                        )}
                       </div>
                     </div>
 

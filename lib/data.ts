@@ -56,11 +56,11 @@ export const SERVICES = [
     icon: "brush",
     tagline: "Editorial precision meets wearable luxury — by resident artist Isabella.",
     items: [
-      { name: "Makeup Application", price: 75, priceLabel: "$75", description: "Full face application by Isabella — foundation matched to your undertone, contouring, eye design, and lip color. Perfect for date nights, professional portraits, events, or simply a night out." },
-      { name: "Special Event Makeup", price: 150, priceLabel: "$150", description: "Red-carpet-ready glam for galas, birthday celebrations, and milestone occasions. Includes extended wear products, setting spray, and touch-up kit for the event." },
-      { name: "Bridal Makeup", price: 200, priceLabel: "$200", description: "Wedding day looks designed to photograph beautifully, last through tears and dancing, and feel like you — just the most radiant version. Trial session strongly recommended 4–6 weeks before." },
-      { name: "Airbrush Makeup", price: 125, priceLabel: "$125", description: "Ultra-smooth, skin-like finish using professional airbrush equipment. Long-wearing, lightweight formula ideal for photography, video, outdoor events, and high-humidity summers." },
-      { name: "Makeup Lesson (1 hr)", price: 100, priceLabel: "$100", description: "One-on-one coaching session with Isabella. Learn your ideal foundation formula, contouring for your specific bone structure, and receive personalized product recommendations to take home." },
+      { name: "Makeup Application", price: 125, priceLabel: "$125+", description: "Full face application by Isabella — foundation matched to your undertone, contouring, eye design, and lip color. Perfect for date nights, professional portraits, events, or simply a night out." },
+      { name: "Bridal Makeup", price: 250, priceLabel: "$250", description: "Wedding day looks designed to photograph beautifully, last through tears and dancing, and feel like you — just the most radiant version. Trial session strongly recommended 4–6 weeks before." },
+      { name: "Eye Makeup", price: 75, priceLabel: "$75", description: "Focused eye artistry — eyeshadow, liner, and lash application tailored to your eye shape and occasion. Perfect as a standalone service or paired with your own base." },
+      { name: "Lashes", price: 25, priceLabel: "$25+", description: "Individual or strip lash application for added volume, length, and drama. Choose from natural to full-glam styles. Add-on or standalone service." },
+      { name: "Makeup Lesson (1 hr)", price: 150, priceLabel: "$150+", description: "One-on-one coaching session with Isabella. Learn your ideal foundation formula, contouring for your specific bone structure, and receive personalized product recommendations to take home." },
     ],
   },
 ];
@@ -98,7 +98,7 @@ export const TEAM = [
     name: "Isabella",
     role: "Resident Makeup Artist",
     bio: "Isabella is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry, she tailors every look to your unique features and personal style.",
-    specialties: ["Bridal Makeup", "Airbrush", "Special Events", "Makeup Lessons"],
+    specialties: ["Bridal Makeup", "Eye Makeup", "Lashes", "Makeup Lessons"],
     image: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
     isMakeupArtist: true,
   },
@@ -115,6 +115,8 @@ export interface PackageDef {
   highlight: string;
   badge?: string;
   validityDays: number;
+  baseGuests?: number;
+  pricePerGuest?: number;
 }
 
 export const PACKAGES: PackageDef[] = [
@@ -152,32 +154,33 @@ export const PACKAGES: PackageDef[] = [
     validityDays: 365,
   },
   {
-    id: "pkg_glam_3",
+    id: "pkg_glam_5",
     name: "Glam Pack",
     tagline: "Look your best for every occasion",
-    price: 199,
-    originalValue: 225,
-    sessions: 3,
-    services: ["3 × Makeup Application by Isabella"],
-    highlight: "Save $26 — events, date nights, and more",
+    price: 500,
+    originalValue: 625,
+    sessions: 5,
+    services: ["5 × Makeup Application by Isabella"],
+    highlight: "Save $125 — events, date nights, and more",
     validityDays: 365,
   },
   {
     id: "pkg_bridal_prep",
     name: "Bridal Prep",
     tagline: "Everything you need before the big day",
-    price: 449,
-    originalValue: 500,
-    sessions: 4,
+    price: 1500,
+    originalValue: 1800,
+    sessions: 6,
     services: [
-      "1 × Bridal Hair Trial",
-      "1 × Bridal Updo (wedding day)",
-      "1 × Bridal Makeup Trial",
-      "1 × Bridal Makeup (wedding day)",
+      "Hair & Makeup for each guest",
+      "Bridal party coordination",
+      "Day-of timeline planning",
     ],
-    highlight: "Save $51 — the complete bridal beauty plan",
+    highlight: "$250 per guest — add or remove guests below",
     badge: "Most Popular",
     validityDays: 365,
+    baseGuests: 6,
+    pricePerGuest: 250,
   },
 ];
 

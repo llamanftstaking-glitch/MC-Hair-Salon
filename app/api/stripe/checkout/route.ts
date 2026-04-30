@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { type, bookingId, bookingDetails, giftCardAmount, customerEmail, customerName,
             recipientName, recipientEmail, recipientPhone, senderName, message, deliveryMethod,
-            packageId, customerId } = body;
+            packageId, customerId, guestCount } = body;
 
     if (!type) {
       return NextResponse.json({ error: "Missing checkout type" }, { status: 400 });
@@ -145,6 +145,18 @@ export async function POST(req: NextRequest) {
       const pkg = PACKAGES.find(p => p.id === packageId);
       if (!pkg) return NextResponse.json({ error: "Package not found" }, { status: 404 });
 
+      // Dynamic pricing for guest-based packages
+      let amountCents: number;
+      let description: string;
+      if (pkg.pricePerGuest && guestCount) {
+        const guests = Math.max(1, Math.round(Number(guestCount)));
+        amountCents = pkg.pricePerGuest * guests * 100;
+        description = `${pkg.tagline} · ${guests} guest${guests > 1 ? "s" : ""} · $${pkg.pricePerGuest}/guest · Valid ${pkg.validityDays} days`;
+      } else {
+        amountCents = pkg.price * 100;
+        description = `${pkg.tagline} · ${pkg.sessions} sessions · Valid ${pkg.validityDays} days`;
+      }
+
       const session = await (await getStripe()).checkout.sessions.create({
         mode: "payment",
         payment_method_types: ["card"],
@@ -154,10 +166,10 @@ export async function POST(req: NextRequest) {
             quantity: 1,
             price_data: {
               currency: "usd",
-              unit_amount: pkg.price * 100,
+              unit_amount: amountCents,
               product_data: {
                 name: `MC Hair Salon — ${pkg.name}`,
-                description: `${pkg.tagline} · ${pkg.sessions} sessions · Valid ${pkg.validityDays} days`,
+                description,
               },
             },
           },
@@ -165,6 +177,7 @@ export async function POST(req: NextRequest) {
         metadata: {
           type: "package",
           packageId: pkg.id,
+          guestCount: guestCount ? String(Math.round(Number(guestCount))) : "",
           customerId: customerId ?? "",
           customerName: customerName ?? "",
         },

@@ -168,7 +168,7 @@ export default function AdminPage() {
     } catch { setEmailStatus(p => ({ ...p, [bookingId]: "failed" })); }
   };
   const chargeNoShow = async (id: string) => {
-    if (!confirm("Charge the $20 no-show fee to the card on file?")) return;
+    if (!confirm("Charge the 30% cancellation fee to the card on file?")) return;
     setNoshowLoading(p => ({ ...p, [id]: true }));
     try {
       const res = await fetch("/api/stripe/charge-noshow", {
@@ -471,7 +471,7 @@ export default function AdminPage() {
                               {booking.cardLast4 ? `·· ${booking.cardLast4}` : "on file"}
                             </span>
                             {noshowResult[booking.id] === "charged" && (
-                              <span className="text-[10px] text-orange-400 uppercase tracking-wider">$20 charged</span>
+                              <span className="text-[10px] text-orange-400 uppercase tracking-wider">Fee charged</span>
                             )}
                           </div>
                         )}
@@ -501,11 +501,11 @@ export default function AdminPage() {
                           </button>
                         )}
                         {/* No-show charge button — shows when card is on file and booking is not already charged */}
-                        {booking.stripePaymentMethodId && booking.status !== "no_show" && !noshowResult[booking.id] && (
+                        {booking.stripePaymentMethodId && booking.status !== "cancelled" && booking.status !== "no_show" && !noshowResult[booking.id] && (
                           <button
                             onClick={() => chargeNoShow(booking.id)}
                             disabled={noshowLoading[booking.id]}
-                            title="Charge $20 no-show fee"
+                            title="Charge 30% cancellation fee"
                             className="h-9 px-3 flex items-center gap-1.5 border border-orange-500/30 text-orange-400 hover:bg-orange-500/10 transition-colors cursor-pointer text-xs font-semibold uppercase tracking-wider disabled:opacity-50"
                           >
                             {noshowLoading[booking.id] ? (
@@ -513,7 +513,7 @@ export default function AdminPage() {
                             ) : (
                               <AlertTriangle size={13} />
                             )}
-                            No-Show $20
+                            Cancel Fee
                           </button>
                         )}
                         <button onClick={() => deleteBooking(booking.id)}

@@ -13,11 +13,13 @@ export interface Booking {
   notes?: string;
   status: "pending" | "confirmed" | "cancelled" | "no_show";
   createdAt: string;
+  servicePrice?: number;
   stripeCustomerId?: string;
   stripePaymentMethodId?: string;
   cardLast4?: string;
   cardBrand?: string;
   noshowChargeId?: string;
+  cancellationChargeId?: string;
 }
 
 const DATA_FILE = path.join(process.cwd(), "data", "bookings.json");

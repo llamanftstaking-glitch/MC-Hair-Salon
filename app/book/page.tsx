@@ -665,6 +665,7 @@ function CardFormStep({
           date: form.date,
           time: form.time,
           notes: form.notes,
+          servicePrice: form.servicePrice,
           stripeCustomerId: customerId,
           stripePaymentMethodId: paymentMethodId,
         }),
@@ -712,7 +713,7 @@ function CardFormStep({
               Cancellation Policy
             </p>
             <p className="text-[#B8860B]/70 text-xs leading-relaxed">
-              $20 no-show fee
+              30% of your service total if cancelled late or no-show
             </p>
           </div>
         </div>
@@ -723,7 +724,7 @@ function CardFormStep({
           </li>
           <li className="flex items-start gap-2.5">
             <Check size={14} className="text-[var(--mc-accent)] mt-0.5 shrink-0" />
-            <span>Cancel <strong className="text-white">less than 24 hours</strong> before, or no-show — a <strong className="text-white">$20 fee</strong> will be applied to the card on file.</span>
+            <span>Cancel <strong className="text-white">less than 24 hours</strong> before, or no-show — a <strong className="text-white">30% cancellation fee</strong> of your service total will be charged to the card on file.</span>
           </li>
           <li className="flex items-start gap-2.5">
             <ShieldCheck size={14} className="text-[var(--mc-accent)] mt-0.5 shrink-0" />
@@ -748,7 +749,7 @@ function CardFormStep({
         <span className="text-[var(--mc-muted)] text-sm leading-relaxed">
           I understand and agree to the MC Hair Salon &amp; Spa{" "}
           <a href="/terms#cancellation" target="_blank" className="text-[var(--mc-accent)] hover:underline">cancellation policy</a>.
-          {" "}A $20 fee may be charged if I no-show or cancel with less than 24 hours notice.
+          {" "}A 30% cancellation fee may be charged if I no-show or cancel with less than 24 hours notice.
         </span>
       </label>
 
@@ -812,7 +813,7 @@ function CardFormStep({
       </div>
 
       <p className="text-[#333] text-xs text-center">
-        $0 charged today &nbsp;·&nbsp; Card securely held via Stripe &nbsp;·&nbsp; $20 only if you no-show
+        $0 charged today &nbsp;·&nbsp; Card securely held via Stripe &nbsp;·&nbsp; 30% fee only if you cancel late or no-show
       </p>
     </div>
   );
@@ -882,7 +883,7 @@ function SuccessScreen({
         <div className="flex items-center justify-center gap-2 mb-8">
           <ShieldCheck size={15} className="text-[var(--mc-accent)]" />
           <p className="text-[var(--mc-muted)] text-xs">
-            Card secured on file &nbsp;·&nbsp; $0 charged today &nbsp;·&nbsp; $20 applies only if you no-show
+            Card secured on file &nbsp;·&nbsp; $0 charged today &nbsp;·&nbsp; 30% fee applies only if you cancel late or no-show
           </p>
         </div>
 

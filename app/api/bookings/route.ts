@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       name, email, phone, service, stylist, date, time, notes,
-      stripeCustomerId, stripePaymentMethodId,
+      servicePrice, stripeCustomerId, stripePaymentMethodId,
     } = body;
 
     if (!name || !email || !phone || !service || !date || !time) {
@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
       date,
       time,
       notes: (notes ?? "").slice(0, 1000),
+      servicePrice: typeof servicePrice === "number" ? servicePrice : undefined,
       stripeCustomerId,
       stripePaymentMethodId,
       cardLast4,

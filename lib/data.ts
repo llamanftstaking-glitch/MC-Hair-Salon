@@ -47,7 +47,7 @@ export const SERVICES = [
     items: [
       { name: "Full Color (L'Oréal Majerel/Inoa)", price: 100, priceLabel: "$100+", description: "All-over color using L'Oréal Majerel for rich pigment or ammonia-free Inoa for scalp-sensitive clients. Includes gray coverage, built-in conditioning agents, and a toning rinse." },
       { name: "Highlights / Balayage", price: 140, priceLabel: "$140+", description: "Hand-painted balayage and traditional foil highlights for natural-looking dimension, sun-kissed depth, or bold contrast. Technique is selected based on your hair's texture and target result." },
-      { name: "Corrective Color", price: 250, priceLabel: "$250+", description: "Specialized multi-step correction for brassiness, uneven tone, over-processing, or box dye damage. Includes a detailed consultation, strand test, and a tailored treatment plan before any color is applied." },
+      { name: "Corrective Color", price: 250, priceLabel: "By Consultation", description: "Specialized multi-step correction for brassiness, uneven tone, over-processing, or box dye damage. Pricing determined after consultation. Includes a detailed consultation, strand test, and a tailored treatment plan before any color is applied." },
       { name: "Hair Treatments", price: 25, priceLabel: "$25+", description: "Deep conditioning, bond-building, and keratin smoothing treatments to restore moisture, elasticity, and shine. Particularly recommended after color, bleach, or chemical services." },
     ],
   },

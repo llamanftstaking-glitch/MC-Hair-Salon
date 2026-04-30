@@ -15,10 +15,10 @@ export default function TeamStrip() {
         </div>
 
         {/* Horizontally scrollable on mobile, grid on desktop */}
-        <div className="flex gap-4 sm:gap-6 overflow-x-auto sm:grid sm:grid-cols-3 lg:grid-cols-6 pb-4 sm:pb-0 -mx-6 px-6 sm:mx-0 sm:px-0 snap-x snap-mandatory sm:snap-none scrollbar-none">
+        <div className="flex gap-4 sm:gap-6 overflow-x-auto sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 pb-4 sm:pb-0 -mx-6 px-6 sm:mx-0 sm:px-0 snap-x snap-mandatory sm:snap-none scrollbar-none">
           {TEAM.map((member) => (
             <div key={member.name}
-              className="flex-shrink-0 w-56 sm:w-auto snap-start luxury-card overflow-hidden group">
+              className="flex-shrink-0 w-56 sm:w-full snap-start luxury-card overflow-hidden group">
               <div className="relative aspect-[3/4] overflow-hidden">
                 {member.image ? (
                   <Image

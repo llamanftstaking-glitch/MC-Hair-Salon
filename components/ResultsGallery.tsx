@@ -1,16 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 
+// Row layout (3-col grid):
+// Row 1: [IMG_5036 r2] [IMG_5888 ] [IMG_4603]
+// Row 2: [IMG_5036 r2] [IMG_6359 c2        ]
+// Row 3: [IMG_9318   ] [IMG_4872 c2        ]
+// Row 4: [5D4F5F4C   ] [IMG_5544] [F3524012]
 const GALLERY = [
-  { src: "/hope/IMG_5036.jpg",   label: "Color Correction",     span: "col-span-1 row-span-2" },
-  { src: "/hope/IMG_5888.JPEG",  label: "Highlights & Blowout", span: "col-span-1 row-span-1" },
-  { src: "/hope/IMG_4603.JPEG",  label: "Highlights",           span: "col-span-1 row-span-1" },
-  { src: "/hope/IMG_6359.JPEG",  label: "Balayage",             span: "col-span-2 row-span-1" },
-  { src: "/hope/IMG_9318.JPG",   label: "Color & Style",        span: "col-span-1 row-span-1" },
-  { src: "/hope/IMG_4872.jpg",   label: "Balayage & Blowout",   span: "col-span-1 row-span-1" },
-  { src: "/hope/5D4F5F4C.jpg",   label: "Balayage",             span: "col-span-1 row-span-1" },
-  { src: "/hope/IMG_5544.jpg",   label: "Baby Lights",          span: "col-span-1 row-span-1" },
-  { src: "/hope/F3524012.jpg",   label: "Highlights",           span: "col-span-1 row-span-1" },
+  { src: "/hope/IMG_5036.jpg",  label: "Color Correction",     span: "col-span-1 row-span-2" },
+  { src: "/hope/IMG_5888.JPEG", label: "Highlights & Blowout", span: "col-span-1 row-span-1" },
+  { src: "/hope/IMG_4603.JPEG", label: "Highlights",           span: "col-span-1 row-span-1" },
+  { src: "/hope/IMG_6359.JPEG", label: "Balayage",             span: "col-span-2 row-span-1" },
+  { src: "/hope/IMG_9318.JPG",  label: "Color & Style",        span: "col-span-1 row-span-1" },
+  { src: "/hope/IMG_4872.jpg",  label: "Balayage & Blowout",   span: "col-span-2 row-span-1" },
+  { src: "/hope/5D4F5F4C.jpg",  label: "Balayage",             span: "col-span-1 row-span-1" },
+  { src: "/hope/IMG_5544.jpg",  label: "Baby Lights",          span: "col-span-1 row-span-1" },
+  { src: "/hope/F3524012.jpg",  label: "Highlights",           span: "col-span-1 row-span-1" },
 ];
 
 export default function ResultsGallery() {
@@ -24,7 +29,7 @@ export default function ResultsGallery() {
         </div>
 
         {/* Asymmetric grid */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3" style={{ gridTemplateRows: "280px 280px 220px" }}>
+        <div className="grid grid-cols-3 gap-2 sm:gap-3" style={{ gridTemplateRows: "260px 260px 220px 200px" }}>
           {GALLERY.map((item, i) => (
             <Link key={i} href="/book"
               className={`relative overflow-hidden group cursor-pointer ${item.span}`}>

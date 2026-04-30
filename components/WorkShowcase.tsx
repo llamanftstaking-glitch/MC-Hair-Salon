@@ -55,27 +55,29 @@ export default function WorkShowcase() {
         style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.1) 100%)" }} />
 
       {/* Content */}
-      <div className="absolute inset-0 z-20 flex flex-col justify-end pb-12 px-8 sm:px-16 max-w-4xl">
-        <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-3">Our Work</p>
-        <h2
-          className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-3 transition-opacity duration-500"
-          style={{ opacity: fading ? 0 : 1 }}>
-          {slide.label}
-        </h2>
-        <p className="text-[var(--mc-muted)] text-base sm:text-lg mb-8 transition-opacity duration-500" style={{ opacity: fading ? 0 : 1 }}>
-          {slide.sub}
-        </p>
-        <div className="flex items-center gap-6">
-          <Link href="/book"
-            className="gold-gradient-bg text-black font-bold px-8 py-3.5 uppercase tracking-widest text-xs hover:opacity-90 transition-opacity cursor-pointer">
-            Book This Look
-          </Link>
-          {/* Dot indicators */}
-          <div className="flex gap-2">
-            {SLIDES.map((_, i) => (
-              <button key={i} onClick={() => goTo(i)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${i === active ? "bg-[var(--mc-accent)] w-6" : "bg-white/40 hover:bg-white/70"}`} />
-            ))}
+      <div className="absolute inset-0 z-20 flex flex-col justify-end pb-12 sm:pb-16">
+        <div className="max-w-7xl mx-auto w-full px-8 sm:px-16">
+          <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-3">Our Work</p>
+          <h2
+            className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-3 transition-opacity duration-500"
+            style={{ opacity: fading ? 0 : 1 }}>
+            {slide.label}
+          </h2>
+          <p className="text-[var(--mc-muted)] text-base sm:text-lg mb-8 transition-opacity duration-500" style={{ opacity: fading ? 0 : 1 }}>
+            {slide.sub}
+          </p>
+          <div className="flex items-center gap-6">
+            <Link href="/book"
+              className="gold-gradient-bg text-black font-bold px-8 py-3.5 uppercase tracking-widest text-xs hover:opacity-90 transition-opacity cursor-pointer">
+              Book This Look
+            </Link>
+            {/* Dot indicators */}
+            <div className="flex gap-2">
+              {SLIDES.map((_, i) => (
+                <button key={i} onClick={() => goTo(i)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${i === active ? "bg-[var(--mc-accent)] w-6" : "bg-white/40 hover:bg-white/70"}`} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

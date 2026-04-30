@@ -65,7 +65,8 @@ export default function GoogleSignInButton({ mode = "signin" }: { mode?: "signin
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Google Sign-In failed");
-          router.push("/account");
+          const redirectTo = new URLSearchParams(window.location.search).get("redirect");
+          router.push(redirectTo || (data.customer?.isAdmin ? "/admin" : "/account"));
         } catch (err: unknown) {
           setError(err instanceof Error ? err.message : "Google Sign-In failed");
           setSubmitting(false);

@@ -1,9 +1,11 @@
 import Link from "next/link";
-import Image from "next/image";
-import { Star, ChevronRight, Scissors, Wind, Palette, Sparkles } from "lucide-react";
-import { SERVICES, TESTIMONIALS, GALLERY_IMAGES, SALON_INFO } from "@/lib/data";
+import { ChevronRight, Scissors, Wind, Palette, Sparkles } from "lucide-react";
+import { SERVICES, SALON_INFO } from "@/lib/data";
 import HeroLogo from "@/components/HeroLogo";
 import MarqueeStrip from "@/components/MarqueeStrip";
+import WorkShowcase from "@/components/WorkShowcase";
+import ResultsGallery from "@/components/ResultsGallery";
+import TeamStrip from "@/components/TeamStrip";
 import SectionDivider from "@/components/SectionDivider";
 import NewsletterStrip from "@/components/NewsletterStrip";
 import FadeIn from "@/components/FadeIn";
@@ -33,6 +35,7 @@ export default function Home() {
     <>
       <HeroLogo />
       <MarqueeStrip />
+      <WorkShowcase />
 
       {/* STATS BAR */}
       <section className="bg-[var(--mc-surface)] border-y border-[var(--mc-border)] py-6 sm:py-8">
@@ -41,7 +44,7 @@ export default function Home() {
             { value: "13+", label: "Years of Excellence" },
             { value: "5★",  label: "Average Rating" },
             { value: "10K+", label: "Happy Clients" },
-            { value: "4",   label: "Expert Stylists" },
+            { value: "6",   label: "Expert Stylists" },
           ].map((s, i) => (
             <FadeIn key={s.label} delay={i * 80}>
               <p className="font-serif text-3xl gold-gradient font-bold">{s.value}</p>
@@ -112,53 +115,13 @@ export default function Home() {
 
       <SectionDivider />
 
-      {/* TRANSFORMATIONS GRID */}
-      <section className="py-16 sm:py-24 px-6 bg-[var(--mc-surface-dark)]">
-        <div className="max-w-7xl mx-auto">
-          <FadeIn className="text-center mb-10 sm:mb-16">
-            <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Client Transformations</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">The Work</h2>
-            <p className="text-[var(--mc-muted)] text-sm mt-4 max-w-lg mx-auto">Every look is personal. Every result is intentional.</p>
-          </FadeIn>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-            {[
-              { ...GALLERY_IMAGES[2],  label: "Balayage",        service: "from $120" },
-              { ...GALLERY_IMAGES[7],  label: "Cut & Style",     service: "from $45"  },
-              { ...GALLERY_IMAGES[0],  label: "Bridal Updo",     service: "from $150" },
-              { ...GALLERY_IMAGES[12], label: "Makeup",          service: "from $75"  },
-              { ...GALLERY_IMAGES[9],  label: "Color",           service: "from $85"  },
-              { ...GALLERY_IMAGES[4],  label: "Lash Extensions", service: "from $150" },
-            ].map((item, i) => (
-              <FadeIn key={i} delay={i * 60}>
-                <Link href="/services" className="block relative overflow-hidden aspect-square group cursor-pointer">
-                  <Image
-                    src={item.src}
-                    alt={`${item.label} transformation at MC Hair Salon Upper East Side NYC`}
-                    fill
-                    sizes="(max-width: 640px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-white font-serif font-bold text-lg leading-tight">{item.label}</p>
-                    <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest mt-0.5">{item.service}</p>
-                  </div>
-                </Link>
-              </FadeIn>
-            ))}
-          </div>
-
-          <div className="text-center mt-10">
-            <Link href="/gallery"
-              className="border border-[var(--mc-accent)] text-[var(--mc-accent)] px-10 py-4 uppercase tracking-widest text-sm hover:bg-[var(--mc-accent)] hover:text-black transition-all duration-300 cursor-pointer">
-              View Full Gallery
-            </Link>
-          </div>
-        </div>
-      </section>
+      <ResultsGallery />
 
       <SectionDivider bg="bg-[var(--mc-surface-dark)]" />
+
+      <TeamStrip />
+
+      <SectionDivider bg="bg-black" />
 
       {/* TESTIMONIALS */}
       <section className="py-16 sm:py-24 px-6 bg-black">

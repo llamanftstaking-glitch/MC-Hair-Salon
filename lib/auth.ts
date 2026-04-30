@@ -19,7 +19,7 @@ export interface CustomerPayload {
 }
 
 export async function signToken(payload: CustomerPayload) {
-  return await new SignJWT(payload as Record<string, unknown>)
+  return await new SignJWT(payload as unknown as Record<string, unknown>)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("30d")

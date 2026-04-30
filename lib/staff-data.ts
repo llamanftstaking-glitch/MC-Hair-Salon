@@ -47,9 +47,9 @@ const STAFF: StaffMember[] = [
   {
     id: "sofia",
     name: "Sofia",
-    role: "Spa Specialist",
-    bio: "Sofia creates a serene luxury experience for every guest. Specializing in spa treatments, lash extensions, and makeup artistry.",
-    specialties: ["Lash Extensions", "Facials", "Makeup"],
+    role: "Senior Stylist",
+    bio: "Sofia brings warmth and precision to every appointment. Known for her meticulous attention to detail and ability to create stunning looks tailored to each client.",
+    specialties: ["Cuts", "Blowouts", "Styling"],
     image: "/instagram/mchairsalonspa_1528578580_1798169924515305526_509340228.jpg",
   },
   {

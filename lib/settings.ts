@@ -28,7 +28,7 @@ const DATA_FILE = path.join(process.cwd(), "data", "site-settings.json");
 
 const DEFAULTS: SiteSettings = {
   business: {
-    name: "MC Hair Salon & Spa",
+    name: "MC Hair Salon",
     tagline: "Luxury Hair Care on the Upper East Side",
     address: "1231 Lexington Ave, New York, NY 10028",
     phone: "(212) 555-0190",

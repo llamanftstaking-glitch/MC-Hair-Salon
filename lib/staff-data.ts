@@ -1,3 +1,8 @@
+import fs from "fs";
+import path from "path";
+
+const STAFF_FILE = path.join(process.cwd(), "data", "staff.json");
+
 export interface PortfolioItem {
   type: "image" | "video";
   src: string;
@@ -68,10 +73,46 @@ const STAFF: StaffMember[] = [
   },
 ];
 
+function readStaff(): StaffMember[] {
+  try {
+    return JSON.parse(fs.readFileSync(STAFF_FILE, "utf8")) as StaffMember[];
+  } catch {
+    return STAFF;
+  }
+}
+
+function writeStaff(staff: StaffMember[]): void {
+  fs.writeFileSync(STAFF_FILE, JSON.stringify(staff, null, 2));
+}
+
 export function getAllStaff(): StaffMember[] {
-  return STAFF;
+  return readStaff();
 }
 
 export function getStaffById(id: string): StaffMember | undefined {
-  return STAFF.find((s) => s.id === id);
+  return readStaff().find((s) => s.id === id);
+}
+
+export function createStaff(data: Omit<StaffMember, "id">): StaffMember {
+  const staff = readStaff();
+  const id = data.name.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
+  const created: StaffMember = { id, ...data };
+  writeStaff([...staff, created]);
+  return created;
+}
+
+export function updateStaff(id: string, updates: Partial<Omit<StaffMember, "id">>): StaffMember {
+  const staff = readStaff();
+  const idx = staff.findIndex((s) => s.id === id);
+  if (idx === -1) throw new Error(`Staff member "${id}" not found`);
+  staff[idx] = { ...staff[idx], ...updates };
+  writeStaff(staff);
+  return staff[idx];
+}
+
+export function deleteStaff(id: string): void {
+  const staff = readStaff();
+  const filtered = staff.filter((s) => s.id !== id);
+  if (filtered.length === staff.length) throw new Error(`Staff member "${id}" not found`);
+  writeStaff(filtered);
 }

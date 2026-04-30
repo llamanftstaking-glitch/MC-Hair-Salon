@@ -25,6 +25,26 @@ export async function signToken(payload: CustomerPayload) {
     .sign(getSecret());
 }
 
+// Signs a short-lived token containing only an email, used as a "pending" 2FA token
+export async function signPartialToken(email: string): Promise<string> {
+  return await new SignJWT({ email, partial: true })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("10m")
+    .sign(getSecret());
+}
+
+// Verifies a partial token and returns the email, or null if invalid/expired
+export async function verifyPartialToken(token: string): Promise<string | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSecret());
+    if (!payload.partial || typeof payload.email !== "string") return null;
+    return payload.email;
+  } catch {
+    return null;
+  }
+}
+
 export async function verifyToken(token: string): Promise<CustomerPayload | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret());

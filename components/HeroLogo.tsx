@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function HeroLogo() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-[var(--mc-bg)]">
+    <section className="relative flex flex-col items-center justify-center overflow-hidden bg-[var(--mc-bg)] mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)]">
 
       {/* Subtle static glow */}
       <div
@@ -13,7 +13,7 @@ export default function HeroLogo() {
       />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center pt-20 px-4 text-center">
+      <div className="relative z-10 flex flex-col items-center py-10 sm:py-12 px-4 text-center">
 
         {/* Logo */}
         <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-72 md:h-72">
@@ -89,7 +89,7 @@ export default function HeroLogo() {
         </div>
 
         {/* Scroll indicator */}
-        <div className="mt-16 flex flex-col items-center opacity-40">
+        <div className="mt-8 flex flex-col items-center opacity-40">
           <div
             className="w-px h-14"
             style={{ background: "linear-gradient(to bottom, var(--mc-accent), transparent)" }}

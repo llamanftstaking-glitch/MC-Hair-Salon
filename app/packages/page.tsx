@@ -12,9 +12,17 @@ export default function PackagesPage() {
     PACKAGES.forEach(p => { if (p.baseGuests) defaults[p.id] = p.baseGuests; });
     return defaults;
   });
+  const [quantities, setQuantities] = useState<Record<string, number>>(() => {
+    const defaults: Record<string, number> = {};
+    PACKAGES.forEach(p => { if (!p.baseGuests) defaults[p.id] = 1; });
+    return defaults;
+  });
 
   function adjustGuests(packageId: string, delta: number) {
     setGuestCounts(prev => ({ ...prev, [packageId]: Math.max(1, (prev[packageId] ?? 1) + delta) }));
+  }
+  function adjustQty(packageId: string, delta: number) {
+    setQuantities(prev => ({ ...prev, [packageId]: Math.max(1, (prev[packageId] ?? 1) + delta) }));
   }
 
   async function handleBuy(packageId: string) {
@@ -26,6 +34,7 @@ export default function PackagesPage() {
 
       const pkg = PACKAGES.find(p => p.id === packageId);
       const guestCount = pkg?.baseGuests ? guestCounts[packageId] : undefined;
+      const quantity = !pkg?.baseGuests ? (quantities[packageId] ?? 1) : undefined;
 
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
@@ -34,6 +43,7 @@ export default function PackagesPage() {
           type: "package",
           packageId,
           guestCount,
+          quantity,
           customerId: me?.id ?? "",
           customerEmail: me?.email ?? "",
           customerName: me?.name ?? "",
@@ -82,8 +92,9 @@ export default function PackagesPage() {
             {PACKAGES.map(pkg => {
               const isGuest = !!pkg.baseGuests && !!pkg.pricePerGuest;
               const guestCount = isGuest ? (guestCounts[pkg.id] ?? pkg.baseGuests!) : null;
-              const displayPrice = isGuest ? pkg.pricePerGuest! * guestCount! : pkg.price;
-              const displayOriginal = isGuest ? Math.round(pkg.originalValue / pkg.baseGuests!) * guestCount! : pkg.originalValue;
+              const qty = !isGuest ? (quantities[pkg.id] ?? 1) : 1;
+              const displayPrice = isGuest ? pkg.pricePerGuest! * guestCount! : pkg.price * qty;
+              const displayOriginal = isGuest ? Math.round(pkg.originalValue / pkg.baseGuests!) * guestCount! : pkg.originalValue * qty;
               const savePct = Math.round(((displayOriginal - displayPrice) / displayOriginal) * 100);
               const isLoading = loading === pkg.id;
               return (
@@ -145,11 +156,31 @@ export default function PackagesPage() {
                       </div>
                     )}
 
-                    {/* Highlight */}
+                    {/* Quantity stepper — regular packages */}
                     {!isGuest && (
-                      <p className="text-[var(--mc-accent)] text-xs mb-5 pb-5 border-b border-[var(--mc-border)]">
-                        {pkg.highlight}
-                      </p>
+                      <div className="mb-5 pb-5 border-b border-[var(--mc-border)]">
+                        <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-3">Quantity</p>
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() => adjustQty(pkg.id, -1)}
+                            disabled={qty <= 1}
+                            className="w-9 h-9 border border-[var(--mc-border)] flex items-center justify-center text-[var(--mc-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-colors disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
+                          >
+                            <Minus size={14} />
+                          </button>
+                          <span className="font-serif text-2xl font-bold gold-gradient w-8 text-center">{qty}</span>
+                          <button
+                            onClick={() => adjustQty(pkg.id, 1)}
+                            className="w-9 h-9 border border-[var(--mc-border)] flex items-center justify-center text-[var(--mc-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer"
+                          >
+                            <Plus size={14} />
+                          </button>
+                          <span className="text-[#555] text-xs">{qty > 1 ? `${pkg.sessions * qty} total sessions` : `${pkg.sessions} sessions`}</span>
+                        </div>
+                        {qty === 1 && (
+                          <p className="text-[var(--mc-accent)] text-xs mt-3">{pkg.highlight}</p>
+                        )}
+                      </div>
                     )}
 
                     {/* Pricing */}
@@ -166,8 +197,8 @@ export default function PackagesPage() {
                           </>
                         ) : (
                           <>
-                            <p className="text-[var(--mc-accent)] text-sm font-semibold">{pkg.sessions} sessions</p>
-                            <p className="text-[#555] text-xs">${Math.round(pkg.price / pkg.sessions)}/each</p>
+                            <p className="text-[var(--mc-accent)] text-sm font-semibold">${pkg.price}/package</p>
+                            <p className="text-[#555] text-xs">{qty > 1 ? `×${qty}` : `${pkg.sessions} sessions`}</p>
                           </>
                         )}
                       </div>

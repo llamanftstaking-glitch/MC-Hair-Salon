@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { type, bookingId, bookingDetails, giftCardAmount, customerEmail, customerName,
             recipientName, recipientEmail, recipientPhone, senderName, message, deliveryMethod,
-            packageId, customerId, guestCount } = body;
+            packageId, customerId, guestCount, quantity } = body;
 
     if (!type) {
       return NextResponse.json({ error: "Missing checkout type" }, { status: 400 });
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
       const pkg = PACKAGES.find(p => p.id === packageId);
       if (!pkg) return NextResponse.json({ error: "Package not found" }, { status: 404 });
 
-      // Dynamic pricing for guest-based packages
+      // Dynamic pricing for guest-based or multi-quantity packages
       let amountCents: number;
       let description: string;
       if (pkg.pricePerGuest && guestCount) {
@@ -153,8 +153,12 @@ export async function POST(req: NextRequest) {
         amountCents = pkg.pricePerGuest * guests * 100;
         description = `${pkg.tagline} · ${guests} guest${guests > 1 ? "s" : ""} · $${pkg.pricePerGuest}/guest · Valid ${pkg.validityDays} days`;
       } else {
-        amountCents = pkg.price * 100;
-        description = `${pkg.tagline} · ${pkg.sessions} sessions · Valid ${pkg.validityDays} days`;
+        const qty = guestCount ? 1 : Math.max(1, Math.round(Number(quantity ?? 1)));
+        amountCents = pkg.price * qty * 100;
+        const totalSessions = pkg.sessions * qty;
+        description = qty > 1
+          ? `${pkg.tagline} · ×${qty} packages · ${totalSessions} total sessions · Valid ${pkg.validityDays} days`
+          : `${pkg.tagline} · ${pkg.sessions} sessions · Valid ${pkg.validityDays} days`;
       }
 
       const session = await (await getStripe()).checkout.sessions.create({
@@ -178,6 +182,7 @@ export async function POST(req: NextRequest) {
           type: "package",
           packageId: pkg.id,
           guestCount: guestCount ? String(Math.round(Number(guestCount))) : "",
+          quantity: quantity ? String(Math.max(1, Math.round(Number(quantity)))) : "1",
           customerId: customerId ?? "",
           customerName: customerName ?? "",
         },

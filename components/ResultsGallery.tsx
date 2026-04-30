@@ -28,8 +28,8 @@ export default function ResultsGallery() {
           <p className="text-[var(--mc-muted)] text-sm mt-4 max-w-lg mx-auto">Every look is personal. Every result is intentional.</p>
         </div>
 
-        {/* Asymmetric grid */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3" style={{ gridTemplateRows: "260px 260px 220px 200px" }}>
+        {/* Asymmetric grid — shorter rows on mobile, taller on desktop */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 [grid-template-rows:200px_200px_170px_150px] sm:[grid-template-rows:280px_280px_240px_210px]">
           {GALLERY.map((item, i) => (
             <Link key={i} href="/book"
               className={`relative overflow-hidden group cursor-pointer ${item.span}`}>
@@ -37,7 +37,7 @@ export default function ResultsGallery() {
                 src={item.src}
                 alt={`${item.label} at MC Hair Salon Upper East Side NYC`}
                 fill
-                sizes="(max-width: 640px) 33vw, 25vw"
+                sizes="(max-width: 640px) 33vw, (max-width: 1024px) 40vw, 30vw"
                 className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300" />

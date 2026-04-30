@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 
-function isAdminEmail(email: string): boolean {
-  const adminEmails = (process.env.ADMIN_EMAIL ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  if (adminEmails.length === 0) return true;
-  return adminEmails.includes(email.toLowerCase());
-}
-
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -32,7 +23,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    if (isAdminRoute && !isAdminEmail(payload.email)) {
+    if (isAdminRoute && !payload.isAdmin) {
       return NextResponse.redirect(new URL("/", req.url));
     }
   }

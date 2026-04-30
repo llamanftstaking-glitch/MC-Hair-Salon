@@ -15,10 +15,11 @@ export interface CustomerPayload {
   id: string;
   email: string;
   name: string;
+  isAdmin?: boolean;
 }
 
 export async function signToken(payload: CustomerPayload) {
-  return await new SignJWT(payload)
+  return await new SignJWT(payload as Record<string, unknown>)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("30d")
@@ -65,21 +66,12 @@ export async function getSession(): Promise<CustomerPayload | null> {
   }
 }
 
-function isAdmin(email: string): boolean {
-  const adminEmails = (process.env.ADMIN_EMAIL ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  if (adminEmails.length === 0) return true; // open during initial setup — lock down by setting ADMIN_EMAIL
-  return adminEmails.includes(email.toLowerCase());
-}
-
 export async function requireAdmin(): Promise<NextResponse | null> {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
-  if (!isAdmin(session.email)) {
+  if (!session.isAdmin) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   return null;

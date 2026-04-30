@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { OAuth2Client } from "google-auth-library";
 import { getCustomerByEmail, createCustomer, updateCustomer } from "@/lib/customers";
 import { signToken } from "@/lib/auth";
+import { isAdminEmail } from "@/lib/admins";
 
 export async function POST(req: NextRequest) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
@@ -70,11 +71,12 @@ export async function POST(req: NextRequest) {
     customer = createCustomer({ name, email, phone: "", googleId, avatarUrl });
   }
 
-  const token = await signToken({ id: customer.id, email: customer.email, name: customer.name });
+  const isAdmin = isAdminEmail(customer.email);
+  const token = await signToken({ id: customer.id, email: customer.email, name: customer.name, isAdmin });
 
   const res = NextResponse.json({
     success: true,
-    customer: { id: customer.id, name: customer.name, email: customer.email },
+    customer: { id: customer.id, name: customer.name, email: customer.email, isAdmin },
   });
   res.cookies.set("mc-session", token, {
     httpOnly: true,

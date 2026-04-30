@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyPartialToken, signToken } from "@/lib/auth";
+import { isAdminEmail } from "@/lib/admins";
 import { verifyTOTP } from "@/lib/totp";
 import { getTOTPRecord } from "@/lib/admin-totp";
 import { getCustomerByEmail } from "@/lib/customers";
@@ -36,10 +37,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "User not found" }, { status: 401 });
   }
 
-  const token = await signToken({ id: customer.id, email: customer.email, name: customer.name });
+  const isAdmin = isAdminEmail(email);
+  const token = await signToken({ id: customer.id, email: customer.email, name: customer.name, isAdmin });
   const res = NextResponse.json({
     success: true,
-    customer: { id: customer.id, name: customer.name, email: customer.email },
+    customer: { id: customer.id, name: customer.name, email: customer.email, isAdmin },
   });
   res.cookies.set("mc-session", token, {
     httpOnly: true,

@@ -12,7 +12,7 @@ import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-type Tab = "reservations" | "clients" | "newsletter" | "reports" | "messages" | "staff" | "settings" | "rewards";
+type Tab = "reservations" | "clients" | "newsletter" | "reports" | "messages" | "staff" | "settings" | "rewards" | "users";
 
 interface RewardCustomer {
   id: string;
@@ -41,6 +41,15 @@ interface SiteSettings {
   business: { name: string; tagline: string; address: string; phone: string; email: string; instagram: string; facebook: string; };
   hours: { day: string; open: string; close: string; closed?: boolean; }[];
   hero: { headline: string; headlineAccent: string; subheadline: string; };
+}
+
+interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  isAdmin: boolean;
+  isEnvAdmin: boolean;
+  adminEntry: { email: string; addedAt: string; addedBy: string } | null;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -97,6 +106,12 @@ export default function AdminPage() {
   const [adjusting,      setAdjusting]      = useState(false);
   const [adjustSuccess,  setAdjustSuccess]  = useState<string | null>(null);
 
+  // ── Users/admin state ────────────────────────────────────────────────────────
+  const [adminUsers,       setAdminUsers]       = useState<AdminUser[]>([]);
+  const [adminGrantEmail,  setAdminGrantEmail]  = useState("");
+  const [adminGrantLoading, setAdminGrantLoading] = useState(false);
+  const [usersLoading,     setUsersLoading]     = useState(false);
+
   // ── Fetch functions ─────────────────────────────────────────────────────────
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -123,9 +138,17 @@ export default function AdminPage() {
     catch { /* non-fatal */ }
   }, []);
 
+  const fetchAdminUsers = useCallback(async () => {
+    setUsersLoading(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      if (res.ok) { const data = await res.json(); setAdminUsers(data.users); }
+    } finally { setUsersLoading(false); }
+  }, []);
+
   useEffect(() => {
-    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards();
-  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards]);
+    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers();
+  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards, fetchAdminUsers]);
 
   // ── Booking handlers ────────────────────────────────────────────────────────
   const [noshowLoading, setNoshowLoading] = useState<Record<string, boolean>>({});
@@ -299,6 +322,20 @@ export default function AdminPage() {
     startEditStaff(created);
   };
 
+  // ── Admin users handlers ─────────────────────────────────────────────────────
+  const handleAdminToggle = async (email: string, action: "grant" | "revoke") => {
+    await fetch("/api/admin/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, action }) });
+    fetchAdminUsers();
+  };
+  const handleAdminGrant = async (email: string) => {
+    if (!email) return;
+    setAdminGrantLoading(true);
+    await fetch("/api/admin/users", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, action: "grant" }) });
+    setAdminGrantEmail("");
+    setAdminGrantLoading(false);
+    fetchAdminUsers();
+  };
+
   // ── Settings handlers ───────────────────────────────────────────────────────
   const saveSettings = async () => {
     if (!settingsForm) return;
@@ -337,6 +374,7 @@ export default function AdminPage() {
     { id: "reports",      label: "Reports",      icon: <BarChart2 size={15} /> },
     { id: "staff",        label: "Staff",        icon: <UserCheck size={15} /> },
     { id: "settings",     label: "Settings",     icon: <Settings size={15} /> },
+    { id: "users",        label: "Users",        icon: <ShieldCheck size={15} /> },
   ];
 
   // ── Render ───────────────────────────────────────────────────────────────────
@@ -1341,6 +1379,97 @@ export default function AdminPage() {
                     {savingSettings ? <><Loader size={14} className="animate-spin" /> Saving…</> : <><Save size={14} /> Save Homepage</>}
                   </button>
                 </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── USERS ────────────────────────────────────────────────────────── */}
+        {tab === "users" && (
+          <div>
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+              <div>
+                <p className="text-white font-semibold text-lg flex items-center gap-2">
+                  <ShieldCheck size={18} className="text-[var(--mc-accent)]" /> Admin Access
+                </p>
+                <p className="text-[#555] text-sm mt-1">
+                  {adminUsers.filter(u => u.isAdmin).length} admin{adminUsers.filter(u => u.isAdmin).length !== 1 ? "s" : ""} · {adminUsers.length} registered users
+                </p>
+              </div>
+            </div>
+
+            {/* Grant by email */}
+            <div className="luxury-card p-6 mb-6">
+              <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+                <Plus size={16} className="text-[var(--mc-accent)]" /> Grant Admin by Email
+              </h3>
+              <div className="flex gap-3">
+                <input
+                  type="email"
+                  value={adminGrantEmail}
+                  onChange={e => setAdminGrantEmail(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handleAdminGrant(adminGrantEmail)}
+                  placeholder="Email address"
+                  className={`${inputCls} flex-1`}
+                />
+                <button
+                  onClick={() => handleAdminGrant(adminGrantEmail)}
+                  disabled={!adminGrantEmail || adminGrantLoading}
+                  className="gold-gradient-bg text-black font-bold px-6 py-2 text-sm uppercase tracking-widest hover:opacity-90 disabled:opacity-40 cursor-pointer shrink-0 transition-opacity"
+                >
+                  {adminGrantLoading ? "Granting…" : "Grant"}
+                </button>
+              </div>
+              <p className="text-[#444] text-xs mt-2">User must log out and back in for changes to take effect.</p>
+            </div>
+
+            {/* Users list */}
+            {usersLoading ? (
+              <div className="text-center py-20 text-[#555]">Loading…</div>
+            ) : adminUsers.length === 0 ? (
+              <div className="text-center py-20 luxury-card">
+                <Users size={48} className="text-[#333] mx-auto mb-4" />
+                <p className="text-[#555]">No registered users yet</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {[...adminUsers].sort((a, b) => Number(b.isAdmin) - Number(a.isAdmin)).map(user => (
+                  <div key={user.id} className={`luxury-card p-4 flex items-center justify-between gap-4 flex-wrap border-l-2 ${user.isAdmin ? "border-l-[var(--mc-accent)]" : "border-l-transparent"}`}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        <p className="text-white font-semibold text-sm">{user.name}</p>
+                        {user.isAdmin && (
+                          <span className="text-[10px] px-2 py-0.5 bg-[var(--mc-accent)]/15 border border-[var(--mc-accent)]/30 text-[var(--mc-accent)] uppercase tracking-wider flex items-center gap-1">
+                            <ShieldCheck size={10} /> Admin
+                          </span>
+                        )}
+                        {user.isEnvAdmin && (
+                          <span className="text-[10px] px-2 py-0.5 border border-[#555]/40 text-[#555] uppercase tracking-wider" title="Set via ADMIN_EMAIL env var">ENV</span>
+                        )}
+                      </div>
+                      <p className="text-[#555] text-xs">{user.email}</p>
+                      {user.adminEntry && (
+                        <p className="text-[#333] text-[10px] mt-0.5">
+                          Added by {user.adminEntry.addedBy} · {new Date(user.adminEntry.addedAt).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                    {user.isEnvAdmin ? (
+                      <span className="text-[#444] text-xs shrink-0">env-protected</span>
+                    ) : (
+                      <button
+                        onClick={() => handleAdminToggle(user.email, user.isAdmin ? "revoke" : "grant")}
+                        className={`shrink-0 px-4 py-1.5 border text-xs uppercase tracking-widest font-semibold transition-all cursor-pointer ${
+                          user.isAdmin
+                            ? "border-red-500/30 text-red-400 hover:bg-red-500/10"
+                            : "border-green-500/30 text-green-400 hover:bg-green-500/10"
+                        }`}
+                      >
+                        {user.isAdmin ? "Revoke" : "Grant"}
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>

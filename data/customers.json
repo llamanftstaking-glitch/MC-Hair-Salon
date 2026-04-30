@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "admin-001",
+    "name": "MC Admin",
+    "email": "admin@mchairsalonspa.com",
+    "phone": "",
+    "passwordHash": "$2b$10$E4gsa9rn.XQKrVu1GHyt/OHZCqTws.3Z10MWT3TFexpIF3tYZN9pm",
+    "createdAt": "2026-04-30T00:00:00.000Z",
+    "points": 0,
+    "visits": 0,
+    "tier": "Bronze",
+    "rewards": []
+  }
+]

@@ -25,7 +25,8 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      router.push("/account");
+      const redirectTo = new URLSearchParams(window.location.search).get("redirect");
+      router.push(redirectTo || (data.customer?.isAdmin ? "/admin" : "/account"));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -79,11 +80,6 @@ export default function LoginPage() {
           </button>
 
           <GoogleSignInButton mode="signin" />
-
-          <p className="text-center text-[var(--mc-text-dim)] text-sm pt-2">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-[var(--mc-accent)] hover:underline cursor-pointer">Create one</Link>
-          </p>
         </form>
       </div>
     </section>

@@ -7,7 +7,7 @@ import { Elements, CardElement, useStripe, useElements } from "@stripe/react-str
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Check, ChevronLeft, ShieldCheck, CreditCard, AlertTriangle,
-  Scissors, Wind, Sparkles, Palette, Star, Calendar, Clock, User,
+  Scissors, Wind, Palette, Star, Calendar, Clock, User,
 } from "lucide-react";
 import { SERVICES, TEAM } from "@/lib/data";
 
@@ -55,7 +55,6 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   "Haircuts":          <Scissors  size={20} />,
   "Blowouts & Styling":<Wind      size={20} />,
   "Color":             <Palette   size={20} />,
-  "Spa Services":      <Sparkles  size={20} />,
   "Makeup":            <Star      size={20} />,
 };
 

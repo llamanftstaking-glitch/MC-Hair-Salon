@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Scissors, Wind, Palette, Sparkles, Check, Brush } from "lucide-react";
+import { Scissors, Wind, Palette, Check, Brush } from "lucide-react";
 import { SERVICES } from "@/lib/data";
 
 
@@ -8,7 +8,6 @@ const iconMap: Record<string, React.ReactNode> = {
   scissors: <Scissors size={24} />,
   wind: <Wind size={24} />,
   palette: <Palette size={24} />,
-  sparkles: <Sparkles size={24} />,
   brush: <Brush size={24} />,
 };
 
@@ -75,7 +74,7 @@ export default function ServicesPage() {
                     </div>
                     <div className="shrink-0 ml-4 sm:ml-8 text-right">
                       <span className="inline-block gold-gradient font-serif text-lg sm:text-xl font-bold tabular-nums">
-                        ${item.price}+
+                        {"priceLabel" in item ? item.priceLabel : `$${item.price}`}
                       </span>
                     </div>
                   </div>

@@ -3,7 +3,7 @@ import { getStripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
 import { updateBookingStatus } from "@/lib/bookings";
 import { createGiftCard } from "@/lib/gift-cards";
 import { getCustomerById, updateCustomer } from "@/lib/customers";
-import { hasProcessedEvent, markEventProcessed } from "@/lib/webhook-events";
+import { claimEvent, releaseEvent } from "@/lib/webhook-events";
 import { PACKAGES } from "@/lib/data";
 import type { CustomerPackage } from "@/lib/customers";
 import Stripe from "stripe";
@@ -34,9 +34,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Webhook Error: ${message}` }, { status: 400 });
   }
 
-  // ── Idempotency check ──────────────────────────────────────────────────────
-  if (await hasProcessedEvent(event.id)) {
-    console.log(`[stripe/webhook] Already processed event ${event.id} — skipping`);
+  // ── Idempotency claim (atomic) ─────────────────────────────────────────────
+  // INSERT ... ON CONFLICT DO NOTHING RETURNING gives us race-safe
+  // single-execution guarantees even when Stripe delivers the same event
+  // to two workers near-simultaneously. Only the caller who actually
+  // inserted the row proceeds to run side-effects.
+  const claimed = await claimEvent(event.id);
+  if (!claimed) {
+    console.log(`[stripe/webhook] Event ${event.id} already claimed — skipping`);
     return NextResponse.json({ received: true });
   }
 
@@ -148,14 +153,19 @@ export async function POST(req: NextRequest) {
         console.log(`[stripe/webhook] Unhandled event type: ${event.type}`);
     }
 
-    // Mark as processed so duplicate deliveries are ignored
-    await markEventProcessed(event.id);
-
+    // Claim is already in the DB (it was inserted atomically up top).
     return NextResponse.json({ received: true });
 
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Webhook handler error";
     console.error("[stripe/webhook] Handler error:", message);
+    // Release the claim so Stripe's automatic retry can re-process this event.
+    // Without this, a transient failure would permanently strand the event.
+    try {
+      await releaseEvent(event.id);
+    } catch (releaseErr) {
+      console.error("[stripe/webhook] Failed to release claim:", releaseErr);
+    }
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

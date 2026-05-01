@@ -18,6 +18,44 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
+// Refuse to use the hardcoded fallback credentials in production. If an admin
+// row already exists in the DB, this script is harmless (it skips re-inserts),
+// so we only block when both env vars are missing AND we are about to create
+// a fresh admin with the predictable defaults.
+if (
+  process.env.NODE_ENV === "production" &&
+  (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD)
+) {
+  // Quick existence check before failing hard, so a normal restart with an
+  // existing admin row keeps booting cleanly.
+  (async () => {
+    const sql = require("postgres")(process.env.DATABASE_URL, { max: 1 });
+    try {
+      const existing = await sql`
+        SELECT 1 FROM customers WHERE email = ${ADMIN_EMAIL} LIMIT 1
+      `;
+      if (existing.length === 0) {
+        console.error(
+          "ERROR: ADMIN_EMAIL and ADMIN_PASSWORD must be set as Replit secrets " +
+          "in production before the initial admin can be seeded. Refusing to " +
+          "create an account with the public default password."
+        );
+        await sql.end();
+        process.exit(1);
+      }
+      // Admin row already exists — nothing to seed, exit cleanly so `npm start` proceeds.
+      console.log(`Admin account already exists: ${ADMIN_EMAIL} (no seed needed)`);
+      await sql.end();
+      process.exit(0);
+    } catch (err) {
+      console.error("Seed pre-check error:", err.message);
+      await sql.end();
+      process.exit(1);
+    }
+  })();
+  return;
+}
+
 const sql = postgres(process.env.DATABASE_URL, { max: 1 });
 
 async function main() {

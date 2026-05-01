@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import {
@@ -229,87 +229,82 @@ function CardCaptureForm({ onSuccess }: { onSuccess: (data: CardData) => void })
   );
 }
 
-// ── Phase 2 — DaySmart booking widget ────────────────────────────────────────
-// DaySmart blocks direct iframe embeds (X-Frame-Options). We work around this
-// by using srcDoc — we own the iframe content, so the restriction doesn't apply.
-// DaySmart's script runs inside our srcdoc iframe and injects its booking UI there.
-const DAYSMART_SRCDOC = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #fff; font-family: sans-serif; }
-  </style>
-</head>
-<body>
-  <script type="text/javascript">
-    daysmart_acc = "0a1d5a05-c4ea-4dcb-b3c7-92ff0d13bfcf";
-    daysmart_iframe_width = 700;
-    daysmart_iframe_height = 0;
-    daysmart_website_root = "https://plugin.mysalononline.com";
-    load_in_iframe = "false";
-  <\/script>
-  <script type="text/javascript" src="https://plugin.mysalononline.com/Scripts/external/bookingplugin.js"><\/script>
-</body>
-</html>`;
+// ── Phase 2 — DaySmart redirect ───────────────────────────────────────────────
+// DaySmart blocks all iframe/srcdoc embedding due to X-Frame-Options.
+// We open DaySmart natively in a new tab — no domain restrictions, full functionality.
+const DAYSMART_BOOKING_URL =
+  "https://plugin.mysalononline.com/Booking?AccountGuid=0a1d5a05-c4ea-4dcb-b3c7-92ff0d13bfcf";
 
-function DaySmartWidget({
+function DaySmartRedirect({
   clientName,
   onBookingDetected,
 }: {
   clientName: string;
   onBookingDetected: () => void;
 }) {
-  const detectedRef = useRef(false);
+  const [opened, setOpened] = useState(false);
 
+  // Auto-open DaySmart on mount
   useEffect(() => {
-    function onMessage(e: MessageEvent) {
-      if (detectedRef.current) return;
-      const d = e.data;
-      const isConfirmation =
-        (typeof d === "string" && /confirm|booked|success|appointment/i.test(d)) ||
-        (d && typeof d === "object" && /confirm|booked|success|appointment/i.test(JSON.stringify(d)));
-      if (isConfirmation) {
-        detectedRef.current = true;
-        onBookingDetected();
-      }
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [onBookingDetected]);
+    const win = window.open(DAYSMART_BOOKING_URL, "_blank", "noopener,noreferrer");
+    setOpened(!!win);
+  }, []);
+
+  const openDaySmart = () => {
+    window.open(DAYSMART_BOOKING_URL, "_blank", "noopener,noreferrer");
+    setOpened(true);
+  };
 
   return (
-    <div>
-      {/* Confirmation strip */}
-      <div className="flex items-center gap-3 border border-[var(--mc-accent)]/30 bg-[#0a0800] px-5 py-4 mb-6">
+    <div className="text-center py-4 space-y-8">
+      {/* Card confirmed badge */}
+      <div className="inline-flex items-center gap-3 border border-[var(--mc-accent)]/30 bg-[#0a0800] px-6 py-4">
         <div className="w-7 h-7 rounded-full gold-gradient-bg flex items-center justify-center shrink-0">
           <Check size={14} strokeWidth={3} className="text-black" />
         </div>
-        <div>
+        <div className="text-left">
           <p className="text-[var(--mc-accent)] text-xs font-bold uppercase tracking-widest">
             Card secured{clientName ? `, ${clientName.split(" ")[0]}` : ""}!
           </p>
-          <p className="text-[var(--mc-muted)] text-xs mt-0.5">Now select your service, stylist, and time below.</p>
+          <p className="text-[var(--mc-muted)] text-xs mt-0.5">$0 charged today · Card held for cancellation policy only</p>
         </div>
       </div>
 
-      {/* DaySmart widget — runs inside a srcdoc iframe we control */}
-      <iframe
-        srcDoc={DAYSMART_SRCDOC}
-        title="Book Appointment — MC Hair Salon & Spa"
-        width="100%"
-        frameBorder="0"
-        className="w-full border-0"
-        style={{ height: 1100, minHeight: 1100 }}
-      />
+      {/* Instruction */}
+      <div>
+        <p className="text-[var(--mc-accent)] uppercase tracking-[0.3em] text-xs font-semibold mb-3">Step 2 of 2</p>
+        <h2 className="font-serif text-3xl font-bold text-white mb-3">
+          {opened ? "Complete your booking" : "Opening booking system…"}
+        </h2>
+        <p className="text-[var(--mc-muted)] text-sm max-w-sm mx-auto leading-relaxed">
+          {opened
+            ? "Our booking system opened in a new tab. Select your service, stylist, and time there."
+            : "A new tab is opening with MC Hair Salon's booking system."}
+        </p>
+      </div>
 
-      {/* Manual confirm fallback */}
-      <div className="mt-8 border-t border-[#1a1a1a] pt-6 text-center">
-        <p className="text-[#444] text-xs mb-3 uppercase tracking-widest">Finished booking above?</p>
+      {/* CTA */}
+      <div className="space-y-3">
         <button
-          onClick={() => { detectedRef.current = true; onBookingDetected(); }}
+          onClick={openDaySmart}
+          className="gold-gradient-bg text-black font-bold px-12 py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity cursor-pointer"
+        >
+          {opened ? "Reopen Booking Tab →" : "Open Booking System →"}
+        </button>
+
+        <p className="text-[#444] text-xs">
+          Popup blocked?{" "}
+          <button onClick={openDaySmart} className="text-[var(--mc-accent)] hover:underline cursor-pointer">
+            Click here to open manually
+          </button>
+        </p>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-[#1a1a1a] pt-6">
+        <p className="text-[#444] text-xs mb-3 uppercase tracking-widest">Finished booking in the other tab?</p>
+        <button
+          onClick={onBookingDetected}
           className="border border-[var(--mc-accent)] text-[var(--mc-accent)] px-8 py-3 text-xs uppercase tracking-widest hover:bg-[var(--mc-accent)] hover:text-black transition-all cursor-pointer"
         >
           I completed my booking ✓
@@ -458,7 +453,7 @@ function BookingFlow() {
                     <p className="text-[var(--mc-muted)] text-xs mt-0.5">Step 2 of 2 — Powered by DaySmart</p>
                   </div>
                 </div>
-                <DaySmartWidget
+                <DaySmartRedirect
                   clientName={cardData?.name ?? ""}
                   onBookingDetected={handleBookingDetected}
                 />

@@ -3,7 +3,7 @@ export const SALON_INFO = {
   tagline: "Upper East Side's Premier Luxury Salon",
   address: "336 East 78th St, New York, NY 10075",
   phone: "(212) 988-5252",
-  email: "info@mchairsalon.com",
+  email: "hello@mchairsalon.com",
   instagram: "https://www.instagram.com/mchairsalonspa/",
   facebook: "https://www.facebook.com/mchairsalonandspa/",
   established: 2011,

@@ -75,7 +75,7 @@ export default function Navbar() {
   return (
     <>
       {/* ── Top bar ── */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-[var(--mc-surface)] border-b border-[var(--mc-border)]">
+      <div className="mc-navbar fixed top-0 left-0 right-0 z-50 bg-[var(--mc-surface)] border-b border-[var(--mc-border)]">
 
         {/* Announcement strip */}
         <div className="flex items-center justify-center py-2 px-4 sm:px-10 relative">

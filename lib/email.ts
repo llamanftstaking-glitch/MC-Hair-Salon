@@ -29,7 +29,7 @@ const FROM = process.env.RESEND_FROM_EMAIL || "MC Hair Salon <info@mchairsalon.c
 
 // Salon-bound notifications (new contact, new booking, new gift card) are routed here.
 // Override with SALON_INBOX_EMAIL env var if the owner wants a different address.
-const SALON_INBOX = process.env.SALON_INBOX_EMAIL || "info@mchairsalon.com";
+const SALON_INBOX = process.env.SALON_INBOX_EMAIL || "hello@mchairsalon.com";
 
 // ── Shared HTML snippets ───────────────────────────────────────────────────────
 const baseStyle = `font-family:'Georgia',serif;background:#000;color:#f5f0e8;max-width:600px;margin:0 auto;padding:40px 32px;`;

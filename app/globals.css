@@ -149,6 +149,23 @@ html[data-theme="light"] .logo-bw {
   mix-blend-mode: multiply;
 }
 
+/* ── NAVBAR: always dark even in light mode (overlays dark hero) ───────────── */
+html[data-theme="light"] .mc-navbar {
+  --mc-bg:      #0c0820;
+  --mc-surface: #100c28;
+  --mc-border:  rgba(124, 58, 237, 0.22);
+  --mc-text:    #ede9fe;
+  --mc-muted:   #c4b5fd;
+  --mc-accent:  #a78bfa;
+  background-color: var(--mc-surface) !important;
+  border-color: var(--mc-border) !important;
+}
+/* Undo the logo invert — white logo looks correct on dark navbar */
+html[data-theme="light"] .mc-navbar .logo-bw {
+  filter: none;
+  mix-blend-mode: normal;
+}
+
 /* ── LIGHT MODE OVERRIDES ──────────────────────────────────────────────────── */
 
 /* ---- Backgrounds ---- */

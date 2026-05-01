@@ -3,29 +3,31 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-// All three images are from /instagram/ — completely separate from the
-// /hope/ images used exclusively in ResultsGallery. No repeats.
-//
-// objectPosition values keep the subject centred on desktop, where portrait
-// images get cropped heavily (scaled ~1–1.4× to fill a 1440×675 container).
 const SLIDES = [
+  {
+    src: "/instagram/mchairsalonspa_1537975181_1876994322903414349_509340228.jpg",
+    label: "Half-Up Style",
+    sub:   "Effortless elegance — swept back and polished to perfection.",
+  },
+  {
+    src: "/instagram/mchairsalonspa_1568744468_2135105812317486094_509340228.jpg",
+    label: "Sleek & Straight",
+    sub:   "Glossy, mirror-smooth — precision cut with dimensional color.",
+  },
+  {
+    src: "/instagram/mchairsalonspa_1551895791_1993768864262785123_509340228.jpg",
+    label: "Platinum Waves",
+    sub:   "Luminous blonde, long and lavish — effortlessly beachy.",
+  },
+  {
+    src: "/instagram/mchairsalonspa_1526678565_1782231439342285913_509340228.jpg",
+    label: "Golden Balayage",
+    sub:   "Sun-kissed warmth, hand-painted through every strand.",
+  },
   {
     src: "/instagram/mchairsalonspa_1597866646_2379400348672402563_509340228.jpg",
     label: "Curly Cut",
     sub:   "Defined, bouncy curls shaped to your natural pattern.",
-    pos:   "50% 28%",
-  },
-  {
-    src: "/instagram/mchairsalonspa_1618323213_2551002466209372019_509340228.jpg",
-    label: "Balayage & Blowout",
-    sub:   "Hand-painted colour, finished to perfection.",
-    pos:   "50% 25%",
-  },
-  {
-    src: "/instagram/mchairsalonspa_1645811757_2781593085253597123_509340228.jpg",
-    label: "Curly Highlights",
-    sub:   "Dimension and texture — every curl lit from within.",
-    pos:   "40% 32%",
   },
 ];
 
@@ -53,7 +55,7 @@ export default function WorkShowcase() {
   const slide = SLIDES[active];
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: "75vh", minHeight: 520 }}>
+    <section className="relative w-full bg-black overflow-hidden" style={{ height: "80vh", minHeight: 560 }}>
 
       {/* Slides — stacked, cross-fade via opacity */}
       {SLIDES.map((s, i) => (
@@ -66,15 +68,16 @@ export default function WorkShowcase() {
             fill
             priority={i === 0}
             sizes="100vw"
-            className="object-cover"
-            style={{ objectPosition: s.pos }}
+            className="object-contain"
           />
         </div>
       ))}
 
-      {/* Gradient — strong at bottom for text legibility */}
-      <div className="absolute inset-0 z-10"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.05) 100%)" }} />
+      {/* Gradient — bottom for text, sides to soften black bars */}
+      <div className="absolute inset-0 z-10 pointer-events-none"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.05) 70%, rgba(0,0,0,0) 100%)" }} />
+      <div className="absolute inset-0 z-10 pointer-events-none"
+        style={{ background: "linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 75%, rgba(0,0,0,0.55) 100%)" }} />
 
       {/* Content */}
       <div className="absolute inset-0 z-20 flex flex-col justify-end pb-12 sm:pb-16">

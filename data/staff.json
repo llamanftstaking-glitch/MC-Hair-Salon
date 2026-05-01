@@ -55,11 +55,11 @@
     "order": 4
   },
   {
-    "id": "isabella",
-    "name": "Isabella",
-    "role": "Makeup Artist",
-    "bio": "Isabella is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry, she tailors every look to your unique features and personal style.",
-    "specialties": ["Bridal Makeup", "Eye Makeup", "Lashes", "Makeup Lessons"],
+    "id": "dhariana",
+    "name": "Dhariana Suriel",
+    "role": "Professional Makeup Artist",
+    "bio": "Dhariana Suriel is MC's professional makeup artist with 18 years of experience creating breathtaking bridal and special event looks. Featured on WeddingWire and The Knot. Fluent in English and Spanish.",
+    "specialties": ["Bridal Makeup", "Contour Makeup", "Eye Makeup", "Lashes", "Makeup Lessons", "Special Event Makeup"],
     "image": "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
     "portfolio": [],
     "isMakeupArtist": true,

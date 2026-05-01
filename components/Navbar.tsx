@@ -215,10 +215,10 @@ export default function Navbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
-                className={`block font-serif leading-none text-gray-900 hover:text-[#B8860B] transition-colors duration-150 cursor-pointer py-3.5 border-b border-gray-100 last:border-0 ${
+                className={`block font-serif leading-none text-gray-900 hover:text-[#B8860B] transition-colors duration-150 cursor-pointer py-2.5 border-b border-gray-100 last:border-0 ${
                   pathname === l.href ? "text-[#B8860B]" : ""
                 }`}
-                style={{ fontSize: "clamp(1.4rem, 6vw, 2rem)" }}
+                style={{ fontSize: "clamp(1rem, 4vw, 1.25rem)" }}
               >
                 {l.label}
               </Link>

@@ -61,9 +61,9 @@ const TIME_SLOTS = [
 ];
 
 // ── Shared styles ─────────────────────────────────────────────────────────────
-const inputCls  = "w-full bg-[#080808] border border-[#1a1a1a] text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#333]";
-const selectCls = "w-full bg-[#080808] border border-[#1a1a1a] text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors appearance-none";
-const labelCls  = "block text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2";
+const inputCls  = "w-full bg-[#080808] border border-[#1a1a1a] text-white px-5 py-4 text-base focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#555]";
+const selectCls = "w-full bg-[#080808] border border-[#1a1a1a] text-white px-5 py-4 text-base focus:outline-none focus:border-[var(--mc-accent)] transition-colors appearance-none";
+const labelCls  = "block text-white text-sm font-semibold mb-2";
 
 // ── Phase 1 — Card capture ────────────────────────────────────────────────────
 interface CardData {
@@ -172,42 +172,36 @@ function CardCaptureForm({
       </div>
 
       {/* Cancellation policy */}
-      <div className="border border-[#B8860B]/40 bg-[#0a0800] p-5">
-        <div className="flex items-start gap-3 mb-4">
-          <AlertTriangle size={18} className="text-[var(--mc-accent)] shrink-0 mt-0.5" />
-          <div>
-            <p className="text-[var(--mc-accent)] font-bold text-sm uppercase tracking-widest mb-0.5">Cancellation Policy</p>
-            <p className="text-[#B8860B]/70 text-xs">30% fee if cancelled late or no-show</p>
-          </div>
-        </div>
-        <ul className="space-y-2.5 text-sm text-[var(--mc-muted)]">
-          <li className="flex items-start gap-2.5">
-            <Check size={13} className="text-[var(--mc-accent)] mt-0.5 shrink-0" />
-            <span>Cancel <strong className="text-white">24+ hours in advance</strong> — no charge, no questions asked.</span>
+      <div className="border border-[#B8860B]/40 bg-[#0a0800] p-6">
+        <p className="text-[var(--mc-accent)] font-bold text-base mb-4">About Your Card on File</p>
+        <ul className="space-y-4 text-[var(--mc-muted)]">
+          <li className="flex items-start gap-3">
+            <ShieldCheck size={18} className="text-[var(--mc-accent)] mt-0.5 shrink-0" />
+            <span className="text-sm leading-relaxed"><strong className="text-white">Nothing is charged today.</strong> We only store your card to hold your appointment — just like a hotel reservation.</span>
           </li>
-          <li className="flex items-start gap-2.5">
-            <Check size={13} className="text-[var(--mc-accent)] mt-0.5 shrink-0" />
-            <span>Cancel <strong className="text-white">under 24 hours</strong> or no-show — a <strong className="text-white">30% cancellation fee</strong> is charged to your card on file.</span>
+          <li className="flex items-start gap-3">
+            <Check size={18} className="text-[var(--mc-accent)] mt-0.5 shrink-0" />
+            <span className="text-sm leading-relaxed">Need to cancel? No problem — <strong className="text-white">cancel at least 24 hours ahead</strong> and there is no charge at all.</span>
           </li>
-          <li className="flex items-start gap-2.5">
-            <ShieldCheck size={13} className="text-[var(--mc-accent)] mt-0.5 shrink-0" />
-            <span><strong className="text-white">$0 charged today.</strong> Your card is stored securely via Stripe to hold your spot.</span>
+          <li className="flex items-start gap-3">
+            <AlertTriangle size={18} className="text-[#B8860B] mt-0.5 shrink-0" />
+            <span className="text-sm leading-relaxed">If you cancel with less than 24 hours notice or do not show up, a <strong className="text-white">30% fee</strong> will be charged to protect our stylists&apos; time.</span>
           </li>
         </ul>
       </div>
 
       {/* Agreement */}
-      <label className="flex items-start gap-3 cursor-pointer group">
-        <div className={`mt-0.5 w-5 h-5 shrink-0 border-2 flex items-center justify-center transition-all ${
-          agreed ? "bg-[var(--mc-accent)] border-[var(--mc-accent)]" : "border-[#333] group-hover:border-[var(--mc-accent)]"
+      <label className="flex items-start gap-4 cursor-pointer group">
+        <div className={`mt-0.5 w-6 h-6 shrink-0 border-2 flex items-center justify-center transition-all ${
+          agreed ? "bg-[var(--mc-accent)] border-[var(--mc-accent)]" : "border-[#444] group-hover:border-[var(--mc-accent)]"
         }`}>
-          {agreed && <Check size={11} strokeWidth={3} className="text-black" />}
+          {agreed && <Check size={13} strokeWidth={3} className="text-black" />}
         </div>
         <input type="checkbox" className="sr-only" checked={agreed} onChange={e => setAgreed(e.target.checked)} />
         <span className="text-[var(--mc-muted)] text-sm leading-relaxed">
-          I agree to the MC Hair Salon &amp; Spa{" "}
-          <a href="/terms#cancellation" target="_blank" className="text-[var(--mc-accent)] hover:underline">cancellation policy</a>.
-          A 30% fee may apply for late cancellations or no-shows.
+          I understand and agree to the{" "}
+          <a href="/terms#cancellation" target="_blank" className="text-[var(--mc-accent)] hover:underline">cancellation policy</a>{" "}
+          above.
         </span>
       </label>
 
@@ -243,17 +237,17 @@ function CardCaptureForm({
       <button
         type="submit"
         disabled={loading || !intentReady || !!intentError}
-        className="w-full gold-gradient-bg text-black font-bold py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer flex items-center justify-center gap-3"
+        className="w-full gold-gradient-bg text-black font-bold py-5 text-base hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer flex items-center justify-center gap-3"
       >
         {loading ? (
-          <><Loader size={16} className="animate-spin" /> Securing your spot...</>
+          <><Loader size={18} className="animate-spin" /> Securing your spot…</>
         ) : (
-          <><ShieldCheck size={16} /> Continue to Book Appointment</>
+          <><ShieldCheck size={18} /> Continue to Choose Your Appointment</>
         )}
       </button>
 
-      <p className="text-[#333] text-xs text-center">
-        $0 charged today · Card held via Stripe · 30% fee only if you no-show or cancel late
+      <p className="text-[#555] text-sm text-center">
+        Nothing is charged today. Card on file for cancellation policy only.
       </p>
     </form>
   );
@@ -659,12 +653,17 @@ function BookingFlow() {
           )}
 
           {!done && (
-            <p className="text-center text-[#333] text-xs mt-8">
-              Need help?{" "}
-              <a href="tel:+12129885252" className="text-[var(--mc-accent)] hover:underline">
+            <div className="mt-8 border border-[#1a1a1a] py-5 px-6 text-center">
+              <p className="text-[#666] text-sm mb-2">Prefer to speak with someone?</p>
+              <a
+                href="tel:+12129885252"
+                className="inline-flex items-center gap-2 text-[var(--mc-accent)] font-semibold text-xl hover:opacity-80 transition-opacity"
+              >
+                <Scissors size={18} />
                 (212) 988-5252
               </a>
-            </p>
+              <p className="text-[#444] text-xs mt-1">Our team is happy to book your appointment by phone.</p>
+            </div>
           )}
         </div>
       </section>

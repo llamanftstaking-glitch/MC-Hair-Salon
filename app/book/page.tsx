@@ -230,10 +230,11 @@ function CardCaptureForm({ onSuccess }: { onSuccess: (data: CardData) => void })
 }
 
 // ── Phase 2 — DaySmart redirect ───────────────────────────────────────────────
-// DaySmart blocks all iframe/srcdoc embedding due to X-Frame-Options.
-// We open DaySmart natively in a new tab — no domain restrictions, full functionality.
+// Correct URL sourced from DaySmart's bookingplugin.js:
+// src = daysmartWebsiteRoot + "/External/BookingPlugin/?guid=" + daysmart_acc
+// bookThroughNewTab=true tells DaySmart to open sub-steps in the same tab
 const DAYSMART_BOOKING_URL =
-  "https://plugin.mysalononline.com/Booking?AccountGuid=0a1d5a05-c4ea-4dcb-b3c7-92ff0d13bfcf";
+  "https://plugin.mysalononline.com/External/BookingPlugin/?guid=0a1d5a05-c4ea-4dcb-b3c7-92ff0d13bfcf&bookThroughNewTab=true";
 
 function DaySmartRedirect({
   clientName,

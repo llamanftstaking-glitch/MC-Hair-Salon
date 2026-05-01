@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Meet Our Team",
   description:
-    "Meet the stylists at MC Hair Salon & Spa — Upper East Side NYC. Maria, Meagan, Sally, Kato, Juany & Dhariana. Expert cuts, color, keratin, and bridal makeup.",
+    "Meet the team at MC Hair Salon & Spa — Upper East Side NYC. Maria, Meagan, Sally, Kato, Juany, Dhariana, Nazareth & Nathaly. Expert cuts, color, keratin, and bridal makeup.",
   keywords: [
     "hair stylist Upper East Side NYC", "balayage specialist Manhattan",
     "best hair colorist NYC", "makeup artist Upper East Side",
@@ -97,31 +97,6 @@ export default async function TeamPage() {
             </div>
           ))}
 
-          {/* 6th slot — fills orphan gap, drives bookings */}
-          <div className="border border-dashed border-[#222] flex flex-col items-center justify-center text-center p-10 sm:p-14 gap-6">
-            <div className="w-14 h-14 border border-[var(--mc-accent)]/30 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--mc-accent)" strokeWidth="1" className="w-6 h-6 opacity-70">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-[0.4em] font-semibold mb-2">Not Sure Who to Book?</p>
-              <p className="font-serif text-xl text-white font-bold mb-3">Let Us Match You</p>
-              <p className="text-[#444] text-xs leading-relaxed max-w-[220px] mx-auto">
-                Call us and we&apos;ll pair you with the right specialist for your service and hair type.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 w-full max-w-[200px]">
-              <Link href="/book"
-                className="gold-gradient-bg text-black text-[10px] font-bold px-6 py-3 uppercase tracking-widest hover:opacity-90 transition-opacity text-center">
-                Book Online
-              </Link>
-              <a href="tel:+12129885252"
-                className="border border-[#2a2a2a] text-[#555] text-[10px] px-6 py-3 uppercase tracking-widest hover:border-[var(--mc-accent)]/40 hover:text-[var(--mc-accent)] transition-all text-center">
-                (212) 988-5252
-              </a>
-            </div>
-          </div>
         </div>
       </section>
     </>

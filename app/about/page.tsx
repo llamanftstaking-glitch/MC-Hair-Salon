@@ -236,7 +236,7 @@ export default function AboutPage() {
             <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2">Our People</p>
             <h2 className="font-serif text-2xl font-bold text-white mb-2">Meet the Team</h2>
             <p className="text-[#555] text-sm leading-relaxed max-w-sm">
-              Maria, Meagan, Sally, Kato, Juany, and Dhariana — six specialists with one shared commitment
+              Maria, Meagan, Sally, Kato, Juany, Dhariana, Nazareth, and Nathaly — eight specialists with one shared commitment
               to your best look.
             </p>
           </div>

@@ -74,6 +74,22 @@ const STAFF: StaffMember[] = [
     image: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
     portfolio: [],
   },
+  {
+    id: "nazareth",
+    name: "Nazareth",
+    role: "Salon Manager",
+    bio: "Nazareth keeps MC Hair Salon & Spa running beautifully behind the scenes. With a sharp eye for detail and a warm presence, she ensures every client has a seamless, elevated experience from the moment they walk in.",
+    specialties: ["Salon Operations", "Team Management", "Client Relations", "Guest Experience"],
+    portfolio: [],
+  },
+  {
+    id: "nathaly",
+    name: "Nathaly",
+    role: "Receptionist",
+    bio: "Nathaly is the welcoming face of MC Hair Salon & Spa. She handles scheduling, coordinates appointments, and makes sure every guest feels at home the moment they arrive.",
+    specialties: ["Scheduling", "Client Coordination", "Front Desk", "Guest Relations"],
+    portfolio: [],
+  },
 ];
 
 function readStaff(): StaffMember[] {

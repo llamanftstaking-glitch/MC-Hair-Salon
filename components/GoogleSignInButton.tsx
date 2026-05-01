@@ -40,7 +40,19 @@ declare global {
   }
 }
 
-export default function GoogleSignInButton({ mode = "signin" }: { mode?: "signin" | "signup" }) {
+export interface AuthCustomer {
+  id: string; name: string; email: string; phone: string;
+  stripeCustomerId?: string; stripePaymentMethodId?: string;
+  avatarUrl?: string;
+}
+
+export default function GoogleSignInButton({
+  mode = "signin",
+  onSuccess,
+}: {
+  mode?: "signin" | "signup";
+  onSuccess?: (customer: AuthCustomer) => void;
+}) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
@@ -65,8 +77,16 @@ export default function GoogleSignInButton({ mode = "signin" }: { mode?: "signin
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "Google Sign-In failed");
-          const redirectTo = new URLSearchParams(window.location.search).get("redirect");
-          router.push(redirectTo || (data.customer?.isAdmin ? "/admin" : "/account"));
+
+          if (onSuccess) {
+            // Stay on page — fetch full profile (includes Stripe card info) and pass to caller
+            const profileRes = await fetch("/api/auth/me");
+            const profile = await profileRes.json();
+            onSuccess(profile);
+          } else {
+            const redirectTo = new URLSearchParams(window.location.search).get("redirect");
+            router.push(redirectTo || (data.customer?.isAdmin ? "/admin" : "/account"));
+          }
         } catch (err: unknown) {
           setError(err instanceof Error ? err.message : "Google Sign-In failed");
           setSubmitting(false);
@@ -98,7 +118,7 @@ export default function GoogleSignInButton({ mode = "signin" }: { mode?: "signin
       logo_alignment: "center",
       width: buttonWidth,
     });
-  }, [scriptLoaded, clientId, mode, router]);
+  }, [scriptLoaded, clientId, mode, router, onSuccess]);
 
   if (!clientId) {
     return null;
@@ -111,12 +131,6 @@ export default function GoogleSignInButton({ mode = "signin" }: { mode?: "signin
         strategy="afterInteractive"
         onLoad={() => setScriptLoaded(true)}
       />
-
-      <div className="relative flex items-center py-2">
-        <div className="flex-grow border-t border-[var(--mc-border)]" />
-        <span className="mx-4 text-[var(--mc-text-dim)] text-xs uppercase tracking-widest">or</span>
-        <div className="flex-grow border-t border-[var(--mc-border)]" />
-      </div>
 
       <div className="flex justify-center">
         <div ref={containerRef} className={submitting ? "opacity-60 pointer-events-none" : ""} />

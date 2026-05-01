@@ -6,6 +6,7 @@ import { Elements, CardElement, useStripe, useElements } from "@stripe/react-str
 import {
   Check, ShieldCheck, CreditCard, AlertTriangle, Loader, Scissors, CalendarDays,
 } from "lucide-react";
+import GoogleSignInButton, { type AuthCustomer } from "@/components/GoogleSignInButton";
 
 // ── Stripe ────────────────────────────────────────────────────────────────────
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -73,13 +74,19 @@ interface CardData {
   stripePaymentMethodId: string;
 }
 
-function CardCaptureForm({ onSuccess }: { onSuccess: (data: CardData) => void }) {
+function CardCaptureForm({
+  onSuccess,
+  prefill,
+}: {
+  onSuccess: (data: CardData) => void;
+  prefill?: { name: string; email: string; phone: string };
+}) {
   const stripe   = useStripe();
   const elements = useElements();
 
-  const [name,  setName]  = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name,  setName]  = useState(prefill?.name  ?? "");
+  const [email, setEmail] = useState(prefill?.email ?? "");
+  const [phone, setPhone] = useState(prefill?.phone ?? "");
   const [agreed,       setAgreed]      = useState(false);
   const [loading,      setLoading]     = useState(false);
   const [error,        setError]       = useState("");
@@ -484,9 +491,47 @@ function StepDots({ phase }: { phase: 1 | 2 }) {
 
 // ── Main flow ─────────────────────────────────────────────────────────────────
 function BookingFlow() {
-  const [phase,    setPhase]    = useState<1 | 2>(1);
-  const [done,     setDone]     = useState(false);
-  const [cardData, setCardData] = useState<CardData | null>(null);
+  const [phase,        setPhase]        = useState<1 | 2>(1);
+  const [done,         setDone]         = useState(false);
+  const [cardData,     setCardData]     = useState<CardData | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState<AuthCustomer | null>(null);
+  const [prefill,      setPrefill]      = useState<{ name: string; email: string; phone: string } | null>(null);
+  const [authChecked,  setAuthChecked]  = useState(false);
+
+  // Check if user is already signed in on mount
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && !data.error) applyAuthUser(data);
+      })
+      .catch(() => {})
+      .finally(() => setAuthChecked(true));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function applyAuthUser(user: AuthCustomer) {
+    setLoggedInUser(user);
+    if (user.stripeCustomerId && user.stripePaymentMethodId) {
+      // Has card on file → skip Step 1 entirely
+      setCardData({
+        name:                  user.name,
+        email:                 user.email,
+        phone:                 user.phone,
+        stripeCustomerId:      user.stripeCustomerId,
+        stripePaymentMethodId: user.stripePaymentMethodId,
+      });
+      setPhase(2);
+    } else {
+      // Signed in but no card → pre-fill Step 1
+      setPrefill({ name: user.name, email: user.email, phone: user.phone ?? "" });
+    }
+  }
+
+  const handleGoogleSuccess = useCallback((user: AuthCustomer) => {
+    applyAuthUser(user);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCardSuccess = useCallback((data: CardData) => {
     setCardData(data);
@@ -503,7 +548,18 @@ function BookingFlow() {
     setPhase(1);
     setDone(false);
     setCardData(null);
+    setPrefill(null);
+    setLoggedInUser(null);
   };
+
+  // While checking auth, show nothing so there's no flash of Step 1 before jumping to Step 2
+  if (!authChecked) {
+    return (
+      <section className="pt-40 pb-24 flex items-center justify-center bg-black">
+        <div className="w-6 h-6 border-2 border-[#222] border-t-[var(--mc-accent)] rounded-full animate-spin" />
+      </section>
+    );
+  }
 
   return (
     <>
@@ -530,17 +586,67 @@ function BookingFlow() {
             </div>
           ) : phase === 1 ? (
             <div className="luxury-card p-8 md:p-10">
-              <div className="flex items-center gap-3 mb-8">
+              <div className="flex items-center gap-3 mb-6">
                 <Scissors size={18} className="text-[var(--mc-accent)]" />
                 <div>
                   <h2 className="font-serif text-xl font-bold text-white">Secure Your Spot</h2>
                   <p className="text-[var(--mc-muted)] text-xs mt-0.5">Step 1 of 2 — Your details & card on file</p>
                 </div>
               </div>
-              <CardCaptureForm onSuccess={handleCardSuccess} />
+
+              {/* Google sign-in CTA — only if not already signed in */}
+              {!loggedInUser && (
+                <div className="mb-8">
+                  <p className="text-[var(--mc-muted)] text-sm text-center mb-4">
+                    Sign in to book faster — we&apos;ll fill in your details automatically.
+                  </p>
+                  <GoogleSignInButton mode="signin" onSuccess={handleGoogleSuccess} />
+                  <div className="flex items-center gap-3 mt-6">
+                    <div className="flex-1 h-px bg-[#1a1a1a]" />
+                    <span className="text-[#444] text-xs uppercase tracking-widest whitespace-nowrap">or continue as guest</span>
+                    <div className="flex-1 h-px bg-[#1a1a1a]" />
+                  </div>
+                </div>
+              )}
+
+              {/* Signed-in banner (no card yet) */}
+              {loggedInUser && (
+                <div className="flex items-center gap-3 mb-6 px-4 py-3 border border-[var(--mc-accent)]/25 bg-[#0a0800]">
+                  {loggedInUser.avatarUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={loggedInUser.avatarUrl} alt="" className="w-8 h-8 rounded-full shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium truncate">{loggedInUser.name}</p>
+                    <p className="text-[var(--mc-muted)] text-xs truncate">{loggedInUser.email}</p>
+                  </div>
+                  <Check size={14} className="text-[var(--mc-accent)] shrink-0" />
+                </div>
+              )}
+
+              <CardCaptureForm
+                key={prefill ? `signed-${prefill.email}` : "guest"}
+                prefill={prefill ?? undefined}
+                onSuccess={handleCardSuccess}
+              />
             </div>
           ) : (
             <div className="luxury-card p-8 md:p-10">
+              {/* Instant-book banner */}
+              {loggedInUser && cardData && (
+                <div className="flex items-center gap-3 mb-6 px-4 py-3 border border-[var(--mc-accent)]/25 bg-[#0a0800]">
+                  {loggedInUser.avatarUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={loggedInUser.avatarUrl} alt="" className="w-8 h-8 rounded-full shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[var(--mc-accent)] text-xs font-bold uppercase tracking-widest">Booking as {loggedInUser.name.split(" ")[0]}</p>
+                    <p className="text-[var(--mc-muted)] text-xs">Card on file · instant booking</p>
+                  </div>
+                  <ShieldCheck size={15} className="text-[var(--mc-accent)] shrink-0" />
+                </div>
+              )}
+
               <div className="flex items-center gap-3 mb-8">
                 <CalendarDays size={18} className="text-[var(--mc-accent)]" />
                 <div>

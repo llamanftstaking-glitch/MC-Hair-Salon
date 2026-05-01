@@ -22,6 +22,9 @@ export interface Customer {
   // Punch card — 10 hair services = 1 free blowout
   visitStreak:    number;   // current punches toward next blowout (resets at 10)
   blowoutsEarned: number;   // lifetime complimentary blowouts earned
+  // Stripe card on file — used for no-show / late cancellation charges
+  stripeCustomerId?:     string;
+  stripePaymentMethodId?: string;
 }
 
 export interface Appointment {

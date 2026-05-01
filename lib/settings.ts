@@ -61,8 +61,12 @@ export async function getSettings(): Promise<SiteSettings> {
     .where(eq(siteSettingsTable.key, SETTINGS_KEY));
 
   if (!rows.length) {
-    // First-run: seed defaults
-    await db.insert(siteSettingsTable).values({ key: SETTINGS_KEY, value: DEFAULTS });
+    // First-run: seed defaults. Use ON CONFLICT DO NOTHING so concurrent
+    // requests racing the seed don't crash on the unique key.
+    await db
+      .insert(siteSettingsTable)
+      .values({ key: SETTINGS_KEY, value: DEFAULTS })
+      .onConflictDoNothing({ target: siteSettingsTable.key });
     return DEFAULTS;
   }
 

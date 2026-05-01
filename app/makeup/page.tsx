@@ -160,7 +160,7 @@ export default function MakeupPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
               { title: "Premium Products", body: "We use only professional-grade, skin-safe cosmetics from top brands — no compromises." },
-              { title: "Custom Looks", body: "Every face is unique. Dhariani creates custom looks tailored to your bone structure, coloring, and vision." },
+              { title: "Custom Looks", body: "Every face is unique. Dhariana creates custom looks tailored to your bone structure, coloring, and vision." },
               { title: "Salon Experience", body: "Enjoy the full MC luxury salon environment — champagne vibes on the Upper East Side." },
             ].map(c => (
               <div key={c.title} className="luxury-card p-8 text-center">

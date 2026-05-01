@@ -230,7 +230,7 @@ export default function FirstVisitGuidePost() {
             <p className="mt-4">
               Our team has been serving the Upper East Side for over 13 years. We&apos;ve welcomed
               thousands of first-time clients who came in nervous and left as regulars. Our stylists
-              — Kato, Megan, Sofia, Marcus, and Dhariani — are experienced with a wide range of
+              — Kato, Megan, Sofia, Marcus, and Dhariana — are experienced with a wide range of
               hair types and backgrounds, and we take the consultation seriously for every guest,
               not just new ones.
             </p>

@@ -79,6 +79,32 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* WeddingWire + The Knot strip */}
+        <div className="border-t border-[#1a1500] py-6 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 bg-[#050400]">
+          <p className="text-[#444] text-[9px] uppercase tracking-[0.4em] shrink-0">Official Vendor On</p>
+          <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
+            target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-2 group cursor-pointer">
+            <span className="text-white font-bold text-sm tracking-tight group-hover:text-[var(--mc-accent)] transition-colors">WeddingWire</span>
+            <div className="flex gap-0.5">
+              {[0,1,2,3,4].map(i => (
+                <svg key={i} xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#C9A84C"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              ))}
+            </div>
+          </a>
+          <div className="w-px h-5 bg-[#222] hidden sm:block" />
+          <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
+            target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-2 group cursor-pointer">
+            <span className="text-white font-bold text-sm tracking-tight group-hover:text-[var(--mc-accent)] transition-colors">The Knot</span>
+            <div className="flex gap-0.5">
+              {[0,1,2,3,4].map(i => (
+                <svg key={i} xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="#C9A84C"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              ))}
+            </div>
+          </a>
+        </div>
+
         <div className="border-t border-[var(--mc-border)] pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <p className="text-[var(--mc-text-dim)] text-xs">© {new Date().getFullYear()} MC Hair Salon & Spa. All rights reserved.</p>

@@ -17,7 +17,7 @@ const HOME_FAQS = [
   { q: "What services does MC Hair Salon & Spa offer?", a: "We offer a full range of hair and beauty services including women's and men's haircuts, blowouts, balayage, highlights, full color, corrective color, updos, bridal styling, eyelash extensions, facials, and professional makeup artistry. We are one of the only salons on the Upper East Side that combines hair, spa, and makeup under one roof." },
   { q: "How much does a haircut cost at MC Hair Salon?", a: "Women's cuts start at $45, men's cuts start at $30, and children's cuts start at $20. All prices are starting rates and may vary based on hair length and complexity. View our full pricing at mchairsalon.com/services." },
   { q: "How much does balayage cost at MC Hair Salon?", a: "Balayage and highlights start at $120 at MC Hair Salon & Spa. Final pricing depends on hair length, density, and the complexity of the color design. Our colorists use L'Oréal professional color systems for all services." },
-  { q: "Does MC Hair Salon offer bridal hair and makeup?", a: "Yes — bridal services are one of our specialties. We offer complete wedding packages including bridal updos, trial sessions, hair and makeup for the full bridal party, and day-of coordination. Our resident makeup artist Dhariani specializes in bridal looks. Contact us to discuss your wedding date and party size." },
+  { q: "Does MC Hair Salon offer bridal hair and makeup?", a: "Yes — bridal services are one of our specialties. We offer complete wedding packages including bridal updos, trial sessions, hair and makeup for the full bridal party, and day-of coordination. Our resident makeup artist Dhariana specializes in bridal looks. Contact us to discuss your wedding date and party size." },
   { q: "Can I walk in without an appointment?", a: "Yes, walk-ins are always welcome at MC Hair Salon & Spa. We recommend calling ahead at (212) 988-5252 to confirm availability, especially on weekends and for color services. Online booking is also available 24/7 at mchairsalon.com/book." },
   { q: "What are MC Hair Salon's hours?", a: "Monday: 9:30AM–4PM. Tuesday–Thursday: 10:30AM–7:30PM. Friday: 10AM–7PM. Saturday: 10AM–7PM. Sunday: 11AM–6PM." },
 ];
@@ -115,6 +115,47 @@ export default function Home() {
       <SectionDivider />
 
       <ResultsGallery />
+
+      {/* WEDDINGWIRE + THE KNOT FEATURE */}
+      <section className="py-16 sm:py-20 px-6 bg-[#050400] border-y border-[#1a1500]">
+        <div className="max-w-5xl mx-auto text-center">
+          <FadeIn>
+            <p className="text-[var(--mc-accent)] uppercase tracking-[0.5em] text-[10px] font-semibold mb-6">As Trusted By NYC Brides On</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 mb-10">
+              <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
+                target="_blank" rel="noopener noreferrer"
+                className="flex flex-col items-center gap-2 group cursor-pointer">
+                <p className="font-bold text-2xl sm:text-3xl text-white tracking-tight group-hover:text-[var(--mc-accent)] transition-colors">WeddingWire</p>
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#C9A84C"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  ))}
+                </div>
+                <p className="text-[#555] text-[10px] uppercase tracking-widest">5.0 · Verified Reviews</p>
+              </a>
+              <div className="w-px h-14 bg-[#1a1a1a] hidden sm:block" />
+              <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
+                target="_blank" rel="noopener noreferrer"
+                className="flex flex-col items-center gap-2 group cursor-pointer">
+                <p className="font-bold text-2xl sm:text-3xl text-white tracking-tight group-hover:text-[var(--mc-accent)] transition-colors">The Knot</p>
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#C9A84C"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  ))}
+                </div>
+                <p className="text-[#555] text-[10px] uppercase tracking-widest">5.0 · Verified Reviews</p>
+              </a>
+            </div>
+            <p className="text-[var(--mc-muted)] text-sm max-w-xl mx-auto mb-8 leading-relaxed">
+              MC Hair Salon & Spa is an official vendor on both WeddingWire and The Knot — the world&apos;s most trusted wedding platforms. NYC brides choose us for bridal hair, makeup, and full-party beauty.
+            </p>
+            <Link href="/weddings"
+              className="inline-block border border-[var(--mc-accent)] text-[var(--mc-accent)] px-10 py-3 uppercase tracking-widest text-xs hover:bg-[var(--mc-accent)] hover:text-black transition-all duration-300 cursor-pointer">
+              Plan Your Wedding Beauty →
+            </Link>
+          </FadeIn>
+        </div>
+      </section>
 
       <SectionDivider bg="bg-[var(--mc-surface-dark)]" />
 

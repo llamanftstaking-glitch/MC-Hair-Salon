@@ -158,6 +158,131 @@ export default function WeddingsPage() {
         </div>
       </section>
 
+      {/* ── WEDDINGWIRE + THE KNOT TRUST BANNER ── */}
+      <section className="py-12 px-6 bg-[#050400] border-y border-[#1a1500]">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16">
+            <p className="text-[#555] text-[10px] uppercase tracking-[0.4em] shrink-0">Official Vendor On</p>
+            <div className="flex flex-col sm:flex-row items-center gap-8 sm:gap-12">
+              <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-3 group cursor-pointer">
+                <div className="text-center">
+                  <p className="font-bold text-xl text-white group-hover:text-[var(--mc-accent)] transition-colors tracking-tight">WeddingWire</p>
+                  <div className="flex gap-0.5 justify-center mt-1">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="#C9A84C"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    ))}
+                  </div>
+                </div>
+              </a>
+              <div className="w-px h-8 bg-[#1a1a1a] hidden sm:block" />
+              <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-3 group cursor-pointer">
+                <div className="text-center">
+                  <p className="font-bold text-xl text-white group-hover:text-[var(--mc-accent)] transition-colors tracking-tight">The Knot</p>
+                  <div className="flex gap-0.5 justify-center mt-1">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="#C9A84C"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    ))}
+                  </div>
+                </div>
+              </a>
+            </div>
+            <p className="text-[#444] text-[10px] uppercase tracking-widest shrink-0 hidden sm:block">5.0 · Verified Bridal Reviews</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── MEET DHARIANA ── */}
+      <section className="py-24 px-6 bg-[var(--mc-surface-dark)]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Your Bridal Makeup Artist</p>
+            <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white">Meet Dhariana Suriel</h2>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="relative">
+              <div className="relative overflow-hidden border border-[var(--mc-border)]" style={{ aspectRatio: "4/5" }}>
+                <Image
+                  src="/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg"
+                  alt="Dhariana Suriel — Professional Makeup Artist at MC Hair Salon"
+                  fill className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="flex gap-2 flex-wrap">
+                    {["WeddingWire ★ 5.0", "The Knot ★ 5.0", "Woman-Owned", "18 Years Experience"].map(badge => (
+                      <span key={badge} className="bg-black/70 border border-[var(--mc-accent)]/40 text-[var(--mc-accent)] text-[9px] uppercase tracking-widest px-2.5 py-1 font-semibold">
+                        {badge}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2">Professional Makeup Artist</p>
+              <h3 className="font-serif text-3xl font-bold text-white mb-2">Dhariana Suriel</h3>
+              <div className="w-12 h-px bg-gradient-to-r from-[var(--mc-accent)] to-transparent mb-6" />
+              <p className="text-[var(--mc-muted)] text-sm leading-relaxed mb-4">
+                With 18 years of professional makeup artistry, Dhariana Suriel is MC&apos;s resident bridal beauty specialist. She creates breathtaking, timeless looks designed to photograph beautifully from morning preparations through the final dance.
+              </p>
+              <p className="text-[var(--mc-muted)] text-sm leading-relaxed mb-8">
+                Fluent in both English and Spanish, Dhariana works closely with each bride to understand her unique vision — whether that&apos;s soft romantic glam, classic elegance, or modern sophistication — ensuring she feels like the most radiant version of herself.
+              </p>
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {[
+                  { label: "Experience", value: "18 Years" },
+                  { label: "Languages", value: "EN · ES" },
+                  { label: "WeddingWire", value: "5.0 ★" },
+                  { label: "Specialties", value: "Bridal & Events" },
+                ].map(stat => (
+                  <div key={stat.label} className="border border-[var(--mc-border)] px-4 py-3">
+                    <p className="text-[#555] text-[10px] uppercase tracking-widest mb-1">{stat.label}</p>
+                    <p className="text-white font-semibold text-sm">{stat.value}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/book"
+                  className="gold-gradient-bg text-black font-bold px-8 py-3 uppercase tracking-widest text-xs hover:opacity-90 transition-opacity cursor-pointer text-center">
+                  Book with Dhariana
+                </Link>
+                <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
+                  target="_blank" rel="noopener noreferrer"
+                  className="border border-[var(--mc-border)] text-[var(--mc-muted)] px-8 py-3 uppercase tracking-widest text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-center">
+                  View on WeddingWire →
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Kaitie WeddingWire review */}
+          <div className="mt-14 border border-[var(--mc-accent)]/20 bg-[#0a0800] p-8">
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              <div className="shrink-0">
+                <div className="flex gap-0.5 mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#C9A84C"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  ))}
+                </div>
+                <p className="text-[#555] text-[9px] uppercase tracking-widest">WeddingWire · Verified</p>
+              </div>
+              <div className="flex-1">
+                <p className="text-[var(--mc-muted)] text-sm leading-relaxed italic mb-4">
+                  &ldquo;Highly recommend Dhariana&apos;s artistry! She was available on a dime for an intimate event and was incredibly accommodating and flexible. Got nothing but amazing feedback from the bride and the mother of the bride. They loved their looks!!&rdquo;
+                </p>
+                <p className="text-white font-semibold text-sm">Kaitie</p>
+                <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest mt-0.5">Wedding · March 2026</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── HOW IT WORKS ── */}
       <section className="py-24 px-6 bg-[var(--mc-surface-dark)]">
         <div className="max-w-5xl mx-auto">

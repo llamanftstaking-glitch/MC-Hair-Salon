@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import {
-  Check, ShieldCheck, CreditCard, AlertTriangle, Loader, Scissors,
+  Check, ShieldCheck, CreditCard, AlertTriangle, Loader, Scissors, CalendarDays,
 } from "lucide-react";
 
 // ── Stripe ────────────────────────────────────────────────────────────────────
@@ -26,6 +26,44 @@ const CARD_STYLE = {
   },
 };
 
+// ── Static data ───────────────────────────────────────────────────────────────
+const SERVICES = [
+  "Women's Haircut",
+  "Men's Haircut",
+  "Kids' Haircut",
+  "Curly Cut",
+  "Blowout / Blow Dry",
+  "Balayage",
+  "Highlights",
+  "Baby Lights",
+  "Hair Color",
+  "Color Correction",
+  "Keratin Treatment",
+  "Hair Botox Treatment",
+  "Relaxer",
+  "Updo & Special Event Styling",
+  "Bridal Makeup",
+  "Makeup Application",
+  "Eyebrow & Lip Wax",
+  "Other (specify in notes)",
+];
+
+const STYLISTS = ["No preference", "Maria", "Meagan", "Sally", "Kato", "Juany", "Isabella"];
+
+const TIME_SLOTS = [
+  "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
+  "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM",
+  "1:00 PM",  "1:30 PM",  "2:00 PM",  "2:30 PM",
+  "3:00 PM",  "3:30 PM",  "4:00 PM",  "4:30 PM",
+  "5:00 PM",  "5:30 PM",  "6:00 PM",  "6:30 PM",
+  "7:00 PM",
+];
+
+// ── Shared styles ─────────────────────────────────────────────────────────────
+const inputCls  = "w-full bg-[#080808] border border-[#1a1a1a] text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#333]";
+const selectCls = "w-full bg-[#080808] border border-[#1a1a1a] text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors appearance-none";
+const labelCls  = "block text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2";
+
 // ── Phase 1 — Card capture ────────────────────────────────────────────────────
 interface CardData {
   name: string;
@@ -36,30 +74,29 @@ interface CardData {
 }
 
 function CardCaptureForm({ onSuccess }: { onSuccess: (data: CardData) => void }) {
-  const stripe = useStripe();
+  const stripe   = useStripe();
   const elements = useElements();
 
-  const [name, setName]   = useState("");
+  const [name,  setName]  = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [agreed, setAgreed]           = useState(false);
-  const [loading, setLoading]         = useState(false);
-  const [error, setError]             = useState("");
+  const [agreed,       setAgreed]      = useState(false);
+  const [loading,      setLoading]     = useState(false);
+  const [error,        setError]       = useState("");
   const [clientSecret, setClientSecret] = useState("");
-  const [customerId, setCustomerId]     = useState("");
-  const [intentReady, setIntentReady]   = useState(false);
-  const [intentError, setIntentError]   = useState("");
+  const [customerId,   setCustomerId]   = useState("");
+  const [intentReady,  setIntentReady]  = useState(false);
+  const [intentError,  setIntentError]  = useState("");
   const intentFetched = useRef(false);
 
-  // Fetch setup intent once name + email are present
   useEffect(() => {
     if (!name || !email || intentFetched.current) return;
     const t = setTimeout(() => {
       intentFetched.current = true;
       fetch("/api/stripe/setup-intent", {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name }),
+        body:    JSON.stringify({ email, name }),
       })
         .then(r => r.json())
         .then(data => {
@@ -98,47 +135,33 @@ function CardCaptureForm({ onSuccess }: { onSuccess: (data: CardData) => void })
 
     const paymentMethodId = setupIntent?.payment_method as string;
 
-    // Save card to our customer DB (linked by email for future no-show charges)
     await fetch("/api/stripe/save-card", {
-      method: "POST",
+      method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, phone, stripeCustomerId: customerId, stripePaymentMethodId: paymentMethodId }),
+      body:    JSON.stringify({ name, email, phone, stripeCustomerId: customerId, stripePaymentMethodId: paymentMethodId }),
     });
 
     onSuccess({ name, email, phone, stripeCustomerId: customerId, stripePaymentMethodId: paymentMethodId });
   }, [agreed, stripe, elements, clientSecret, customerId, name, email, phone, onSuccess]);
 
-  const inputCls = "w-full bg-[#080808] border border-[#1a1a1a] text-white px-4 py-3 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#333]";
-  const labelCls = "block text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2";
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Contact fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label className={labelCls}>Full Name *</label>
-          <input
-            type="text" required placeholder="Jane Smith" value={name}
-            onChange={e => setName(e.target.value)}
-            className={inputCls}
-          />
+          <input type="text" required placeholder="Jane Smith" value={name}
+            onChange={e => setName(e.target.value)} className={inputCls} />
         </div>
         <div>
           <label className={labelCls}>Phone *</label>
-          <input
-            type="tel" required placeholder="(212) 000-0000" value={phone}
-            onChange={e => setPhone(e.target.value)}
-            className={inputCls}
-          />
+          <input type="tel" required placeholder="(212) 000-0000" value={phone}
+            onChange={e => setPhone(e.target.value)} className={inputCls} />
         </div>
       </div>
       <div>
         <label className={labelCls}>Email *</label>
-        <input
-          type="email" required placeholder="your@email.com" value={email}
-          onChange={e => setEmail(e.target.value)}
-          className={inputCls}
-        />
+        <input type="email" required placeholder="your@email.com" value={email}
+          onChange={e => setEmail(e.target.value)} className={inputCls} />
       </div>
 
       {/* Cancellation policy */}
@@ -229,89 +252,164 @@ function CardCaptureForm({ onSuccess }: { onSuccess: (data: CardData) => void })
   );
 }
 
-// ── Phase 2 — DaySmart redirect ───────────────────────────────────────────────
-// Correct URL sourced from DaySmart's bookingplugin.js:
-// src = daysmartWebsiteRoot + "/External/BookingPlugin/?guid=" + daysmart_acc
-// bookThroughNewTab=true tells DaySmart to open sub-steps in the same tab
-const DAYSMART_BOOKING_URL =
-  "https://plugin.mysalononline.com/External/BookingPlugin/?guid=0a1d5a05-c4ea-4dcb-b3c7-92ff0d13bfcf&bookThroughNewTab=true";
-
-function DaySmartRedirect({
-  clientName,
-  onBookingDetected,
+// ── Phase 2 — Appointment details ────────────────────────────────────────────
+function AppointmentForm({
+  cardData,
+  onSuccess,
 }: {
-  clientName: string;
-  onBookingDetected: () => void;
+  cardData: CardData;
+  onSuccess: () => void;
 }) {
-  const [opened, setOpened] = useState(false);
+  const today = new Date().toISOString().split("T")[0];
 
-  // Auto-open DaySmart on mount
-  useEffect(() => {
-    const win = window.open(DAYSMART_BOOKING_URL, "_blank", "noopener,noreferrer");
-    setOpened(!!win);
-  }, []);
+  const [service, setService] = useState("");
+  const [stylist, setStylist] = useState("No preference");
+  const [date,    setDate]    = useState("");
+  const [time,    setTime]    = useState("");
+  const [notes,   setNotes]   = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState("");
 
-  const openDaySmart = () => {
-    window.open(DAYSMART_BOOKING_URL, "_blank", "noopener,noreferrer");
-    setOpened(true);
-  };
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!service || !date || !time) {
+      setError("Please fill in service, date, and time.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/bookings", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          name:                  cardData.name,
+          email:                 cardData.email,
+          phone:                 cardData.phone,
+          service,
+          stylist:               stylist === "No preference" ? "" : stylist,
+          date,
+          time,
+          notes,
+          stripeCustomerId:      cardData.stripeCustomerId,
+          stripePaymentMethodId: cardData.stripePaymentMethodId,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? "Failed to submit booking. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      onSuccess();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      setError("Network error — please check your connection and try again.");
+      setLoading(false);
+    }
+  }, [cardData, service, stylist, date, time, notes, onSuccess]);
 
   return (
-    <div className="text-center py-4 space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Card confirmed badge */}
-      <div className="inline-flex items-center gap-3 border border-[var(--mc-accent)]/30 bg-[#0a0800] px-6 py-4">
+      <div className="flex items-center gap-3 border border-[var(--mc-accent)]/30 bg-[#0a0800] px-5 py-4">
         <div className="w-7 h-7 rounded-full gold-gradient-bg flex items-center justify-center shrink-0">
           <Check size={14} strokeWidth={3} className="text-black" />
         </div>
-        <div className="text-left">
+        <div>
           <p className="text-[var(--mc-accent)] text-xs font-bold uppercase tracking-widest">
-            Card secured{clientName ? `, ${clientName.split(" ")[0]}` : ""}!
+            Card secured{cardData.name ? `, ${cardData.name.split(" ")[0]}` : ""}!
           </p>
           <p className="text-[var(--mc-muted)] text-xs mt-0.5">$0 charged today · Card held for cancellation policy only</p>
         </div>
       </div>
 
-      {/* Instruction */}
+      {/* Service */}
       <div>
-        <p className="text-[var(--mc-accent)] uppercase tracking-[0.3em] text-xs font-semibold mb-3">Step 2 of 2</p>
-        <h2 className="font-serif text-3xl font-bold text-white mb-3">
-          {opened ? "Complete your booking" : "Opening booking system…"}
-        </h2>
-        <p className="text-[var(--mc-muted)] text-sm max-w-sm mx-auto leading-relaxed">
-          {opened
-            ? "Our booking system opened in a new tab. Select your service, stylist, and time there."
-            : "A new tab is opening with MC Hair Salon's booking system."}
-        </p>
+        <label className={labelCls}>Service *</label>
+        <div className="relative">
+          <select required value={service} onChange={e => setService(e.target.value)} className={selectCls}>
+            <option value="" disabled>Select a service…</option>
+            {SERVICES.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[var(--mc-accent)]">▾</div>
+        </div>
       </div>
 
-      {/* CTA */}
-      <div className="space-y-3">
-        <button
-          onClick={openDaySmart}
-          className="gold-gradient-bg text-black font-bold px-12 py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity cursor-pointer"
-        >
-          {opened ? "Reopen Booking Tab →" : "Open Booking System →"}
-        </button>
-
-        <p className="text-[#444] text-xs">
-          Popup blocked?{" "}
-          <button onClick={openDaySmart} className="text-[var(--mc-accent)] hover:underline cursor-pointer">
-            Click here to open manually
-          </button>
-        </p>
+      {/* Stylist */}
+      <div>
+        <label className={labelCls}>Stylist</label>
+        <div className="relative">
+          <select value={stylist} onChange={e => setStylist(e.target.value)} className={selectCls}>
+            {STYLISTS.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[var(--mc-accent)]">▾</div>
+        </div>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-[#1a1a1a] pt-6">
-        <p className="text-[#444] text-xs mb-3 uppercase tracking-widest">Finished booking in the other tab?</p>
-        <button
-          onClick={onBookingDetected}
-          className="border border-[var(--mc-accent)] text-[var(--mc-accent)] px-8 py-3 text-xs uppercase tracking-widest hover:bg-[var(--mc-accent)] hover:text-black transition-all cursor-pointer"
-        >
-          I completed my booking ✓
-        </button>
+      {/* Date + Time */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label className={labelCls}>Date *</label>
+          <input
+            type="date"
+            required
+            min={today}
+            value={date}
+            onChange={e => setDate(e.target.value)}
+            className={inputCls}
+            style={{ colorScheme: "dark" }}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Preferred Time *</label>
+          <div className="relative">
+            <select required value={time} onChange={e => setTime(e.target.value)} className={selectCls}>
+              <option value="" disabled>Select a time…</option>
+              {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[var(--mc-accent)]">▾</div>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Notes */}
+      <div>
+        <label className={labelCls}>Notes <span className="text-[#444] normal-case tracking-normal font-normal">(optional)</span></label>
+        <textarea
+          placeholder="Anything we should know? (e.g. hair length, allergies, inspiration photo links)"
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          rows={3}
+          className={`${inputCls} resize-none`}
+        />
+      </div>
+
+      {error && (
+        <div className="border border-red-900/50 bg-red-950/20 p-3 text-red-400 text-sm flex items-start gap-2">
+          <AlertTriangle size={14} className="shrink-0 mt-0.5" /> {error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full gold-gradient-bg text-black font-bold py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity disabled:opacity-30 cursor-pointer flex items-center justify-center gap-3"
+      >
+        {loading ? (
+          <><Loader size={16} className="animate-spin" /> Booking your appointment…</>
+        ) : (
+          <><CalendarDays size={16} /> Confirm Appointment</>
+        )}
+      </button>
+
+      <p className="text-[#444] text-xs text-center">
+        A confirmation will be sent to {cardData.email}
+      </p>
+    </form>
   );
 }
 
@@ -325,8 +423,8 @@ function SuccessScreen({ name, onReset }: { name: string; onReset: () => void })
       <p className="text-[var(--mc-accent)] text-xs uppercase tracking-[0.4em] font-semibold mb-3">All Set</p>
       <h2 className="font-serif text-4xl font-bold text-white mb-3">You&apos;re booked!</h2>
       <p className="text-[var(--mc-muted)] text-sm max-w-sm mx-auto mb-8 leading-relaxed">
-        Your appointment is confirmed and your card is securely on file.
-        You&apos;ll receive a confirmation from us shortly.
+        Your appointment request has been received. We&apos;ll be in touch shortly to confirm your time.
+        Your card is securely on file for the cancellation policy only.
       </p>
 
       <div className="inline-flex items-center gap-2 border border-[#1a1a1a] bg-[#080808] px-6 py-3 text-sm text-[var(--mc-muted)] mb-8">
@@ -356,8 +454,8 @@ function SuccessScreen({ name, onReset }: { name: string; onReset: () => void })
 function StepDots({ phase }: { phase: 1 | 2 }) {
   return (
     <div className="flex items-center justify-center gap-2 mb-10">
-      {(["Secure Spot", "Book Appointment"] as const).map((label, i) => {
-        const num = i + 1;
+      {(["Secure Spot", "Appointment Details"] as const).map((label, i) => {
+        const num    = i + 1;
         const done   = phase > num;
         const active = phase === num;
         return (
@@ -386,18 +484,17 @@ function StepDots({ phase }: { phase: 1 | 2 }) {
 
 // ── Main flow ─────────────────────────────────────────────────────────────────
 function BookingFlow() {
-  const [phase, setPhase] = useState<1 | 2>(1);
-  const [done, setDone]   = useState(false);
+  const [phase,    setPhase]    = useState<1 | 2>(1);
+  const [done,     setDone]     = useState(false);
   const [cardData, setCardData] = useState<CardData | null>(null);
 
   const handleCardSuccess = useCallback((data: CardData) => {
     setCardData(data);
     setPhase(2);
-    // Scroll to top of booking section
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const handleBookingDetected = useCallback(() => {
+  const handleBookingSuccess = useCallback(() => {
     setDone(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -426,40 +523,33 @@ function BookingFlow() {
 
       {/* Content */}
       <section className="pb-24 px-6 bg-black">
-        <div className={done || phase === 1 ? "max-w-2xl mx-auto" : "max-w-4xl mx-auto"}>
+        <div className="max-w-2xl mx-auto">
           {done ? (
             <div className="luxury-card p-8 md:p-10">
               <SuccessScreen name={cardData?.name ?? ""} onReset={reset} />
             </div>
           ) : phase === 1 ? (
-            <>
-              <div className="luxury-card p-8 md:p-10">
-                <div className="flex items-center gap-3 mb-8">
-                  <Scissors size={18} className="text-[var(--mc-accent)]" />
-                  <div>
-                    <h2 className="font-serif text-xl font-bold text-white">Secure Your Spot</h2>
-                    <p className="text-[var(--mc-muted)] text-xs mt-0.5">Step 1 of 2 — Your details & card on file</p>
-                  </div>
+            <div className="luxury-card p-8 md:p-10">
+              <div className="flex items-center gap-3 mb-8">
+                <Scissors size={18} className="text-[var(--mc-accent)]" />
+                <div>
+                  <h2 className="font-serif text-xl font-bold text-white">Secure Your Spot</h2>
+                  <p className="text-[var(--mc-muted)] text-xs mt-0.5">Step 1 of 2 — Your details & card on file</p>
                 </div>
-                <CardCaptureForm onSuccess={handleCardSuccess} />
               </div>
-            </>
+              <CardCaptureForm onSuccess={handleCardSuccess} />
+            </div>
           ) : (
-            <>
-              <div className="luxury-card p-8 md:p-10">
-                <div className="flex items-center gap-3 mb-8">
-                  <Scissors size={18} className="text-[var(--mc-accent)]" />
-                  <div>
-                    <h2 className="font-serif text-xl font-bold text-white">Choose Your Service & Time</h2>
-                    <p className="text-[var(--mc-muted)] text-xs mt-0.5">Step 2 of 2 — Powered by DaySmart</p>
-                  </div>
+            <div className="luxury-card p-8 md:p-10">
+              <div className="flex items-center gap-3 mb-8">
+                <CalendarDays size={18} className="text-[var(--mc-accent)]" />
+                <div>
+                  <h2 className="font-serif text-xl font-bold text-white">Choose Your Service & Time</h2>
+                  <p className="text-[var(--mc-muted)] text-xs mt-0.5">Step 2 of 2 — Appointment details</p>
                 </div>
-                <DaySmartRedirect
-                  clientName={cardData?.name ?? ""}
-                  onBookingDetected={handleBookingDetected}
-                />
               </div>
-            </>
+              <AppointmentForm cardData={cardData!} onSuccess={handleBookingSuccess} />
+            </div>
           )}
 
           {!done && (

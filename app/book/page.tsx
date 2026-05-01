@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import {
@@ -230,6 +230,9 @@ function CardCaptureForm({ onSuccess }: { onSuccess: (data: CardData) => void })
 }
 
 // ── Phase 2 — DaySmart booking widget ────────────────────────────────────────
+const DAYSMART_URL =
+  "https://plugin.mysalononline.com/Booking?AccountGuid=0a1d5a05-c4ea-4dcb-b3c7-92ff0d13bfcf";
+
 function DaySmartWidget({
   clientName,
   onBookingDetected,
@@ -237,28 +240,9 @@ function DaySmartWidget({
   clientName: string;
   onBookingDetected: () => void;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const scriptRef    = useRef<HTMLScriptElement | null>(null);
-  const detectedRef  = useRef(false);
+  const detectedRef = useRef(false);
 
   useEffect(() => {
-    // Set DaySmart globals before the script loads
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const w = window as any;
-    w.daysmart_acc          = "0a1d5a05-c4ea-4dcb-b3c7-92ff0d13bfcf";
-    w.daysmart_iframe_width = 700;
-    w.daysmart_iframe_height = 0;
-    w.daysmart_website_root = "https://plugin.mysalononline.com";
-    w.load_in_iframe        = "false";
-
-    const script = document.createElement("script");
-    script.type  = "text/javascript";
-    script.src   = "https://plugin.mysalononline.com/Scripts/external/bookingplugin.js";
-    script.async = true;
-    document.body.appendChild(script);
-    scriptRef.current = script;
-
-    // Listen for DaySmart postMessage completion events
     function onMessage(e: MessageEvent) {
       if (detectedRef.current) return;
       const d = e.data;
@@ -271,33 +255,38 @@ function DaySmartWidget({
       }
     }
     window.addEventListener("message", onMessage);
-
-    return () => {
-      window.removeEventListener("message", onMessage);
-      if (scriptRef.current && document.body.contains(scriptRef.current)) {
-        document.body.removeChild(scriptRef.current);
-      }
-    };
+    return () => window.removeEventListener("message", onMessage);
   }, [onBookingDetected]);
 
   return (
     <div>
-      {/* Instruction strip */}
-      <div className="flex items-center gap-3 border border-[var(--mc-accent)]/30 bg-[#0a0800] px-5 py-4 mb-8">
+      {/* Confirmation strip */}
+      <div className="flex items-center gap-3 border border-[var(--mc-accent)]/30 bg-[#0a0800] px-5 py-4 mb-6">
         <div className="w-7 h-7 rounded-full gold-gradient-bg flex items-center justify-center shrink-0">
           <Check size={14} strokeWidth={3} className="text-black" />
         </div>
         <div>
-          <p className="text-[var(--mc-accent)] text-xs font-bold uppercase tracking-widest">Card secured, {clientName.split(" ")[0]}!</p>
+          <p className="text-[var(--mc-accent)] text-xs font-bold uppercase tracking-widest">
+            Card secured{clientName ? `, ${clientName.split(" ")[0]}` : ""}!
+          </p>
           <p className="text-[var(--mc-muted)] text-xs mt-0.5">Now select your service, stylist, and time below.</p>
         </div>
       </div>
 
-      {/* DaySmart widget container — the script injects here */}
-      <div ref={containerRef} id="daysmart-booking-container" className="min-h-[400px]" />
+      {/* DaySmart iframe */}
+      <iframe
+        src={DAYSMART_URL}
+        title="Book Appointment — MC Hair Salon & Spa"
+        width="100%"
+        height="900"
+        frameBorder="0"
+        allow="payment"
+        className="w-full border border-[#1a1a1a] bg-[#080808]"
+        style={{ minHeight: 700 }}
+      />
 
-      {/* Manual confirm fallback — in case postMessage doesn't fire */}
-      <div className="mt-10 border-t border-[#1a1a1a] pt-8 text-center">
+      {/* Manual confirm fallback */}
+      <div className="mt-8 border-t border-[#1a1a1a] pt-6 text-center">
         <p className="text-[#444] text-xs mb-3 uppercase tracking-widest">Finished booking above?</p>
         <button
           onClick={() => { detectedRef.current = true; onBookingDetected(); }}

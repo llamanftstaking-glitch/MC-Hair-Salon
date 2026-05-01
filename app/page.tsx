@@ -19,7 +19,7 @@ const HOME_FAQS = [
   { q: "How much does balayage cost at MC Hair Salon?", a: "Balayage and highlights start at $120 at MC Hair Salon & Spa. Final pricing depends on hair length, density, and the complexity of the color design. Our colorists use L'Oréal professional color systems for all services." },
   { q: "Does MC Hair Salon offer bridal hair and makeup?", a: "Yes — bridal services are one of our specialties. We offer complete wedding packages including bridal updos, trial sessions, hair and makeup for the full bridal party, and day-of coordination. Our resident makeup artist Isabella specializes in bridal looks. Contact us to discuss your wedding date and party size." },
   { q: "Can I walk in without an appointment?", a: "Yes, walk-ins are always welcome at MC Hair Salon & Spa. We recommend calling ahead at (212) 988-5252 to confirm availability, especially on weekends and for color services. Online booking is also available 24/7 at mchairsalon.com/book." },
-  { q: "What are MC Hair Salon's hours?", a: "Monday: 10AM–5PM. Tuesday–Thursday: 10:30AM–7:30PM. Friday: 10AM–7PM. Saturday: 10AM–7PM. Sunday: 11AM–6PM." },
+  { q: "What are MC Hair Salon's hours?", a: "Monday: 9:30AM–4PM. Tuesday–Thursday: 10:30AM–7:30PM. Friday: 10AM–7PM. Saturday: 10AM–7PM. Sunday: 11AM–6PM." },
 ];
 
 const iconMap: Record<string, React.ReactNode> = {

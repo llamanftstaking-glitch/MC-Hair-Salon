@@ -66,19 +66,19 @@ html[data-theme="light"] {
   --mc-surface:      #f5f3ff;
   --mc-surface-2:    #f0eeff;
   --mc-surface-dark: #ede9fe;
-  --mc-border:       #ddd6fe;
+  --mc-border:       #c4b5fd;
   --mc-text:         #1e1b4b;
   --mc-text-body:    #2d2a5e;
-  --mc-muted:        #6d5b98;
-  --mc-text-dim:     #8b7bb0;
-  --mc-accent:       #7c3aed;
-  --mc-accent-2:     #a78bfa;
-  --mc-hero-glow:    rgba(124,58,237,0.08);
-  --mc-hero-pulse:   rgba(167,139,250,0.15);
-  --mc-divider:      rgba(124,58,237,0.3);
-  --mc-scrollbar:    #a78bfa;
-  --mc-title-grad:   linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #a78bfa 100%);
-  --mc-shimmer:      linear-gradient(90deg, #5b21b6 0%, #7c3aed 25%, #a78bfa 50%, #7c3aed 75%, #5b21b6 100%);
+  --mc-muted:        #4a3a80;   /* darkened — 7:1 contrast on lightest lavender bg */
+  --mc-text-dim:     #5c4a8a;   /* darkened — 5.6:1 contrast */
+  --mc-accent:       #6d28d9;
+  --mc-accent-2:     #7c3aed;
+  --mc-hero-glow:    rgba(109,40,217,0.08);
+  --mc-hero-pulse:   rgba(124,58,237,0.15);
+  --mc-divider:      rgba(109,40,217,0.3);
+  --mc-scrollbar:    #7c3aed;
+  --mc-title-grad:   linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
+  --mc-shimmer:      linear-gradient(90deg, #4c1d95 0%, #6d28d9 25%, #7c3aed 50%, #6d28d9 75%, #4c1d95 100%);
   --mc-card-bg:      #ffffff;
   --mc-card-border:  #ddd6fe;
 }
@@ -149,12 +149,17 @@ html[data-theme="light"] .logo-bw {
   mix-blend-mode: multiply;
 }
 
-/* ── LIGHT MODE BG OVERRIDES ───────────────────────────────────────────────── */
+/* ── LIGHT MODE OVERRIDES ──────────────────────────────────────────────────── */
+
+/* ---- Backgrounds ---- */
 html[data-theme="light"] .bg-black {
   background-color: var(--mc-surface) !important;
 }
 html[data-theme="light"] [class*="bg-[#0"] {
   background-color: var(--mc-surface-2) !important;
+}
+html[data-theme="light"] [class*="bg-[#1"] {
+  background-color: var(--mc-surface) !important;
 }
 html[data-theme="light"] nav.bg-black\/95,
 html[data-theme="light"] nav {
@@ -162,6 +167,47 @@ html[data-theme="light"] nav {
 }
 html[data-theme="light"] footer {
   background-color: var(--mc-surface) !important;
+}
+
+/* ---- Text: white text is invisible on light bg — force to --mc-text ---- */
+html[data-theme="light"] .text-white {
+  color: var(--mc-text) !important;
+}
+
+/* ---- Hardcoded very-dark text that becomes near-invisible on white/near-white ---- */
+html[data-theme="light"] [class*="text-[#1"],
+html[data-theme="light"] [class*="text-[#2"],
+html[data-theme="light"] [class*="text-[#3"] {
+  color: var(--mc-muted) !important;
+}
+
+/* ---- Borders: dark borders stay visible as structure on light bg ---- */
+html[data-theme="light"] [class*="border-[#0"],
+html[data-theme="light"] [class*="border-[#1"] {
+  border-color: var(--mc-border) !important;
+}
+
+/* ---- Dividers / lines ---- */
+html[data-theme="light"] .h-px.bg-\[\#1a1a1a\],
+html[data-theme="light"] [class*="bg-[#1a1a1a]"],
+html[data-theme="light"] [class*="bg-[#111"] {
+  background-color: var(--mc-border) !important;
+}
+
+/* ---- Cards: ensure card text is readable ---- */
+html[data-theme="light"] .luxury-card {
+  background: var(--mc-card-bg) !important;
+  border-color: var(--mc-card-border) !important;
+}
+
+/* ---- Headings that use text-white inside theamed sections ---- */
+html[data-theme="light"] h1.text-white,
+html[data-theme="light"] h2.text-white,
+html[data-theme="light"] h3.text-white,
+html[data-theme="light"] h4.text-white,
+html[data-theme="light"] p.text-white,
+html[data-theme="light"] span.text-white {
+  color: var(--mc-text) !important;
 }
 
 /* ── SCROLLBAR ─────────────────────────────────────────────────────────────── */

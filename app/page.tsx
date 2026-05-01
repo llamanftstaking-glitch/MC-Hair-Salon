@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight, Scissors, Wind, Palette, Sparkles } from "lucide-react";
-import { SERVICES, SALON_INFO } from "@/lib/data";
+import { SERVICES } from "@/lib/data";
+import { getSalonInfo } from "@/lib/settings";
 import HeroLogo from "@/components/HeroLogo";
 import MarqueeStrip from "@/components/MarqueeStrip";
 import WorkShowcase from "@/components/WorkShowcase";
@@ -30,6 +31,7 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default function Home() {
+  const SALON_INFO = getSalonInfo();
   return (
     <>
       <HeroLogo />

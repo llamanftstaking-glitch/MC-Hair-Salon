@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSettings, updateSettings } from "@/lib/settings";
 import { requireAdmin } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 // GET — public (site settings like hours are read by the frontend)
 export async function GET() {
   try {

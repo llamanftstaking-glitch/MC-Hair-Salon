@@ -28,27 +28,27 @@ const DATA_FILE = path.join(process.cwd(), "data", "site-settings.json");
 
 const DEFAULTS: SiteSettings = {
   business: {
-    name: "MC Hair Salon",
-    tagline: "Luxury Hair Care on the Upper East Side",
-    address: "1231 Lexington Ave, New York, NY 10028",
-    phone: "(212) 555-0190",
-    email: "hello@mchairsalon.com",
-    instagram: "https://instagram.com/mchairsalon",
-    facebook: "https://facebook.com/mchairsalon",
+    name: "MC Hair Salon & Spa",
+    tagline: "Upper East Side's Premier Luxury Salon",
+    address: "336 East 78th St, New York, NY 10075",
+    phone: "(212) 988-5252",
+    email: "info@mchairsalon.com",
+    instagram: "https://www.instagram.com/mchairsalonspa/",
+    facebook: "https://www.facebook.com/mchairsalonandspa/",
   },
   hours: [
-    { day: "Monday",    open: "9:00 AM",  close: "7:00 PM" },
-    { day: "Tuesday",   open: "9:00 AM",  close: "7:00 PM" },
-    { day: "Wednesday", open: "9:00 AM",  close: "7:00 PM" },
-    { day: "Thursday",  open: "9:00 AM",  close: "8:00 PM" },
-    { day: "Friday",    open: "9:00 AM",  close: "8:00 PM" },
-    { day: "Saturday",  open: "9:00 AM",  close: "6:00 PM" },
-    { day: "Sunday",    open: "10:00 AM", close: "5:00 PM" },
+    { day: "Monday",    open: "9:30 AM",  close: "4:00 PM" },
+    { day: "Tuesday",   open: "10:30 AM", close: "7:30 PM" },
+    { day: "Wednesday", open: "10:30 AM", close: "7:30 PM" },
+    { day: "Thursday",  open: "10:30 AM", close: "7:30 PM" },
+    { day: "Friday",    open: "10:00 AM", close: "7:00 PM" },
+    { day: "Saturday",  open: "10:00 AM", close: "7:00 PM" },
+    { day: "Sunday",    open: "11:00 AM", close: "6:00 PM" },
   ],
   hero: {
-    headline: "Your Hair.",
-    headlineAccent: "Your Crown.",
-    subheadline: "Premium salon services tailored to you.",
+    headline: "Upper East Side's",
+    headlineAccent: "Premier Hair Salon",
+    subheadline: "Luxury hair and spa services in the heart of New York City. Precision cuts, transformative color, and expert beauty treatments since 2011.",
   },
 };
 
@@ -68,6 +68,22 @@ export function getSettings(): SiteSettings {
   } catch {
     return DEFAULTS;
   }
+}
+
+// Convenience helper for server components that need salon info
+export function getSalonInfo() {
+  const s = getSettings();
+  return {
+    name:        s.business.name,
+    tagline:     s.business.tagline,
+    address:     s.business.address,
+    phone:       s.business.phone,
+    email:       s.business.email,
+    instagram:   s.business.instagram,
+    facebook:    s.business.facebook,
+    hours:       s.hours,
+    established: 2011,
+  };
 }
 
 export function updateSettings(updates: Partial<SiteSettings>): SiteSettings {

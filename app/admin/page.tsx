@@ -25,6 +25,8 @@ interface RewardCustomer {
   tier: "Bronze" | "Silver" | "Gold" | "Platinum";
   rewards: { id: string; name: string; pointsCost: number; redeemedAt: string }[];
   createdAt: string;
+  visitStreak: number;
+  blowoutsEarned: number;
 }
 
 interface Subscriber { id: string; email: string; name?: string; subscribedAt: string; active: boolean; }
@@ -387,7 +389,7 @@ export default function AdminPage() {
             <h1 className="font-serif text-2xl font-bold gold-gradient">MC Admin Panel</h1>
             <p className="text-[#555] text-sm mt-1">Reservations · Staff · Settings · Reports</p>
           </div>
-          <button onClick={() => { fetchBookings(); fetchSubscribers(); fetchStaff(); fetchSettings(); }}
+          <button onClick={() => { fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); }}
             className="flex items-center gap-2 border border-[var(--mc-border)] text-[var(--mc-text-dim)] px-4 py-2 text-sm hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
             <RefreshCw size={14} /> Refresh
           </button>

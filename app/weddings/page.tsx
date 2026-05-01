@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Star, Check, Phone, Mail, ChevronRight, Heart } from "lucide-react";
-import { WEDDING_SERVICES, WEDDING_TESTIMONIALS, WEDDING_GALLERY, SALON_INFO } from "@/lib/data";
+import { WEDDING_SERVICES, WEDDING_TESTIMONIALS, WEDDING_GALLERY } from "@/lib/data";
+import { getSalonInfo } from "@/lib/settings";
 
 export const metadata = {
   title: "Wedding Hair & Makeup | MC Hair Salon & Spa NYC",
@@ -9,6 +10,7 @@ export const metadata = {
 };
 
 export default function WeddingsPage() {
+  const SALON_INFO = getSalonInfo();
   return (
     <>
       {/* ── HERO ── */}

@@ -74,7 +74,7 @@ export default function ServicesPage() {
                     </div>
                     <div className="shrink-0 ml-4 sm:ml-8 text-right">
                       <span className="inline-block gold-gradient font-serif text-lg sm:text-xl font-bold tabular-nums">
-                        {"priceLabel" in item ? item.priceLabel : `$${item.price}`}
+                        {"priceLabel" in item ? item.priceLabel : `$${(item as { price: number }).price}`}
                       </span>
                     </div>
                   </div>

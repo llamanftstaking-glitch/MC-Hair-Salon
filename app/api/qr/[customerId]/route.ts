@@ -22,7 +22,7 @@ export async function GET(
     color:  { dark: "#000000", light: "#ffffff" },
   });
 
-  return new NextResponse(buffer, {
+  return new NextResponse(new Uint8Array(buffer), {
     headers: {
       "Content-Type":  "image/png",
       "Cache-Control": "public, max-age=86400",

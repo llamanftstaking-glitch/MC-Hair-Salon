@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAllStaff, createStaff, updateStaff, deleteStaff } from "@/lib/staff-data";
 import { requireAdmin } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 // GET — public (staff profiles shown on /team page)
 export async function GET() {
   try {

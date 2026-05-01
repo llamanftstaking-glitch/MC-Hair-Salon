@@ -55,18 +55,39 @@ const DEFAULTS: SiteSettings = {
 };
 
 export async function getSettings(): Promise<SiteSettings> {
-  const rows = await db
-    .select()
-    .from(siteSettingsTable)
-    .where(eq(siteSettingsTable.key, SETTINGS_KEY));
+  let rows: { value: unknown }[];
+  try {
+    rows = await db
+      .select()
+      .from(siteSettingsTable)
+      .where(eq(siteSettingsTable.key, SETTINGS_KEY));
+  } catch (err) {
+    // The site_settings table may not exist yet during build-time
+    // prerendering (the production DB schema is applied after the build
+    // completes), or the DB may be transiently unreachable. Fall back to
+    // DEFAULTS so static generation and the public site keep working.
+    console.warn(
+      "[settings] DB read failed, returning DEFAULTS:",
+      err instanceof Error ? err.message : err,
+    );
+    return DEFAULTS;
+  }
 
   if (!rows.length) {
     // First-run: seed defaults. Use ON CONFLICT DO NOTHING so concurrent
-    // requests racing the seed don't crash on the unique key.
-    await db
-      .insert(siteSettingsTable)
-      .values({ key: SETTINGS_KEY, value: DEFAULTS })
-      .onConflictDoNothing({ target: siteSettingsTable.key });
+    // requests racing the seed don't crash on the unique key. If the seed
+    // itself fails (e.g. read-only replica), still return DEFAULTS.
+    try {
+      await db
+        .insert(siteSettingsTable)
+        .values({ key: SETTINGS_KEY, value: DEFAULTS })
+        .onConflictDoNothing({ target: siteSettingsTable.key });
+    } catch (err) {
+      console.warn(
+        "[settings] DB seed failed, returning DEFAULTS:",
+        err instanceof Error ? err.message : err,
+      );
+    }
     return DEFAULTS;
   }
 

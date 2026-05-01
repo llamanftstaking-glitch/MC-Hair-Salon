@@ -1,18 +1,55 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRef, useEffect } from "react";
 
 export default function HeroLogo() {
-  return (
-    <section className="relative flex flex-col items-center justify-center overflow-hidden bg-[var(--mc-bg)] mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)]">
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-      {/* Subtle static glow */}
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mq.matches) videoRef.current?.pause();
+  }, []);
+
+  return (
+    <section className="relative flex flex-col items-center justify-center overflow-hidden bg-black mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)]">
+
+      {/* ── Background video ── */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ filter: "brightness(0.65) saturate(0.85)" }}
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+      </video>
+
+      {/* ── Nike-style overlay: dark vignette, brighter window in the middle ── */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: [
+            "linear-gradient(to bottom,",
+            "  rgba(0,0,0,0.60) 0%,",
+            "  rgba(0,0,0,0.30) 30%,",
+            "  rgba(0,0,0,0.30) 60%,",
+            "  rgba(0,0,0,0.75) 100%",
+            ")",
+          ].join(""),
+        }}
+      />
+
+      {/* ── Subtle radial accent glow ── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ background: "radial-gradient(ellipse 70% 50% at 50% 38%, var(--mc-hero-glow) 0%, transparent 70%)" }}
       />
 
-      {/* Content */}
+      {/* ── Content (unchanged) ── */}
       <div className="relative z-10 flex flex-col items-center py-10 sm:py-12 px-4 text-center">
 
         {/* Logo */}
@@ -33,7 +70,7 @@ export default function HeroLogo() {
           Upper East Side · New York City · Est. 2011
         </p>
 
-        {/* Headline — both lines share the same gradient, no half-shimmer bug */}
+        {/* Headline */}
         <h1 className="font-serif font-bold mt-6 leading-[1.25] px-4 overflow-visible">
           <span className="gold-gradient block text-5xl sm:text-6xl md:text-8xl pb-4">Every Service.</span>
           <span className="gold-gradient block text-5xl sm:text-6xl md:text-8xl">One Studio.</span>

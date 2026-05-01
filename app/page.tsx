@@ -45,7 +45,7 @@ export default function Home() {
             { value: "13+", label: "Years of Excellence" },
             { value: "5★",  label: "Average Rating" },
             { value: "10K+", label: "Happy Clients" },
-            { value: "6",   label: "Expert Stylists" },
+            { value: "8",   label: "Team Members" },
           ].map((s, i) => (
             <FadeIn key={s.label} delay={i * 80}>
               <p className="font-serif text-3xl gold-gradient font-bold">{s.value}</p>

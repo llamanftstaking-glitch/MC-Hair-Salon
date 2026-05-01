@@ -230,8 +230,30 @@ function CardCaptureForm({ onSuccess }: { onSuccess: (data: CardData) => void })
 }
 
 // ── Phase 2 — DaySmart booking widget ────────────────────────────────────────
-const DAYSMART_URL =
-  "https://plugin.mysalononline.com/Booking?AccountGuid=0a1d5a05-c4ea-4dcb-b3c7-92ff0d13bfcf";
+// DaySmart blocks direct iframe embeds (X-Frame-Options). We work around this
+// by using srcDoc — we own the iframe content, so the restriction doesn't apply.
+// DaySmart's script runs inside our srcdoc iframe and injects its booking UI there.
+const DAYSMART_SRCDOC = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #fff; font-family: sans-serif; }
+  </style>
+</head>
+<body>
+  <script type="text/javascript">
+    daysmart_acc = "0a1d5a05-c4ea-4dcb-b3c7-92ff0d13bfcf";
+    daysmart_iframe_width = 700;
+    daysmart_iframe_height = 0;
+    daysmart_website_root = "https://plugin.mysalononline.com";
+    load_in_iframe = "false";
+  <\/script>
+  <script type="text/javascript" src="https://plugin.mysalononline.com/Scripts/external/bookingplugin.js"><\/script>
+</body>
+</html>`;
 
 function DaySmartWidget({
   clientName,
@@ -273,16 +295,16 @@ function DaySmartWidget({
         </div>
       </div>
 
-      {/* DaySmart iframe */}
+      {/* DaySmart widget — runs inside a srcdoc iframe we control */}
       <iframe
-        src={DAYSMART_URL}
+        srcDoc={DAYSMART_SRCDOC}
         title="Book Appointment — MC Hair Salon & Spa"
         width="100%"
         height="900"
         frameBorder="0"
-        allow="payment"
-        className="w-full border border-[#1a1a1a] bg-[#080808]"
-        style={{ minHeight: 700 }}
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"
+        className="w-full border-0 rounded-sm overflow-hidden"
+        style={{ minHeight: 800 }}
       />
 
       {/* Manual confirm fallback */}

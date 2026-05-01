@@ -198,7 +198,9 @@ export async function updateStaff(
 }
 
 export async function deleteStaff(id: string): Promise<void> {
-  const result = await db.delete(staffTable).where(eq(staffTable.id, id));
-  const rowCount = (result as unknown as { rowCount?: number })?.rowCount ?? 0;
-  if (rowCount === 0) throw new Error(`Staff member "${id}" not found`);
+  const result = await db
+    .delete(staffTable)
+    .where(eq(staffTable.id, id))
+    .returning({ id: staffTable.id });
+  if (result.length === 0) throw new Error(`Staff member "${id}" not found`);
 }

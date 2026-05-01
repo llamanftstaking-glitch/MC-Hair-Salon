@@ -52,11 +52,15 @@ export async function markRead(id: string): Promise<boolean> {
   const result = await db
     .update(messagesTable)
     .set({ read: true })
-    .where(eq(messagesTable.id, id));
-  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
+    .where(eq(messagesTable.id, id))
+    .returning({ id: messagesTable.id });
+  return result.length > 0;
 }
 
 export async function deleteMessage(id: string): Promise<boolean> {
-  const result = await db.delete(messagesTable).where(eq(messagesTable.id, id));
-  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
+  const result = await db
+    .delete(messagesTable)
+    .where(eq(messagesTable.id, id))
+    .returning({ id: messagesTable.id });
+  return result.length > 0;
 }

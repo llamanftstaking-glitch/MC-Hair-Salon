@@ -2,13 +2,20 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const JWT_SECRET_VALUE = process.env.JWT_SECRET || "mc-hair-salon-dev-only-NOT-FOR-PRODUCTION";
+if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
+  throw new Error(
+    "JWT_SECRET environment variable must be set in production. " +
+    "Refusing to start with an insecure fallback secret.",
+  );
+}
+
+const JWT_SECRET_VALUE =
+  process.env.JWT_SECRET || "mc-hair-salon-dev-only-NOT-FOR-PRODUCTION";
+
+const SECRET_BYTES = new TextEncoder().encode(JWT_SECRET_VALUE);
 
 function getSecret(): Uint8Array {
-  if (process.env.NODE_ENV === "production" && !process.env.JWT_SECRET) {
-    throw new Error("JWT_SECRET environment variable must be set in production.");
-  }
-  return new TextEncoder().encode(JWT_SECRET_VALUE);
+  return SECRET_BYTES;
 }
 
 export interface CustomerPayload {

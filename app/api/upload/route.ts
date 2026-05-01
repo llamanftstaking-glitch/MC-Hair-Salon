@@ -13,21 +13,39 @@ const ALLOWED_TYPES = [
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
-// Try to use Replit Object Storage if available, otherwise fall back to local disk
+// Persist a file. In production, Replit Object Storage is required — disk
+// fallback is intentionally disabled because Autoscale disks are ephemeral
+// and any file written to disk will be lost on the next deploy/restart.
 async function uploadFile(
   buffer: Buffer,
   key: string,
 ): Promise<string> {
-  // Attempt Replit Object Storage
+  const isProduction = process.env.NODE_ENV === "production";
+
+  // Attempt Replit Object Storage first
   try {
-    // Dynamic import so the build doesn't fail if the package isn't present
     const { Client } = await import("@replit/object-storage");
     const client = new Client();
-    await client.uploadFromBytes(key, buffer);
+    const result = await client.uploadFromBytes(key, buffer);
+    // The replit-object-storage client returns a Result<void, Error>
+    // — surface the error instead of silently falling through.
+    if (result && typeof result === "object" && "ok" in result && result.ok === false) {
+      throw new Error(
+        `Object storage upload failed: ${(result as { error?: { message?: string } }).error?.message ?? "unknown"}`,
+      );
+    }
     // Return a proxy URL so the browser can fetch via our serve-upload route
     return `/api/serve-upload?key=${encodeURIComponent(key)}`;
-  } catch {
-    // Object storage not available (local dev or package missing) — fall back to disk
+  } catch (err) {
+    if (isProduction) {
+      // Hard fail — disk is ephemeral on Autoscale, so a silent fallback would
+      // lose every uploaded file on the next redeploy.
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        `Object storage is required in production but is unavailable: ${message}`,
+      );
+    }
+    // Dev only: fall back to local disk so contributors can run without a bucket
     const parts = key.split("/"); // uploads/category/filename
     const filename  = parts.pop()!;
     const category  = parts.join("/");

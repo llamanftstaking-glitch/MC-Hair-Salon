@@ -46,6 +46,7 @@ export async function addAdmin(email: string, addedBy: string): Promise<AdminEnt
 export async function removeAdmin(email: string): Promise<boolean> {
   const result = await db
     .delete(adminsTable)
-    .where(eq(adminsTable.email, email.toLowerCase()));
-  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
+    .where(eq(adminsTable.email, email.toLowerCase()))
+    .returning({ id: adminsTable.email });
+  return result.length > 0;
 }

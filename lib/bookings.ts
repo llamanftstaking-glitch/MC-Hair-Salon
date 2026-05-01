@@ -125,6 +125,9 @@ export async function updateBookingStatus(
 }
 
 export async function deleteBooking(id: string): Promise<boolean> {
-  const result = await db.delete(bookingsTable).where(eq(bookingsTable.id, id));
-  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
+  const result = await db
+    .delete(bookingsTable)
+    .where(eq(bookingsTable.id, id))
+    .returning({ id: bookingsTable.id });
+  return result.length > 0;
 }

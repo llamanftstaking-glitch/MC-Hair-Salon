@@ -67,11 +67,15 @@ export async function unsubscribe(email: string): Promise<boolean> {
   const result = await db
     .update(subscribersTable)
     .set({ active: false })
-    .where(eq(subscribersTable.email, email.toLowerCase()));
-  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
+    .where(eq(subscribersTable.email, email.toLowerCase()))
+    .returning({ id: subscribersTable.id });
+  return result.length > 0;
 }
 
 export async function removeSubscriber(id: string): Promise<boolean> {
-  const result = await db.delete(subscribersTable).where(eq(subscribersTable.id, id));
-  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
+  const result = await db
+    .delete(subscribersTable)
+    .where(eq(subscribersTable.id, id))
+    .returning({ id: subscribersTable.id });
+  return result.length > 0;
 }

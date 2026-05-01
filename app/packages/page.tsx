@@ -156,10 +156,10 @@ export default function PackagesPage() {
                       </div>
                     )}
 
-                    {/* Quantity stepper — regular packages */}
+                    {/* Sessions stepper — regular packages */}
                     {!isGuest && (
                       <div className="mb-5 pb-5 border-b border-[var(--mc-border)]">
-                        <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-3">Quantity</p>
+                        <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-3">Sessions</p>
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() => adjustQty(pkg.id, -1)}
@@ -168,14 +168,14 @@ export default function PackagesPage() {
                           >
                             <Minus size={14} />
                           </button>
-                          <span className="font-serif text-2xl font-bold gold-gradient w-8 text-center">{qty}</span>
+                          <span className="font-serif text-2xl font-bold gold-gradient w-12 text-center">{pkg.sessions * qty}</span>
                           <button
                             onClick={() => adjustQty(pkg.id, 1)}
                             className="w-9 h-9 border border-[var(--mc-border)] flex items-center justify-center text-[var(--mc-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer"
                           >
                             <Plus size={14} />
                           </button>
-                          <span className="text-[#555] text-xs">{qty > 1 ? `${pkg.sessions * qty} total sessions` : `${pkg.sessions} sessions`}</span>
+                          <span className="text-[#555] text-xs">{qty > 1 ? `${qty} packages` : `${pkg.sessions} sessions`}</span>
                         </div>
                         {qty === 1 && (
                           <p className="text-[var(--mc-accent)] text-xs mt-3">{pkg.highlight}</p>
@@ -198,7 +198,7 @@ export default function PackagesPage() {
                         ) : (
                           <>
                             <p className="text-[var(--mc-accent)] text-sm font-semibold">${pkg.price}/package</p>
-                            <p className="text-[#555] text-xs">{qty > 1 ? `×${qty}` : `${pkg.sessions} sessions`}</p>
+                            <p className="text-[#555] text-xs">{pkg.sessions * qty} sessions</p>
                           </>
                         )}
                       </div>

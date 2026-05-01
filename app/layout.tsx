@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import CurlyBot from "@/components/CurlyBot";
 import MobileBookBar from "@/components/MobileBookBar";
+import PromoPopup from "@/components/PromoPopup";
 
 const SITE_URL = "https://mchairsalon.com";
 
@@ -95,6 +96,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <MobileBookBar />
         <CurlyBot />
+        <PromoPopup />
       </body>
     </html>
   );

@@ -3,13 +3,30 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-// objectPosition tuned per-image so faces appear on both mobile AND wide desktop.
-// Portrait images scale to fill width on desktop (≈1.5–1.7×), so object-top would
-// only show hair/scalp. Each pos value pushes the crop down to the face region.
+// All three images are from /instagram/ — completely separate from the
+// /hope/ images used exclusively in ResultsGallery. No repeats.
+//
+// objectPosition values keep the subject centred on desktop, where portrait
+// images get cropped heavily (scaled ~1–1.4× to fill a 1440×675 container).
 const SLIDES = [
-  { src: "/hope/IMG_5888.JPEG", label: "Highlights & Blowout", sub: "Luminous dimension, every strand intentional.", pos: "50% 30%" },
-  { src: "/hope/IMG_6359.JPEG", label: "Balayage",             sub: "Sun-kissed depth crafted for your texture.",  pos: "50% 20%" },
-  { src: "/hope/IMG_9318.JPG",  label: "Color & Style",        sub: "Tone, cut, and finish — fully transformed.",  pos: "50% 15%" },
+  {
+    src: "/instagram/mchairsalonspa_1597866646_2379400348672402563_509340228.jpg",
+    label: "Curly Cut",
+    sub:   "Defined, bouncy curls shaped to your natural pattern.",
+    pos:   "50% 28%",
+  },
+  {
+    src: "/instagram/mchairsalonspa_1618323213_2551002466209372019_509340228.jpg",
+    label: "Balayage & Blowout",
+    sub:   "Hand-painted colour, finished to perfection.",
+    pos:   "50% 25%",
+  },
+  {
+    src: "/instagram/mchairsalonspa_1645811757_2781593085253597123_509340228.jpg",
+    label: "Curly Highlights",
+    sub:   "Dimension and texture — every curl lit from within.",
+    pos:   "40% 32%",
+  },
 ];
 
 export default function WorkShowcase() {
@@ -37,7 +54,8 @@ export default function WorkShowcase() {
 
   return (
     <section className="relative w-full overflow-hidden" style={{ height: "75vh", minHeight: 520 }}>
-      {/* Images — stacked, cross-fade via opacity */}
+
+      {/* Slides — stacked, cross-fade via opacity */}
       {SLIDES.map((s, i) => (
         <div key={s.src}
           className="absolute inset-0 transition-opacity duration-700"
@@ -54,9 +72,9 @@ export default function WorkShowcase() {
         </div>
       ))}
 
-      {/* Gradient overlay — stronger at bottom for text legibility */}
+      {/* Gradient — strong at bottom for text legibility */}
       <div className="absolute inset-0 z-10"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.08) 100%)" }} />
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.05) 100%)" }} />
 
       {/* Content */}
       <div className="absolute inset-0 z-20 flex flex-col justify-end pb-12 sm:pb-16">
@@ -79,11 +97,9 @@ export default function WorkShowcase() {
             <div className="flex items-center gap-2">
               {SLIDES.map((_, i) => (
                 <button key={i} onClick={() => goTo(i)}
-                  aria-label={`Go to slide ${i + 1}`}
-                  className={`h-[3px] rounded-full transition-all duration-400 cursor-pointer ${
-                    i === active
-                      ? "w-8 bg-[var(--mc-accent)]"
-                      : "w-3 bg-white/40 hover:bg-white/70"
+                  aria-label={`Slide ${i + 1}`}
+                  className={`h-[3px] rounded-full transition-all duration-300 cursor-pointer ${
+                    i === active ? "w-8 bg-[var(--mc-accent)]" : "w-3 bg-white/40 hover:bg-white/70"
                   }`} />
               ))}
             </div>

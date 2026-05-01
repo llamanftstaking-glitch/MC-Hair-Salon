@@ -72,10 +72,26 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-[var(--mc-border)] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="border-t border-[var(--mc-border)] pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <p className="text-[var(--mc-text-dim)] text-xs">© {new Date().getFullYear()} MC Hair Salon & Spa. All rights reserved.</p>
             <Link href="/terms" className="text-[#444] text-xs hover:text-[var(--mc-accent)] transition-colors uppercase tracking-widest">Terms & Conditions</Link>
+          </div>
+          {/* LGBTQ+ Friendly badge */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-7 rounded-sm overflow-hidden shrink-0" aria-hidden="true">
+              <div className="h-[14.28%] w-full bg-[#FF0018]" />
+              <div className="h-[14.28%] w-full bg-[#FF6600]" />
+              <div className="h-[14.28%] w-full bg-[#FFDD00]" />
+              <div className="h-[14.28%] w-full bg-[#008026]" />
+              <div className="h-[14.28%] w-full bg-[#004DFF]" />
+              <div className="h-[14.28%] w-full bg-[#750787]" />
+              <div className="h-[14.28%] w-full bg-[#750787]" />
+            </div>
+            <div>
+              <p className="text-white text-xs font-bold leading-tight">LGBTQ+</p>
+              <p className="text-[var(--mc-text-dim)] text-xs leading-tight">Friendly</p>
+            </div>
           </div>
         </div>
       </div>

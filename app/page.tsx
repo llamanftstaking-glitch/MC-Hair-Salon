@@ -5,7 +5,6 @@ import HeroLogo from "@/components/HeroLogo";
 import MarqueeStrip from "@/components/MarqueeStrip";
 import WorkShowcase from "@/components/WorkShowcase";
 import ResultsGallery from "@/components/ResultsGallery";
-import TeamStrip from "@/components/TeamStrip";
 import SectionDivider from "@/components/SectionDivider";
 import NewsletterStrip from "@/components/NewsletterStrip";
 import FadeIn from "@/components/FadeIn";
@@ -118,10 +117,6 @@ export default function Home() {
       <ResultsGallery />
 
       <SectionDivider bg="bg-[var(--mc-surface-dark)]" />
-
-      <TeamStrip />
-
-      <SectionDivider bg="bg-black" />
 
       {/* TESTIMONIALS */}
       <section className="py-16 sm:py-24 px-6 bg-black">

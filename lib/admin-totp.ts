@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
-
-const FILE = path.join(process.cwd(), "data", "admin-totp.json");
+import "server-only";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { adminTotp as adminTotpTable } from "./schema";
 
 interface TOTPRecord {
   secret: string;
@@ -9,18 +9,27 @@ interface TOTPRecord {
   createdAt: string;
 }
 
-export function getTOTPRecord(): TOTPRecord | null {
-  try {
-    if (fs.existsSync(FILE)) return JSON.parse(fs.readFileSync(FILE, "utf8"));
-  } catch {}
-  return null;
+export async function getTOTPRecord(): Promise<TOTPRecord | null> {
+  const rows = await db.select().from(adminTotpTable).where(eq(adminTotpTable.id, 1));
+  if (!rows.length) return null;
+  return {
+    secret:    rows[0].secret,
+    enabled:   rows[0].enabled,
+    createdAt: rows[0].createdAt,
+  };
 }
 
-export function saveTOTPRecord(record: TOTPRecord): void {
-  fs.mkdirSync(path.dirname(FILE), { recursive: true });
-  fs.writeFileSync(FILE, JSON.stringify(record, null, 2));
+export async function saveTOTPRecord(record: TOTPRecord): Promise<void> {
+  await db
+    .insert(adminTotpTable)
+    .values({ id: 1, secret: record.secret, enabled: record.enabled, createdAt: record.createdAt })
+    .onConflictDoUpdate({
+      target: adminTotpTable.id,
+      set: { secret: record.secret, enabled: record.enabled, createdAt: record.createdAt },
+    });
 }
 
-export function isTOTPEnabled(): boolean {
-  return getTOTPRecord()?.enabled === true;
+export async function isTOTPEnabled(): Promise<boolean> {
+  const record = await getTOTPRecord();
+  return record?.enabled === true;
 }

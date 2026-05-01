@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const { bookingId } = await req.json();
     if (!bookingId) return NextResponse.json({ error: "bookingId required" }, { status: 400 });
 
-    const bookings = getBookings();
+    const bookings = await getBookings();
     const booking  = bookings.find((b) => b.id === bookingId);
     if (!booking) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     if (!booking.stripeCustomerId || !booking.stripePaymentMethodId) {
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       metadata:       { bookingId, customerName: booking.name, serviceTotalCents: booking.servicePrice * 100 },
     });
 
-    updateBooking(bookingId, { status: "cancelled", cancellationChargeId: paymentIntent.id });
+    await updateBooking(bookingId, { status: "cancelled", cancellationChargeId: paymentIntent.id });
 
     const feeInDollars = Math.round(booking.servicePrice * 0.30 * 100) / 100;
     return NextResponse.json({ success: true, chargeId: paymentIntent.id, amount: feeInDollars });

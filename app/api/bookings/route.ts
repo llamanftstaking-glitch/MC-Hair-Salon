@@ -15,7 +15,7 @@ export async function GET() {
   const err = await requireAdmin();
   if (err) return err;
   try {
-    return NextResponse.json(getBookings());
+    return NextResponse.json(await getBookings());
   } catch {
     return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
   }
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const booking = addBooking({
+    const booking = await addBooking({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       phone: phone.trim(),
@@ -91,11 +91,11 @@ export async function PATCH(req: NextRequest) {
     const { id, status, ...rest } = await req.json();
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
     if (Object.keys(rest).length > 0) {
-      const updated = updateBooking(id, { status, ...rest });
+      const updated = await updateBooking(id, { status, ...rest });
       if (!updated) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
       return NextResponse.json(updated);
     }
-    const ok = updateBookingStatus(id, status);
+    const ok = await updateBookingStatus(id, status);
     if (!ok) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch {
@@ -109,7 +109,7 @@ export async function DELETE(req: NextRequest) {
   if (err) return err;
   try {
     const { id } = await req.json();
-    const ok = deleteBooking(id);
+    const ok = await deleteBooking(id);
     if (!ok) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch {

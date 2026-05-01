@@ -9,13 +9,24 @@ Luxury hair salon website for MC Hair Salon & Spa, Upper East Side, New York.
 - TypeScript
 - Stripe (payments — bookings card capture, gift cards, packages, no-show charges)
 - Resend (transactional email)
-- Flat-file JSON storage (`data/*.json` — auto-created on first run)
+- PostgreSQL via Drizzle ORM (`lib/schema.ts`, `lib/db.ts`) — all data persisted across deploys
+- Replit Object Storage for uploaded files (falls back to local disk in dev)
 
 ## Run
 - Dev: `npm run dev` (configured for Replit on port 5000, host 0.0.0.0)
 - Workflow: `Start application`
 
+## Database Setup (PostgreSQL + Drizzle)
+1. Add `DATABASE_URL` as a Replit secret (PostgreSQL connection string from Replit Postgres or Neon).
+2. Run `npm run db:push` once to create all tables.
+3. Run `node scripts/import-data.js` once to migrate any existing `data/*.json` files into Postgres.
+4. The `scripts/seed-admin.js` runs automatically on start to ensure the admin account exists.
+
+The schema is defined in `lib/schema.ts`. All lib modules are now async and DB-backed. Rate limiting, webhook idempotency, analytics, and settings all use Postgres.
+
 ## Required Secrets
+- `DATABASE_URL` — PostgreSQL connection string (e.g. from Replit Postgres addon or Neon)
+- `JWT_SECRET` — Required in production (throws at startup if missing). Use a long random string.
 - `RESEND_API_KEY` — Resend API key for sending email
 - `RESEND_FROM_EMAIL` — Verified sender address, e.g. `MC Hair Salon <hello@mchairsalon.com>`
 - `SALON_INBOX_EMAIL` (optional) — Where new contact / booking / gift-card notifications are sent. Defaults to `hello@mchairsalon.com`.

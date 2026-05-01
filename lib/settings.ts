@@ -1,5 +1,7 @@
-import fs from "fs";
-import path from "path";
+import "server-only";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { siteSettings as siteSettingsTable } from "./schema";
 
 export interface SiteSettings {
   business: {
@@ -24,17 +26,17 @@ export interface SiteSettings {
   };
 }
 
-const DATA_FILE = path.join(process.cwd(), "data", "site-settings.json");
+const SETTINGS_KEY = "settings";
 
 const DEFAULTS: SiteSettings = {
   business: {
-    name: "MC Hair Salon & Spa",
-    tagline: "Upper East Side's Premier Luxury Salon",
-    address: "336 East 78th St, New York, NY 10075",
-    phone: "(212) 988-5252",
-    email: "hello@mchairsalon.com",
+    name:      "MC Hair Salon & Spa",
+    tagline:   "Upper East Side's Premier Luxury Salon",
+    address:   "336 East 78th St, New York, NY 10075",
+    phone:     "(212) 988-5252",
+    email:     "hello@mchairsalon.com",
     instagram: "https://www.instagram.com/mchairsalonspa/",
-    facebook: "https://www.facebook.com/mchairsalonandspa/",
+    facebook:  "https://www.facebook.com/mchairsalonandspa/",
   },
   hours: [
     { day: "Monday",    open: "9:30 AM",  close: "4:00 PM" },
@@ -46,33 +48,35 @@ const DEFAULTS: SiteSettings = {
     { day: "Sunday",    open: "11:00 AM", close: "6:00 PM" },
   ],
   hero: {
-    headline: "Upper East Side's",
+    headline:       "Upper East Side's",
     headlineAccent: "Premier Hair Salon",
-    subheadline: "Luxury hair and spa services in the heart of New York City. Precision cuts, transformative color, and expert beauty treatments since 2011.",
+    subheadline:    "Luxury hair and spa services in the heart of New York City. Precision cuts, transformative color, and expert beauty treatments since 2011.",
   },
 };
 
-function ensureDataDir() {
-  const dir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(DEFAULTS, null, 2));
-  }
-}
+export async function getSettings(): Promise<SiteSettings> {
+  const rows = await db
+    .select()
+    .from(siteSettingsTable)
+    .where(eq(siteSettingsTable.key, SETTINGS_KEY));
 
-export function getSettings(): SiteSettings {
-  ensureDataDir();
-  try {
-    const raw = fs.readFileSync(DATA_FILE, "utf-8");
-    return { ...DEFAULTS, ...JSON.parse(raw) };
-  } catch {
+  if (!rows.length) {
+    // First-run: seed defaults
+    await db.insert(siteSettingsTable).values({ key: SETTINGS_KEY, value: DEFAULTS });
     return DEFAULTS;
   }
+
+  const stored = rows[0].value as Partial<SiteSettings>;
+  return {
+    business: { ...DEFAULTS.business, ...(stored.business ?? {}) },
+    hours:    stored.hours    ?? DEFAULTS.hours,
+    hero:     { ...DEFAULTS.hero,     ...(stored.hero     ?? {}) },
+  };
 }
 
 // Convenience helper for server components that need salon info
-export function getSalonInfo() {
-  const s = getSettings();
+export async function getSalonInfo() {
+  const s = await getSettings();
   return {
     name:        s.business.name,
     tagline:     s.business.tagline,
@@ -86,14 +90,16 @@ export function getSalonInfo() {
   };
 }
 
-export function updateSettings(updates: Partial<SiteSettings>): SiteSettings {
-  const current = getSettings();
+export async function updateSettings(updates: Partial<SiteSettings>): Promise<SiteSettings> {
+  const current = await getSettings();
   const updated: SiteSettings = {
     business: { ...current.business, ...(updates.business ?? {}) },
     hours:    updates.hours    ?? current.hours,
     hero:     { ...current.hero,     ...(updates.hero     ?? {}) },
   };
-  ensureDataDir();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(updated, null, 2));
+  await db
+    .insert(siteSettingsTable)
+    .values({ key: SETTINGS_KEY, value: updated })
+    .onConflictDoUpdate({ target: siteSettingsTable.key, set: { value: updated } });
   return updated;
 }

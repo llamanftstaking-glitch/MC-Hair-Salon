@@ -1,5 +1,7 @@
-import fs from "fs";
-import path from "path";
+import "server-only";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { bookings as bookingsTable } from "./schema";
 
 export interface Booking {
   id: string;
@@ -22,53 +24,107 @@ export interface Booking {
   cancellationChargeId?: string;
 }
 
-const DATA_FILE = path.join(process.cwd(), "data", "bookings.json");
-
-function ensureDataDir() {
-  const dir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, "[]");
+function rowToBooking(row: typeof bookingsTable.$inferSelect): Booking {
+  return {
+    id:                    row.id,
+    name:                  row.name,
+    email:                 row.email,
+    phone:                 row.phone,
+    service:               row.service,
+    stylist:               row.stylist,
+    date:                  row.date,
+    time:                  row.time,
+    notes:                 row.notes ?? undefined,
+    status:                row.status as Booking["status"],
+    createdAt:             row.createdAt,
+    servicePrice:          row.servicePrice ?? undefined,
+    stripeCustomerId:      row.stripeCustomerId ?? undefined,
+    stripePaymentMethodId: row.stripePaymentMethodId ?? undefined,
+    cardLast4:             row.cardLast4 ?? undefined,
+    cardBrand:             row.cardBrand ?? undefined,
+    noshowChargeId:        row.noshowChargeId ?? undefined,
+    cancellationChargeId:  row.cancellationChargeId ?? undefined,
+  };
 }
 
-export function getBookings(): Booking[] {
-  ensureDataDir();
-  const raw = fs.readFileSync(DATA_FILE, "utf-8");
-  return JSON.parse(raw);
+export async function getBookings(): Promise<Booking[]> {
+  const rows = await db.select().from(bookingsTable);
+  return rows.map(rowToBooking);
 }
 
-export function addBooking(booking: Omit<Booking, "id" | "status" | "createdAt">): Booking {
-  const bookings = getBookings();
+export async function addBooking(
+  booking: Omit<Booking, "id" | "status" | "createdAt">
+): Promise<Booking> {
   const newBooking: Booking = {
     ...booking,
-    id: `MC-${Date.now()}`,
-    status: "pending",
+    id:        `MC-${Date.now()}`,
+    status:    "pending",
     createdAt: new Date().toISOString(),
   };
-  bookings.push(newBooking);
-  fs.writeFileSync(DATA_FILE, JSON.stringify(bookings, null, 2));
+  await db.insert(bookingsTable).values({
+    id:                    newBooking.id,
+    name:                  newBooking.name,
+    email:                 newBooking.email,
+    phone:                 newBooking.phone,
+    service:               newBooking.service,
+    stylist:               newBooking.stylist,
+    date:                  newBooking.date,
+    time:                  newBooking.time,
+    notes:                 newBooking.notes ?? null,
+    status:                newBooking.status,
+    createdAt:             newBooking.createdAt,
+    servicePrice:          newBooking.servicePrice ?? null,
+    stripeCustomerId:      newBooking.stripeCustomerId ?? null,
+    stripePaymentMethodId: newBooking.stripePaymentMethodId ?? null,
+    cardLast4:             newBooking.cardLast4 ?? null,
+    cardBrand:             newBooking.cardBrand ?? null,
+    noshowChargeId:        newBooking.noshowChargeId ?? null,
+    cancellationChargeId:  newBooking.cancellationChargeId ?? null,
+  });
   return newBooking;
 }
 
-export function updateBooking(
+export async function updateBooking(
   id: string,
   updates: Partial<Omit<Booking, "id" | "createdAt">>
-): Booking | null {
-  const bookings = getBookings();
-  const idx = bookings.findIndex((b) => b.id === id);
-  if (idx === -1) return null;
-  bookings[idx] = { ...bookings[idx], ...updates };
-  fs.writeFileSync(DATA_FILE, JSON.stringify(bookings, null, 2));
-  return bookings[idx];
+): Promise<Booking | null> {
+  const dbUpdates: Partial<typeof bookingsTable.$inferInsert> = {};
+  if (updates.name !== undefined)                  dbUpdates.name = updates.name;
+  if (updates.email !== undefined)                 dbUpdates.email = updates.email;
+  if (updates.phone !== undefined)                 dbUpdates.phone = updates.phone;
+  if (updates.service !== undefined)               dbUpdates.service = updates.service;
+  if (updates.stylist !== undefined)               dbUpdates.stylist = updates.stylist;
+  if (updates.date !== undefined)                  dbUpdates.date = updates.date;
+  if (updates.time !== undefined)                  dbUpdates.time = updates.time;
+  if ("notes" in updates)                          dbUpdates.notes = updates.notes ?? null;
+  if (updates.status !== undefined)                dbUpdates.status = updates.status;
+  if ("servicePrice" in updates)                   dbUpdates.servicePrice = updates.servicePrice ?? null;
+  if ("stripeCustomerId" in updates)               dbUpdates.stripeCustomerId = updates.stripeCustomerId ?? null;
+  if ("stripePaymentMethodId" in updates)          dbUpdates.stripePaymentMethodId = updates.stripePaymentMethodId ?? null;
+  if ("cardLast4" in updates)                      dbUpdates.cardLast4 = updates.cardLast4 ?? null;
+  if ("cardBrand" in updates)                      dbUpdates.cardBrand = updates.cardBrand ?? null;
+  if ("noshowChargeId" in updates)                 dbUpdates.noshowChargeId = updates.noshowChargeId ?? null;
+  if ("cancellationChargeId" in updates)           dbUpdates.cancellationChargeId = updates.cancellationChargeId ?? null;
+
+  if (Object.keys(dbUpdates).length === 0) {
+    const rows = await db.select().from(bookingsTable).where(eq(bookingsTable.id, id));
+    return rows.length ? rowToBooking(rows[0]) : null;
+  }
+
+  await db.update(bookingsTable).set(dbUpdates).where(eq(bookingsTable.id, id));
+  const rows = await db.select().from(bookingsTable).where(eq(bookingsTable.id, id));
+  return rows.length ? rowToBooking(rows[0]) : null;
 }
 
-export function updateBookingStatus(id: string, status: Booking["status"]): boolean {
-  return updateBooking(id, { status }) !== null;
+export async function updateBookingStatus(
+  id: string,
+  status: Booking["status"]
+): Promise<boolean> {
+  const result = await updateBooking(id, { status });
+  return result !== null;
 }
 
-export function deleteBooking(id: string): boolean {
-  const bookings = getBookings();
-  const filtered = bookings.filter((b) => b.id !== id);
-  if (filtered.length === bookings.length) return false;
-  fs.writeFileSync(DATA_FILE, JSON.stringify(filtered, null, 2));
-  return true;
+export async function deleteBooking(id: string): Promise<boolean> {
+  const result = await db.delete(bookingsTable).where(eq(bookingsTable.id, id));
+  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
 }

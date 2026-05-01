@@ -4,7 +4,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const { limited } = checkRateLimit("analytics", ip, 200, 60_000);
+  const { limited } = await checkRateLimit("analytics", ip, 200, 60_000);
   if (limited) return NextResponse.json({}, { status: 429 });
 
   try {
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     if (type === "heartbeat") {
       heartbeat(sessionId);
     } else {
-      recordView(hashIp(ip), sessionId);
+      await recordView(hashIp(ip), sessionId);
     }
     return NextResponse.json({ ok: true });
   } catch {

@@ -22,7 +22,7 @@ export default async function AccountPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const customer = getCustomerById(session.id);
+  const customer = await getCustomerById(session.id);
   if (!customer) redirect("/login");
 
   const tier = calcTier(customer.points);

@@ -13,6 +13,31 @@ const ALLOWED_TYPES = [
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
+// Try to use Replit Object Storage if available, otherwise fall back to local disk
+async function uploadFile(
+  buffer: Buffer,
+  key: string,
+): Promise<string> {
+  // Attempt Replit Object Storage
+  try {
+    // Dynamic import so the build doesn't fail if the package isn't present
+    const { Client } = await import("@replit/object-storage");
+    const client = new Client();
+    await client.uploadFromBytes(key, buffer);
+    // Return a proxy URL so the browser can fetch via our serve-upload route
+    return `/api/serve-upload?key=${encodeURIComponent(key)}`;
+  } catch {
+    // Object storage not available (local dev or package missing) — fall back to disk
+    const parts = key.split("/"); // uploads/category/filename
+    const filename  = parts.pop()!;
+    const category  = parts.join("/");
+    const dir = path.join(process.cwd(), "public", category);
+    await mkdir(dir, { recursive: true });
+    await writeFile(path.join(dir, filename), buffer);
+    return `/${category}/${filename}`;
+  }
+}
+
 // POST — admin only
 export async function POST(req: NextRequest) {
   const err = await requireAdmin();
@@ -39,20 +64,18 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     const safeCategory = category.replace(/[^a-zA-Z0-9_-]/g, "");
-    const dir = path.join(process.cwd(), "public", "uploads", safeCategory);
-    await mkdir(dir, { recursive: true });
-
     const ext      = path.extname(file.name) || ".bin";
     const base     = path.basename(file.name, ext).replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 60);
     const filename = `${Date.now()}_${base}${ext}`;
+    const key      = `uploads/${safeCategory}/${filename}`;
 
-    await writeFile(path.join(dir, filename), buffer);
+    const url = await uploadFile(buffer, key);
 
     return NextResponse.json({
-      url:      `/uploads/${safeCategory}/${filename}`,
+      url,
       filename,
-      type:     file.type.startsWith("video") ? "video" : "image",
-      size:     file.size,
+      type: file.type.startsWith("video") ? "video" : "image",
+      size: file.size,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Upload failed";

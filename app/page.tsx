@@ -30,8 +30,8 @@ const iconMap: Record<string, React.ReactNode> = {
   sparkles: <Sparkles size={28} />,
 };
 
-export default function Home() {
-  const SALON_INFO = getSalonInfo();
+export default async function Home() {
+  const SALON_INFO = await getSalonInfo();
   return (
     <>
       <HeroLogo />

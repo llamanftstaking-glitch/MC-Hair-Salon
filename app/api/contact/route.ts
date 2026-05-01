@@ -8,7 +8,7 @@ export async function GET() {
   const err = await requireAdmin();
   if (err) return err;
   try {
-    return NextResponse.json(getMessages());
+    return NextResponse.json(await getMessages());
   } catch {
     return NextResponse.json({ error: "Failed to fetch messages" }, { status: 500 });
   }
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const trimmedEmail   = email.trim().toLowerCase();
     const trimmedMessage = message.trim();
 
-    const msg = addMessage({ name: trimmedName, email: trimmedEmail, message: trimmedMessage });
+    const msg = await addMessage({ name: trimmedName, email: trimmedEmail, message: trimmedMessage });
 
     // Auto-reply to client — non-fatal if Resend key isn't configured yet
     sendContactReply(trimmedEmail, trimmedName, trimmedMessage).catch(err =>
@@ -51,7 +51,7 @@ export async function PATCH(req: NextRequest) {
   if (err) return err;
   try {
     const { id } = await req.json();
-    const ok = markRead(id);
+    const ok = await markRead(id);
     if (!ok) return NextResponse.json({ error: "Message not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch {
@@ -65,7 +65,7 @@ export async function DELETE(req: NextRequest) {
   if (err) return err;
   try {
     const { id } = await req.json();
-    const ok = deleteMessage(id);
+    const ok = await deleteMessage(id);
     if (!ok) return NextResponse.json({ error: "Message not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch {

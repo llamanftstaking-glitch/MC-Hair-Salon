@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Phone, MapPin, Clock } from "lucide-react";
 import { getSalonInfo } from "@/lib/settings";
 
-export default function Footer() {
-  const SALON_INFO = getSalonInfo();
+export default async function Footer() {
+  const SALON_INFO = await getSalonInfo();
   return (
     <footer className="bg-[var(--mc-surface-dark)] border-t border-[var(--mc-border)] pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6">

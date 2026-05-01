@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const customerId = req.nextUrl.searchParams.get("id");
   if (!customerId) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
-  const customer = getCustomerById(customerId);
+  const customer = await getCustomerById(customerId);
   if (!customer) return NextResponse.json({ error: "Client not found" }, { status: 404 });
 
   return NextResponse.json({
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     if (!customerId) return NextResponse.json({ error: "Missing customerId" }, { status: 400 });
 
-    const customer = getCustomerById(customerId);
+    const customer = await getCustomerById(customerId);
     if (!customer) return NextResponse.json({ error: "Client not found" }, { status: 404 });
 
     const isHair        = serviceType === "hair";
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       ];
     }
 
-    updateCustomer(customerId, updates);
+    await updateCustomer(customerId, updates);
 
     return NextResponse.json({
       success:        true,

@@ -9,8 +9,8 @@ export const metadata = {
   description: "Luxury bridal hair and makeup on the Upper East Side. Serving NYC brides since 2011 — in-salon and on-location for your entire bridal party.",
 };
 
-export default function WeddingsPage() {
-  const SALON_INFO = getSalonInfo();
+export default async function WeddingsPage() {
+  const SALON_INFO = await getSalonInfo();
   return (
     <>
       {/* ── HERO ── */}

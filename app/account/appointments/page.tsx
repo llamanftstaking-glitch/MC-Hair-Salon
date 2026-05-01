@@ -13,7 +13,7 @@ const STATUS_STYLES: Record<string, string> = {
 export default async function AppointmentsPage() {
   const session = await getSession();
   if (!session) redirect("/login");
-  const customer = getCustomerById(session.id);
+  const customer = await getCustomerById(session.id);
   if (!customer) redirect("/login");
 
   const sorted = [...customer.appointments].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());

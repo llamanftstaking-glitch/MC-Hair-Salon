@@ -1,19 +1,11 @@
-import path from "path";
-import fs from "fs";
-
-const DATA_FILE = path.join(process.cwd(), "data", "analytics.json");
-
-interface DayBucket {
-  date: string;
-  views: number;
-  uniqueIps: string[];
-}
-
-interface AnalyticsStore {
-  days: DayBucket[];
-}
+import "server-only";
+import { eq, gte } from "drizzle-orm";
+import { db } from "./db";
+import { analyticsDays } from "./schema";
+import { sql } from "drizzle-orm";
 
 // In-memory active sessions: sessionId -> lastSeen ms
+// Keep process-local — no need to persist
 const activeSessions = new Map<string, number>();
 
 setInterval(() => {
@@ -22,22 +14,6 @@ setInterval(() => {
     if (ts < cutoff) activeSessions.delete(id);
   }
 }, 60_000);
-
-function loadStore(): AnalyticsStore {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      return JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
-    }
-  } catch {}
-  return { days: [] };
-}
-
-function saveStore(store: AnalyticsStore) {
-  try {
-    fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
-    fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2));
-  } catch {}
-}
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10);
@@ -49,22 +25,31 @@ export function hashIp(ip: string): string {
   return (h >>> 0).toString(36);
 }
 
-export function recordView(ipHash: string, sessionId: string) {
-  const store = loadStore();
+export async function recordView(ipHash: string, sessionId: string): Promise<void> {
   const date = todayStr();
-  let bucket = store.days.find(d => d.date === date);
-  if (!bucket) {
-    bucket = { date, views: 0, uniqueIps: [] };
-    store.days.push(bucket);
-  }
-  bucket.views++;
-  if (!bucket.uniqueIps.includes(ipHash)) bucket.uniqueIps.push(ipHash);
-  store.days = store.days.sort((a, b) => a.date.localeCompare(b.date)).slice(-90);
-  saveStore(store);
+
+  // Upsert: increment views, add unique IP to array if not present
+  await db
+    .insert(analyticsDays)
+    .values({ date, views: 1, uniqueIps: [ipHash] })
+    .onConflictDoUpdate({
+      target: analyticsDays.date,
+      set: {
+        views: sql`${analyticsDays.views} + 1`,
+        uniqueIps: sql`
+          CASE
+            WHEN ${analyticsDays.uniqueIps}::jsonb @> ${JSON.stringify([ipHash])}::jsonb
+            THEN ${analyticsDays.uniqueIps}
+            ELSE ${analyticsDays.uniqueIps}::jsonb || ${JSON.stringify([ipHash])}::jsonb
+          END
+        `,
+      },
+    });
+
   activeSessions.set(sessionId, Date.now());
 }
 
-export function heartbeat(sessionId: string) {
+export function heartbeat(sessionId: string): void {
   activeSessions.set(sessionId, Date.now());
 }
 
@@ -75,33 +60,41 @@ export function getActiveNow(): number {
   return n;
 }
 
-export function getAnalytics() {
-  const store = loadStore();
+export async function getAnalytics() {
   const now = new Date();
-  const today = todayStr();
+  const today   = todayStr();
   const weekAgo  = new Date(now.getTime() -  7 * 86400_000).toISOString().slice(0, 10);
   const monthAgo = new Date(now.getTime() - 30 * 86400_000).toISOString().slice(0, 10);
 
-  const todayBucket  = store.days.find(d => d.date === today);
-  const weekBuckets  = store.days.filter(d => d.date >= weekAgo);
-  const monthBuckets = store.days.filter(d => d.date >= monthAgo);
+  const rows = await db
+    .select()
+    .from(analyticsDays)
+    .where(gte(analyticsDays.date, monthAgo));
+
+  const todayBucket  = rows.find(d => d.date === today);
+  const weekBuckets  = rows.filter(d => d.date >= weekAgo);
+  const monthBuckets = rows;
 
   return {
     activeNow: getActiveNow(),
     today: {
       views:    todayBucket?.views              ?? 0,
-      visitors: todayBucket?.uniqueIps.length   ?? 0,
+      visitors: (todayBucket?.uniqueIps as string[] | null)?.length ?? 0,
     },
     week: {
       views:    weekBuckets.reduce((s, d) => s + d.views, 0),
-      visitors: new Set(weekBuckets.flatMap(d => d.uniqueIps)).size,
+      visitors: new Set(weekBuckets.flatMap(d => (d.uniqueIps as string[]) ?? [])).size,
     },
     month: {
       views:    monthBuckets.reduce((s, d) => s + d.views, 0),
-      visitors: new Set(monthBuckets.flatMap(d => d.uniqueIps)).size,
+      visitors: new Set(monthBuckets.flatMap(d => (d.uniqueIps as string[]) ?? [])).size,
     },
-    chart: store.days
-      .filter(d => d.date >= monthAgo)
-      .map(d => ({ date: d.date, views: d.views, visitors: d.uniqueIps.length })),
+    chart: rows
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(d => ({
+        date:     d.date,
+        views:    d.views,
+        visitors: (d.uniqueIps as string[] | null)?.length ?? 0,
+      })),
   };
 }

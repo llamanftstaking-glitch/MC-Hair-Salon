@@ -1,5 +1,7 @@
-import fs from "fs";
-import path from "path";
+import "server-only";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { subscribers as subscribersTable } from "./schema";
 
 export interface Subscriber {
   id: string;
@@ -9,52 +11,67 @@ export interface Subscriber {
   active: boolean;
 }
 
-const FILE = path.join(process.cwd(), "data", "newsletter.json");
-
-function read(): Subscriber[] {
-  if (!fs.existsSync(FILE)) fs.writeFileSync(FILE, "[]");
-  return JSON.parse(fs.readFileSync(FILE, "utf-8"));
+function rowToSubscriber(row: typeof subscribersTable.$inferSelect): Subscriber {
+  return {
+    id:           row.id,
+    email:        row.email,
+    name:         row.name ?? undefined,
+    subscribedAt: row.subscribedAt,
+    active:       row.active,
+  };
 }
 
-function write(data: Subscriber[]) {
-  fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
+export async function getSubscribers(): Promise<Subscriber[]> {
+  const rows = await db
+    .select()
+    .from(subscribersTable)
+    .where(eq(subscribersTable.active, true));
+  return rows.map(rowToSubscriber);
 }
 
-export function getSubscribers(): Subscriber[] {
-  return read().filter(s => s.active);
+export async function getAllSubscribers(): Promise<Subscriber[]> {
+  const rows = await db.select().from(subscribersTable);
+  return rows.map(rowToSubscriber);
 }
 
-export function getAllSubscribers(): Subscriber[] {
-  return read();
-}
+export async function addSubscriber(
+  email: string,
+  name?: string
+): Promise<{ ok: boolean; message: string }> {
+  const lower = email.toLowerCase();
+  const existing = await db
+    .select()
+    .from(subscribersTable)
+    .where(eq(subscribersTable.email, lower));
 
-export function addSubscriber(email: string, name?: string): { ok: boolean; message: string } {
-  const list = read();
-  const existing = list.find(s => s.email.toLowerCase() === email.toLowerCase());
-  if (existing) {
-    if (existing.active) return { ok: false, message: "Already subscribed." };
-    existing.active = true;
-    write(list);
+  if (existing.length > 0) {
+    if (existing[0].active) return { ok: false, message: "Already subscribed." };
+    await db
+      .update(subscribersTable)
+      .set({ active: true })
+      .where(eq(subscribersTable.email, lower));
     return { ok: true, message: "Resubscribed successfully." };
   }
-  list.push({ id: `SUB-${Date.now()}`, email, name, subscribedAt: new Date().toISOString(), active: true });
-  write(list);
+
+  await db.insert(subscribersTable).values({
+    id:           `SUB-${Date.now()}`,
+    email:        lower,
+    name:         name ?? null,
+    subscribedAt: new Date().toISOString(),
+    active:       true,
+  });
   return { ok: true, message: "Subscribed successfully." };
 }
 
-export function unsubscribe(email: string): boolean {
-  const list = read();
-  const sub = list.find(s => s.email.toLowerCase() === email.toLowerCase());
-  if (!sub) return false;
-  sub.active = false;
-  write(list);
-  return true;
+export async function unsubscribe(email: string): Promise<boolean> {
+  const result = await db
+    .update(subscribersTable)
+    .set({ active: false })
+    .where(eq(subscribersTable.email, email.toLowerCase()));
+  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
 }
 
-export function removeSubscriber(id: string): boolean {
-  const list = read();
-  const filtered = list.filter(s => s.id !== id);
-  if (filtered.length === list.length) return false;
-  write(filtered);
-  return true;
+export async function removeSubscriber(id: string): Promise<boolean> {
+  const result = await db.delete(subscribersTable).where(eq(subscribersTable.id, id));
+  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
 }

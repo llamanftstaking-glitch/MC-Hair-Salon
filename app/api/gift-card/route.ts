@@ -7,11 +7,11 @@ export async function GET(req: NextRequest) {
   try {
     const code = new URL(req.url).searchParams.get("code");
     if (code) {
-      const card = getGiftCardByCode(code.toUpperCase());
+      const card = await getGiftCardByCode(code.toUpperCase());
       if (!card) return NextResponse.json({ error: "Gift card not found" }, { status: 404 });
       return NextResponse.json(card);
     }
-    return NextResponse.json(getGiftCards());
+    return NextResponse.json(await getGiftCards());
   } catch {
     return NextResponse.json({ error: "Failed to fetch gift cards" }, { status: 500 });
   }
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
       }
 
-      const card = createGiftCard({
+      const card = await createGiftCard({
         amount: Number(amount),
         recipientName,
         recipientEmail,
@@ -77,10 +77,10 @@ export async function POST(req: NextRequest) {
     if (action === "redeem") {
       const { code } = body;
       if (!code) return NextResponse.json({ error: "Missing code" }, { status: 400 });
-      const card = getGiftCardByCode(code.toUpperCase());
+      const card = await getGiftCardByCode(code.toUpperCase());
       if (!card) return NextResponse.json({ error: "Gift card not found" }, { status: 404 });
       if (card.status !== "active") return NextResponse.json({ error: `Gift card is ${card.status}` }, { status: 400 });
-      redeemGiftCard(code.toUpperCase());
+      await redeemGiftCard(code.toUpperCase());
       return NextResponse.json({ success: true, card });
     }
 

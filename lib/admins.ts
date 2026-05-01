@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
-
-const FILE = path.join(process.cwd(), "data", "admins.json");
+import "server-only";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { admins as adminsTable } from "./schema";
 
 export interface AdminEntry {
   email: string;
@@ -9,23 +9,12 @@ export interface AdminEntry {
   addedBy: string;
 }
 
-function read(): AdminEntry[] {
-  try {
-    return JSON.parse(fs.readFileSync(FILE, "utf8"));
-  } catch {
-    return [];
-  }
+export async function getAllAdmins(): Promise<AdminEntry[]> {
+  const rows = await db.select().from(adminsTable);
+  return rows.map(r => ({ email: r.email, addedAt: r.addedAt, addedBy: r.addedBy }));
 }
 
-function write(admins: AdminEntry[]) {
-  fs.writeFileSync(FILE, JSON.stringify(admins, null, 2));
-}
-
-export function getAllAdmins(): AdminEntry[] {
-  return read();
-}
-
-export function isAdminEmail(email: string): boolean {
+export async function isAdminEmail(email: string): Promise<boolean> {
   // Bootstrap: ADMIN_EMAIL env var always works as a fallback
   const envAdmins = (process.env.ADMIN_EMAIL ?? "")
     .split(",")
@@ -33,22 +22,30 @@ export function isAdminEmail(email: string): boolean {
     .filter(Boolean);
   if (envAdmins.includes(email.toLowerCase())) return true;
 
-  return read().some((a) => a.email.toLowerCase() === email.toLowerCase());
+  const rows = await db
+    .select()
+    .from(adminsTable)
+    .where(eq(adminsTable.email, email.toLowerCase()));
+  return rows.length > 0;
 }
 
-export function addAdmin(email: string, addedBy: string): AdminEntry {
-  const admins = read();
-  const existing = admins.find((a) => a.email.toLowerCase() === email.toLowerCase());
-  if (existing) return existing;
-  const entry: AdminEntry = { email: email.toLowerCase(), addedAt: new Date().toISOString(), addedBy };
-  write([...admins, entry]);
+export async function addAdmin(email: string, addedBy: string): Promise<AdminEntry> {
+  const lower = email.toLowerCase();
+  const existing = await db
+    .select()
+    .from(adminsTable)
+    .where(eq(adminsTable.email, lower));
+  if (existing.length > 0) {
+    return { email: existing[0].email, addedAt: existing[0].addedAt, addedBy: existing[0].addedBy };
+  }
+  const entry: AdminEntry = { email: lower, addedAt: new Date().toISOString(), addedBy };
+  await db.insert(adminsTable).values(entry);
   return entry;
 }
 
-export function removeAdmin(email: string): boolean {
-  const admins = read();
-  const filtered = admins.filter((a) => a.email.toLowerCase() !== email.toLowerCase());
-  if (filtered.length === admins.length) return false;
-  write(filtered);
-  return true;
+export async function removeAdmin(email: string): Promise<boolean> {
+  const result = await db
+    .delete(adminsTable)
+    .where(eq(adminsTable.email, email.toLowerCase()));
+  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
 }

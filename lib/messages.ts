@@ -1,5 +1,7 @@
-import fs from "fs";
-import path from "path";
+import "server-only";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { messages as messagesTable } from "./schema";
 
 export interface ContactMessage {
   id: string;
@@ -10,40 +12,51 @@ export interface ContactMessage {
   createdAt: string;
 }
 
-const DATA_FILE = path.join(process.cwd(), "data", "messages.json");
-
-function ensureDataDir() {
-  const dir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, "[]");
+function rowToMessage(row: typeof messagesTable.$inferSelect): ContactMessage {
+  return {
+    id:        row.id,
+    name:      row.name,
+    email:     row.email,
+    message:   row.message,
+    read:      row.read,
+    createdAt: row.createdAt,
+  };
 }
 
-export function getMessages(): ContactMessage[] {
-  ensureDataDir();
-  return JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+export async function getMessages(): Promise<ContactMessage[]> {
+  const rows = await db.select().from(messagesTable);
+  return rows.map(rowToMessage);
 }
 
-export function addMessage(data: Pick<ContactMessage, "name" | "email" | "message">): ContactMessage {
-  const messages = getMessages();
-  const msg: ContactMessage = { ...data, id: `MSG-${Date.now()}`, read: false, createdAt: new Date().toISOString() };
-  messages.push(msg);
-  fs.writeFileSync(DATA_FILE, JSON.stringify(messages, null, 2));
+export async function addMessage(
+  data: Pick<ContactMessage, "name" | "email" | "message">
+): Promise<ContactMessage> {
+  const msg: ContactMessage = {
+    ...data,
+    id:        `MSG-${Date.now()}`,
+    read:      false,
+    createdAt: new Date().toISOString(),
+  };
+  await db.insert(messagesTable).values({
+    id:        msg.id,
+    name:      msg.name,
+    email:     msg.email,
+    message:   msg.message,
+    read:      false,
+    createdAt: msg.createdAt,
+  });
   return msg;
 }
 
-export function markRead(id: string): boolean {
-  const messages = getMessages();
-  const idx = messages.findIndex(m => m.id === id);
-  if (idx === -1) return false;
-  messages[idx].read = true;
-  fs.writeFileSync(DATA_FILE, JSON.stringify(messages, null, 2));
-  return true;
+export async function markRead(id: string): Promise<boolean> {
+  const result = await db
+    .update(messagesTable)
+    .set({ read: true })
+    .where(eq(messagesTable.id, id));
+  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
 }
 
-export function deleteMessage(id: string): boolean {
-  const messages = getMessages();
-  const filtered = messages.filter(m => m.id !== id);
-  if (filtered.length === messages.length) return false;
-  fs.writeFileSync(DATA_FILE, JSON.stringify(filtered, null, 2));
-  return true;
+export async function deleteMessage(id: string): Promise<boolean> {
+  const result = await db.delete(messagesTable).where(eq(messagesTable.id, id));
+  return (result as unknown as { rowCount?: number })?.rowCount !== 0;
 }

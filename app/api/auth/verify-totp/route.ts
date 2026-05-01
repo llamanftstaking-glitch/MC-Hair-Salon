@@ -8,7 +8,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const { limited, headers } = checkRateLimit("totp-verify", ip, 10, 15 * 60_000);
+  const { limited, headers } = await checkRateLimit("totp-verify", ip, 10, 15 * 60_000);
   if (limited) {
     return NextResponse.json({ error: "Too many attempts." }, { status: 429, headers });
   }
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid or expired session" }, { status: 401 });
   }
 
-  const record = getTOTPRecord();
+  const record = await getTOTPRecord();
   if (!record?.enabled || !record.secret) {
     return NextResponse.json({ error: "2FA not configured" }, { status: 400 });
   }
@@ -32,12 +32,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid authentication code" }, { status: 401 });
   }
 
-  const customer = getCustomerByEmail(email);
+  const customer = await getCustomerByEmail(email);
   if (!customer) {
     return NextResponse.json({ error: "User not found" }, { status: 401 });
   }
 
-  const isAdmin = isAdminEmail(email);
+  const isAdmin = await isAdminEmail(email);
   const token = await signToken({ id: customer.id, email: customer.email, name: customer.name, isAdmin });
   const res = NextResponse.json({
     success: true,

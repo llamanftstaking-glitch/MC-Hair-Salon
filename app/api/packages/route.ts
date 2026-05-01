@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const customer = getCustomerById(session.id);
+    const customer = await getCustomerById(session.id);
     if (!customer) return NextResponse.json({ error: "Customer not found" }, { status: 404 });
     return NextResponse.json(customer.packages);
   } catch {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const pkg = PACKAGES.find(p => p.id === packageId);
     if (!pkg) return NextResponse.json({ error: "Package not found" }, { status: 404 });
 
-    const customer = getCustomerById(customerId);
+    const customer = await getCustomerById(customerId);
     if (!customer) return NextResponse.json({ error: "Customer not found" }, { status: 404 });
 
     const expiresAt = new Date();
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       stripeSessionId,
     };
 
-    const updated = updateCustomer(customerId, {
+    const updated = await updateCustomer(customerId, {
       packages: [...customer.packages, newPkg],
       points: customer.points + Math.floor(pkg.price),
       totalSpent: customer.totalSpent + pkg.price,
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const { customerId, customerPackageId } = await req.json();
-    const customer = getCustomerById(customerId);
+    const customer = await getCustomerById(customerId);
     if (!customer) return NextResponse.json({ error: "Customer not found" }, { status: 404 });
 
     const pkgs = customer.packages.map(p =>
@@ -70,7 +70,7 @@ export async function PATCH(req: NextRequest) {
         : p
     );
 
-    const updated = updateCustomer(customerId, { packages: pkgs });
+    const updated = await updateCustomer(customerId, { packages: pkgs });
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json({ error: "Failed to update package" }, { status: 500 });

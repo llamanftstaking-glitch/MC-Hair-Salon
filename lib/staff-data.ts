@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
-
-const STAFF_FILE = path.join(process.cwd(), "data", "staff.json");
+import "server-only";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { staff as staffTable } from "./schema";
 
 export interface PortfolioItem {
   type: "image" | "video";
@@ -17,9 +17,12 @@ export interface StaffMember {
   image?: string;
   specialties: string[];
   portfolio?: PortfolioItem[];
+  isMakeupArtist?: boolean;
+  order?: number;
 }
 
-const STAFF: StaffMember[] = [
+// Default seed data — used if DB is empty
+const STAFF_DEFAULTS: StaffMember[] = [
   {
     id: "maria",
     name: "Maria",
@@ -28,6 +31,8 @@ const STAFF: StaffMember[] = [
     specialties: ["Color Correction", "Balayage", "Updo", "Curly Haircut", "Highlights", "Relaxer", "Color"],
     image: "/instagram/mchairsalonspa_1523641801_1756757213798938429_509340228.jpg",
     portfolio: [],
+    isMakeupArtist: false,
+    order: 0,
   },
   {
     id: "meagan",
@@ -37,6 +42,8 @@ const STAFF: StaffMember[] = [
     specialties: ["Hair Color", "Highlights", "Blowouts"],
     image: "/instagram/mchairsalonspa_1533145637_1836481173825515947_509340228.jpg",
     portfolio: [],
+    isMakeupArtist: false,
+    order: 1,
   },
   {
     id: "sally",
@@ -46,6 +53,8 @@ const STAFF: StaffMember[] = [
     specialties: ["Women's Haircuts", "Men's Haircuts", "Curly Cuts", "Keratin Treatment", "Balayage", "Baby Lights", "Eyebrow & Lip Wax"],
     image: "/instagram/mchairsalonspa_1732646348_3510014434303531709_509340228.jpg",
     portfolio: [],
+    isMakeupArtist: false,
+    order: 2,
   },
   {
     id: "kato",
@@ -55,6 +64,8 @@ const STAFF: StaffMember[] = [
     specialties: ["Hair Color", "Natural Highlights", "Men's Hair", "Precision Cutting"],
     image: "/instagram/mchairsalonspa_1550078255_1978522269296608933_509340228.jpg",
     portfolio: [],
+    isMakeupArtist: false,
+    order: 3,
   },
   {
     id: "juany",
@@ -64,6 +75,8 @@ const STAFF: StaffMember[] = [
     specialties: ["Blow Dry", "Keratin Treatment", "Botox Treatment for Hair"],
     image: "/instagram/mchairsalonspa_1708007392_3303327885522806092_509340228.jpg",
     portfolio: [],
+    isMakeupArtist: false,
+    order: 4,
   },
   {
     id: "dhariana",
@@ -73,6 +86,8 @@ const STAFF: StaffMember[] = [
     specialties: ["Bridal Makeup", "Contour Makeup", "Eye Makeup", "Lashes", "Makeup Lessons", "Special Event Makeup"],
     image: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
     portfolio: [],
+    isMakeupArtist: true,
+    order: 5,
   },
   {
     id: "nazareth",
@@ -81,6 +96,8 @@ const STAFF: StaffMember[] = [
     bio: "Nazareth keeps MC Hair Salon & Spa running beautifully behind the scenes. With a sharp eye for detail and a warm presence, she ensures every client has a seamless, elevated experience from the moment they walk in.",
     specialties: ["Salon Operations", "Team Management", "Client Relations", "Guest Experience"],
     portfolio: [],
+    isMakeupArtist: false,
+    order: 6,
   },
   {
     id: "nathaly",
@@ -89,49 +106,99 @@ const STAFF: StaffMember[] = [
     bio: "Nathaly is the welcoming face of MC Hair Salon & Spa. She handles scheduling, coordinates appointments, and makes sure every guest feels at home the moment they arrive.",
     specialties: ["Scheduling", "Client Coordination", "Front Desk", "Guest Relations"],
     portfolio: [],
+    isMakeupArtist: false,
+    order: 7,
   },
 ];
 
-function readStaff(): StaffMember[] {
-  try {
-    return JSON.parse(fs.readFileSync(STAFF_FILE, "utf8")) as StaffMember[];
-  } catch {
-    return STAFF;
+function rowToStaff(row: typeof staffTable.$inferSelect): StaffMember {
+  return {
+    id:             row.id,
+    name:           row.name,
+    role:           row.role,
+    bio:            row.bio,
+    image:          row.image ?? undefined,
+    specialties:    (row.specialties as string[]) ?? [],
+    portfolio:      (row.portfolio as PortfolioItem[] | null) ?? [],
+    isMakeupArtist: row.isMakeupArtist,
+    order:          row.order,
+  };
+}
+
+async function ensureSeeded(): Promise<void> {
+  const existing = await db.select({ id: staffTable.id }).from(staffTable).limit(1);
+  if (existing.length === 0) {
+    await db.insert(staffTable).values(
+      STAFF_DEFAULTS.map(s => ({
+        id:             s.id,
+        name:           s.name,
+        role:           s.role,
+        bio:            s.bio,
+        image:          s.image ?? null,
+        specialties:    s.specialties,
+        portfolio:      s.portfolio ?? [],
+        isMakeupArtist: s.isMakeupArtist ?? false,
+        order:          s.order ?? 0,
+      }))
+    );
   }
 }
 
-function writeStaff(staff: StaffMember[]): void {
-  fs.writeFileSync(STAFF_FILE, JSON.stringify(staff, null, 2));
+export async function getAllStaff(): Promise<StaffMember[]> {
+  await ensureSeeded();
+  const rows = await db.select().from(staffTable);
+  return rows.map(rowToStaff).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
-export function getAllStaff(): StaffMember[] {
-  return readStaff();
+export async function getStaffById(id: string): Promise<StaffMember | undefined> {
+  const rows = await db.select().from(staffTable).where(eq(staffTable.id, id));
+  return rows.length ? rowToStaff(rows[0]) : undefined;
 }
 
-export function getStaffById(id: string): StaffMember | undefined {
-  return readStaff().find((s) => s.id === id);
-}
-
-export function createStaff(data: Omit<StaffMember, "id">): StaffMember {
-  const staff = readStaff();
+export async function createStaff(data: Omit<StaffMember, "id">): Promise<StaffMember> {
   const id = data.name.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
   const created: StaffMember = { id, ...data };
-  writeStaff([...staff, created]);
+  await db.insert(staffTable).values({
+    id,
+    name:           data.name,
+    role:           data.role,
+    bio:            data.bio,
+    image:          data.image ?? null,
+    specialties:    data.specialties,
+    portfolio:      data.portfolio ?? [],
+    isMakeupArtist: data.isMakeupArtist ?? false,
+    order:          data.order ?? 0,
+  });
   return created;
 }
 
-export function updateStaff(id: string, updates: Partial<Omit<StaffMember, "id">>): StaffMember {
-  const staff = readStaff();
-  const idx = staff.findIndex((s) => s.id === id);
-  if (idx === -1) throw new Error(`Staff member "${id}" not found`);
-  staff[idx] = { ...staff[idx], ...updates };
-  writeStaff(staff);
-  return staff[idx];
+export async function updateStaff(
+  id: string,
+  updates: Partial<Omit<StaffMember, "id">>
+): Promise<StaffMember> {
+  const existing = await db.select().from(staffTable).where(eq(staffTable.id, id));
+  if (!existing.length) throw new Error(`Staff member "${id}" not found`);
+
+  const dbUpdates: Partial<typeof staffTable.$inferInsert> = {};
+  if (updates.name !== undefined)           dbUpdates.name = updates.name;
+  if (updates.role !== undefined)           dbUpdates.role = updates.role;
+  if (updates.bio !== undefined)            dbUpdates.bio = updates.bio;
+  if ("image" in updates)                  dbUpdates.image = updates.image ?? null;
+  if (updates.specialties !== undefined)    dbUpdates.specialties = updates.specialties;
+  if ("portfolio" in updates)              dbUpdates.portfolio = updates.portfolio ?? [];
+  if ("isMakeupArtist" in updates)         dbUpdates.isMakeupArtist = updates.isMakeupArtist ?? false;
+  if ("order" in updates)                  dbUpdates.order = updates.order ?? 0;
+
+  if (Object.keys(dbUpdates).length > 0) {
+    await db.update(staffTable).set(dbUpdates).where(eq(staffTable.id, id));
+  }
+
+  const updated = await db.select().from(staffTable).where(eq(staffTable.id, id));
+  return rowToStaff(updated[0]);
 }
 
-export function deleteStaff(id: string): void {
-  const staff = readStaff();
-  const filtered = staff.filter((s) => s.id !== id);
-  if (filtered.length === staff.length) throw new Error(`Staff member "${id}" not found`);
-  writeStaff(filtered);
+export async function deleteStaff(id: string): Promise<void> {
+  const result = await db.delete(staffTable).where(eq(staffTable.id, id));
+  const rowCount = (result as unknown as { rowCount?: number })?.rowCount ?? 0;
+  if (rowCount === 0) throw new Error(`Staff member "${id}" not found`);
 }

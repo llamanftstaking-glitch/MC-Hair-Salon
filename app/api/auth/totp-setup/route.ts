@@ -7,7 +7,7 @@ import { getTOTPRecord, saveTOTPRecord } from "@/lib/admin-totp";
 export async function GET() {
   const err = await requireAdmin();
   if (err) return err;
-  const record = getTOTPRecord();
+  const record = await getTOTPRecord();
   return NextResponse.json({
     enabled: record?.enabled ?? false,
     hasSecret: !!record?.secret,
@@ -25,28 +25,28 @@ export async function POST(req: NextRequest) {
   if (action === "generate") {
     const secret = generateSecret();
     const uri = getTOTPUri(secret, session?.email ?? "admin");
-    saveTOTPRecord({ secret, enabled: false, createdAt: new Date().toISOString() });
+    await saveTOTPRecord({ secret, enabled: false, createdAt: new Date().toISOString() });
     const qrDataUrl = await QRCode.toDataURL(uri, { width: 200, margin: 2 });
     return NextResponse.json({ secret, uri, qrDataUrl });
   }
 
   if (action === "enable") {
-    const record = getTOTPRecord();
+    const record = await getTOTPRecord();
     if (!record?.secret) return NextResponse.json({ error: "Generate a secret first" }, { status: 400 });
     if (!verifyTOTP(record.secret, String(code))) {
       return NextResponse.json({ error: "Invalid code — try again" }, { status: 401 });
     }
-    saveTOTPRecord({ ...record, enabled: true });
+    await saveTOTPRecord({ ...record, enabled: true });
     return NextResponse.json({ success: true });
   }
 
   if (action === "disable") {
-    const record = getTOTPRecord();
+    const record = await getTOTPRecord();
     if (!record?.enabled) return NextResponse.json({ error: "2FA is not enabled" }, { status: 400 });
     if (!verifyTOTP(record.secret, String(code))) {
       return NextResponse.json({ error: "Invalid code — cannot disable" }, { status: 401 });
     }
-    saveTOTPRecord({ ...record, enabled: false });
+    await saveTOTPRecord({ ...record, enabled: false });
     return NextResponse.json({ success: true });
   }
 

@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     if (body.action === "confirm_booking") {
-      const bookings = getBookings();
+      const bookings = await getBookings();
       const booking = bookings.find(b => b.id === body.bookingId);
       if (!booking) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
       await sendBookingConfirmation(booking);

@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   const name = payload.name || payload.given_name || email.split("@")[0];
   const avatarUrl = payload.picture || undefined;
 
-  let customer = getCustomerByEmail(email);
+  let customer = await getCustomerByEmail(email);
 
   if (customer) {
     if (customer.googleId && customer.googleId !== googleId) {
@@ -64,14 +64,14 @@ export async function POST(req: NextRequest) {
     if (!customer.googleId) updates.googleId = googleId;
     if (avatarUrl && customer.avatarUrl !== avatarUrl) updates.avatarUrl = avatarUrl;
     if (Object.keys(updates).length > 0) {
-      const updated = updateCustomer(customer.id, updates);
+      const updated = await updateCustomer(customer.id, updates);
       if (updated) customer = updated;
     }
   } else {
-    customer = createCustomer({ name, email, phone: "", googleId, avatarUrl });
+    customer = await createCustomer({ name, email, phone: "", googleId, avatarUrl });
   }
 
-  const isAdmin = isAdminEmail(customer.email);
+  const isAdmin = await isAdminEmail(customer.email);
   const token = await signToken({ id: customer.id, email: customer.email, name: customer.name, isAdmin });
 
   const res = NextResponse.json({

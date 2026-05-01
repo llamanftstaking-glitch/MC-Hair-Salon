@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 // GET — public (site settings like hours are read by the frontend)
 export async function GET() {
   try {
-    return NextResponse.json(getSettings());
+    return NextResponse.json(await getSettings());
   } catch {
     return NextResponse.json({ error: "Failed to load settings" }, { status: 500 });
   }
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   if (err) return err;
   try {
     const body    = await req.json();
-    const updated = updateSettings(body);
+    const updated = await updateSettings(body);
     return NextResponse.json(updated);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Failed to save settings";

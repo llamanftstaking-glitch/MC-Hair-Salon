@@ -7,7 +7,7 @@ import { Package, ChevronRight, Check, Sparkles } from "lucide-react";
 export default async function PackagesPage({ searchParams }: { searchParams: Promise<{ purchased?: string }> }) {
   const session = await getSession();
   if (!session) redirect("/login");
-  const customer = getCustomerById(session.id);
+  const customer = await getCustomerById(session.id);
   if (!customer) redirect("/login");
 
   const params = await searchParams;

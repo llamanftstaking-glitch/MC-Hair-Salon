@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   if (!email || !password)
     return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
 
-  const customer = getCustomerByEmail(email);
+  const customer = await getCustomerByEmail(email);
   if (!customer)
     return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
 
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   if (!valid)
     return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
 
-  const isAdmin = isAdminEmail(email);
+  const isAdmin = await isAdminEmail(email);
   const token = await signToken({ id: customer.id, email: customer.email, name: customer.name, isAdmin });
 
   const res = NextResponse.json({ success: true, customer: { id: customer.id, name: customer.name, email: customer.email, isAdmin } });

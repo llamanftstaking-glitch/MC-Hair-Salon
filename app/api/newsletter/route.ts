@@ -8,7 +8,7 @@ export async function GET() {
   const err = await requireAdmin();
   if (err) return err;
   try {
-    return NextResponse.json(getAllSubscribers());
+    return NextResponse.json(await getAllSubscribers());
   } catch {
     return NextResponse.json({ error: "Failed to fetch subscribers" }, { status: 500 });
   }
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       const { email, name } = body;
       if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
       if (email.length > 254) return NextResponse.json({ error: "Email too long" }, { status: 400 });
-      const result = addSubscriber(email.trim().toLowerCase(), name?.trim());
+      const result = await addSubscriber(email.trim().toLowerCase(), name?.trim());
       return NextResponse.json(result, { status: result.ok ? 201 : 409 });
     }
 
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       if (subject.length > 200 || message.length > 50000) {
         return NextResponse.json({ error: "Content too long" }, { status: 400 });
       }
-      const subscribers = getSubscribers();
+      const subscribers = await getSubscribers();
       if (subscribers.length === 0) return NextResponse.json({ error: "No active subscribers" }, { status: 400 });
       const emails = subscribers.map((s) => s.email);
       const result = await sendNewsletterEmail(emails, subject, message);
@@ -55,7 +55,7 @@ export async function DELETE(req: NextRequest) {
   if (err) return err;
   try {
     const { id } = await req.json();
-    const ok = removeSubscriber(id);
+    const ok = await removeSubscriber(id);
     if (!ok) return NextResponse.json({ error: "Subscriber not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch {

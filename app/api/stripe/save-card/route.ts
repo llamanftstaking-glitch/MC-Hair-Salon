@@ -9,12 +9,12 @@ export async function POST(req: NextRequest) {
     if (!email || !stripeCustomerId || !stripePaymentMethodId)
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
-    const existing = getCustomerByEmail(email);
+    const existing = await getCustomerByEmail(email);
 
     if (existing) {
-      updateCustomer(existing.id, { stripeCustomerId, stripePaymentMethodId, name: name || existing.name, phone: phone || existing.phone });
+      await updateCustomer(existing.id, { stripeCustomerId, stripePaymentMethodId, name: name || existing.name, phone: phone || existing.phone });
     } else {
-      createCustomer({ name: name || "", email, phone: phone || "", stripeCustomerId, stripePaymentMethodId });
+      await createCustomer({ name: name || "", email, phone: phone || "", stripeCustomerId, stripePaymentMethodId });
     }
 
     return NextResponse.json({ success: true });

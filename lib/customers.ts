@@ -1,7 +1,12 @@
-import fs from "fs";
-import path from "path";
-
-const FILE = path.join(process.cwd(), "data", "customers.json");
+import "server-only";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import {
+  customers as customersTable,
+  customerAppointments,
+  customerPackages,
+  customerRewards,
+} from "./schema";
 
 export interface Customer {
   id: string;
@@ -19,11 +24,9 @@ export interface Customer {
   appointments: Appointment[];
   packages: CustomerPackage[];
   rewards: RedeemedReward[];
-  // Punch card — 10 hair services = 1 free blowout
-  visitStreak:    number;   // current punches toward next blowout (resets at 10)
-  blowoutsEarned: number;   // lifetime complimentary blowouts earned
-  // Stripe card on file — used for no-show / late cancellation charges
-  stripeCustomerId?:     string;
+  visitStreak: number;
+  blowoutsEarned: number;
+  stripeCustomerId?: string;
   stripePaymentMethodId?: string;
 }
 
@@ -58,58 +61,258 @@ export interface RedeemedReward {
   redeemedAt: string;
 }
 
-function read(): Customer[] {
-  try {
-    return JSON.parse(fs.readFileSync(FILE, "utf8"));
-  } catch {
-    return [];
-  }
-}
+// ── helpers ───────────────────────────────────────────────────────────────────
 
-function write(customers: Customer[]) {
-  fs.writeFileSync(FILE, JSON.stringify(customers, null, 2));
-}
-
-export function getAllCustomers(): Customer[] {
-  return read();
-}
-
-export function getCustomerByEmail(email: string): Customer | undefined {
-  return read().find((c) => c.email.toLowerCase() === email.toLowerCase());
-}
-
-export function getCustomerById(id: string): Customer | undefined {
-  return read().find((c) => c.id === id);
-}
-
-export function createCustomer(data: Omit<Customer, "id" | "createdAt" | "points" | "visits" | "totalSpent" | "tier" | "appointments" | "packages" | "rewards" | "visitStreak" | "blowoutsEarned">): Customer {
-  const customers = read();
-  const customer: Customer = {
-    ...data,
-    id: `cust_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-    createdAt: new Date().toISOString(),
-    points: 0,
-    visits: 0,
-    totalSpent: 0,
-    tier: "Bronze",
-    appointments: [],
-    packages: [],
-    rewards: [],
-    visitStreak: 0,
-    blowoutsEarned: 0,
+function rowToCustomer(
+  row: typeof customersTable.$inferSelect,
+  appts: (typeof customerAppointments.$inferSelect)[],
+  pkgs: (typeof customerPackages.$inferSelect)[],
+  rwds: (typeof customerRewards.$inferSelect)[],
+): Customer {
+  return {
+    id:                   row.id,
+    name:                 row.name,
+    email:                row.email,
+    phone:                row.phone,
+    passwordHash:         row.passwordHash ?? undefined,
+    googleId:             row.googleId ?? undefined,
+    avatarUrl:            row.avatarUrl ?? undefined,
+    createdAt:            row.createdAt,
+    points:               row.points,
+    visits:               row.visits,
+    totalSpent:           row.totalSpent,
+    tier:                 row.tier as Customer["tier"],
+    visitStreak:          row.visitStreak,
+    blowoutsEarned:       row.blowoutsEarned,
+    stripeCustomerId:     row.stripeCustomerId ?? undefined,
+    stripePaymentMethodId: row.stripePaymentMethodId ?? undefined,
+    appointments: appts.map(a => ({
+      id:           a.id,
+      service:      a.service,
+      stylist:      a.stylist,
+      date:         a.date,
+      time:         a.time,
+      status:       a.status as Appointment["status"],
+      pointsEarned: a.pointsEarned,
+    })),
+    packages: pkgs.map(p => ({
+      id:             p.id,
+      packageId:      p.packageId,
+      name:           p.name,
+      tagline:        p.tagline ?? undefined,
+      services:       (p.services as string[] | null) ?? undefined,
+      price:          p.price,
+      sessionsTotal:  p.sessionsTotal,
+      sessionsUsed:   p.sessionsUsed,
+      purchasedAt:    p.purchasedAt,
+      expiresAt:      p.expiresAt,
+      stripeSessionId: p.stripeSessionId ?? undefined,
+    })),
+    rewards: rwds.map(r => ({
+      id:          r.id,
+      name:        r.name,
+      pointsCost:  r.pointsCost,
+      redeemedAt:  r.redeemedAt,
+    })),
   };
-  customers.push(customer);
-  write(customers);
-  return customer;
 }
 
-export function updateCustomer(id: string, updates: Partial<Customer>): Customer | null {
-  const customers = read();
-  const idx = customers.findIndex((c) => c.id === id);
-  if (idx === -1) return null;
-  customers[idx] = { ...customers[idx], ...updates };
-  write(customers);
-  return customers[idx];
+// ── exported functions ────────────────────────────────────────────────────────
+
+export async function getAllCustomers(): Promise<Customer[]> {
+  const [rows, appts, pkgs, rwds] = await Promise.all([
+    db.select().from(customersTable),
+    db.select().from(customerAppointments),
+    db.select().from(customerPackages),
+    db.select().from(customerRewards),
+  ]);
+  return rows.map(row =>
+    rowToCustomer(
+      row,
+      appts.filter(a => a.customerId === row.id),
+      pkgs.filter(p => p.customerId === row.id),
+      rwds.filter(r => r.customerId === row.id),
+    )
+  );
+}
+
+export async function getCustomerByEmail(email: string): Promise<Customer | undefined> {
+  const rows = await db
+    .select()
+    .from(customersTable)
+    .where(eq(customersTable.email, email.toLowerCase()));
+  if (!rows.length) return undefined;
+  const row = rows[0];
+  const [appts, pkgs, rwds] = await Promise.all([
+    db.select().from(customerAppointments).where(eq(customerAppointments.customerId, row.id)),
+    db.select().from(customerPackages).where(eq(customerPackages.customerId, row.id)),
+    db.select().from(customerRewards).where(eq(customerRewards.customerId, row.id)),
+  ]);
+  return rowToCustomer(row, appts, pkgs, rwds);
+}
+
+export async function getCustomerById(id: string): Promise<Customer | undefined> {
+  const rows = await db
+    .select()
+    .from(customersTable)
+    .where(eq(customersTable.id, id));
+  if (!rows.length) return undefined;
+  const row = rows[0];
+  const [appts, pkgs, rwds] = await Promise.all([
+    db.select().from(customerAppointments).where(eq(customerAppointments.customerId, id)),
+    db.select().from(customerPackages).where(eq(customerPackages.customerId, id)),
+    db.select().from(customerRewards).where(eq(customerRewards.customerId, id)),
+  ]);
+  return rowToCustomer(row, appts, pkgs, rwds);
+}
+
+export async function createCustomer(
+  data: Omit<Customer, "id" | "createdAt" | "points" | "visits" | "totalSpent" | "tier" | "appointments" | "packages" | "rewards" | "visitStreak" | "blowoutsEarned">
+): Promise<Customer> {
+  const id = `cust_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const createdAt = new Date().toISOString();
+
+  await db.insert(customersTable).values({
+    id,
+    name:                 data.name,
+    email:                data.email.toLowerCase(),
+    phone:                data.phone ?? "",
+    passwordHash:         data.passwordHash ?? null,
+    googleId:             data.googleId ?? null,
+    avatarUrl:            data.avatarUrl ?? null,
+    createdAt,
+    points:               0,
+    visits:               0,
+    totalSpent:           0,
+    tier:                 "Bronze",
+    visitStreak:          0,
+    blowoutsEarned:       0,
+    stripeCustomerId:     data.stripeCustomerId ?? null,
+    stripePaymentMethodId: data.stripePaymentMethodId ?? null,
+  });
+
+  return {
+    id,
+    name:                 data.name,
+    email:                data.email.toLowerCase(),
+    phone:                data.phone ?? "",
+    passwordHash:         data.passwordHash,
+    googleId:             data.googleId,
+    avatarUrl:            data.avatarUrl,
+    createdAt,
+    points:               0,
+    visits:               0,
+    totalSpent:           0,
+    tier:                 "Bronze",
+    appointments:         [],
+    packages:             [],
+    rewards:              [],
+    visitStreak:          0,
+    blowoutsEarned:       0,
+    stripeCustomerId:     data.stripeCustomerId,
+    stripePaymentMethodId: data.stripePaymentMethodId,
+  };
+}
+
+export async function updateCustomer(
+  id: string,
+  updates: Partial<Customer>
+): Promise<Customer | null> {
+  // Separate scalar fields from nested arrays
+  const { appointments, packages, rewards, ...scalarUpdates } = updates;
+
+  // Build DB column update set (only defined scalar values)
+  const dbUpdates: Partial<typeof customersTable.$inferInsert> = {};
+  if (scalarUpdates.name !== undefined)         dbUpdates.name = scalarUpdates.name;
+  if (scalarUpdates.email !== undefined)        dbUpdates.email = scalarUpdates.email.toLowerCase();
+  if (scalarUpdates.phone !== undefined)        dbUpdates.phone = scalarUpdates.phone;
+  if ("passwordHash" in scalarUpdates)          dbUpdates.passwordHash = scalarUpdates.passwordHash ?? null;
+  if ("googleId" in scalarUpdates)             dbUpdates.googleId = scalarUpdates.googleId ?? null;
+  if ("avatarUrl" in scalarUpdates)            dbUpdates.avatarUrl = scalarUpdates.avatarUrl ?? null;
+  if (scalarUpdates.points !== undefined)       dbUpdates.points = scalarUpdates.points;
+  if (scalarUpdates.visits !== undefined)       dbUpdates.visits = scalarUpdates.visits;
+  if (scalarUpdates.totalSpent !== undefined)   dbUpdates.totalSpent = scalarUpdates.totalSpent;
+  if (scalarUpdates.tier !== undefined)         dbUpdates.tier = scalarUpdates.tier;
+  if (scalarUpdates.visitStreak !== undefined)  dbUpdates.visitStreak = scalarUpdates.visitStreak;
+  if (scalarUpdates.blowoutsEarned !== undefined) dbUpdates.blowoutsEarned = scalarUpdates.blowoutsEarned;
+  if ("stripeCustomerId" in scalarUpdates)      dbUpdates.stripeCustomerId = scalarUpdates.stripeCustomerId ?? null;
+  if ("stripePaymentMethodId" in scalarUpdates) dbUpdates.stripePaymentMethodId = scalarUpdates.stripePaymentMethodId ?? null;
+
+  // Run all DB operations in parallel where possible
+  const ops: Promise<unknown>[] = [];
+
+  if (Object.keys(dbUpdates).length > 0) {
+    ops.push(
+      db.update(customersTable).set(dbUpdates).where(eq(customersTable.id, id))
+    );
+  }
+
+  // Replace child tables if provided
+  if (appointments !== undefined) {
+    ops.push(
+      db.delete(customerAppointments).where(eq(customerAppointments.customerId, id)).then(() => {
+        if (!appointments.length) return;
+        return db.insert(customerAppointments).values(
+          appointments.map(a => ({
+            id:           a.id,
+            customerId:   id,
+            service:      a.service,
+            stylist:      a.stylist,
+            date:         a.date,
+            time:         a.time,
+            status:       a.status,
+            pointsEarned: a.pointsEarned,
+          }))
+        );
+      })
+    );
+  }
+
+  if (packages !== undefined) {
+    ops.push(
+      db.delete(customerPackages).where(eq(customerPackages.customerId, id)).then(() => {
+        if (!packages.length) return;
+        return db.insert(customerPackages).values(
+          packages.map(p => ({
+            id:             p.id,
+            customerId:     id,
+            packageId:      p.packageId,
+            name:           p.name,
+            tagline:        p.tagline ?? null,
+            services:       p.services ?? null,
+            price:          p.price,
+            sessionsTotal:  p.sessionsTotal,
+            sessionsUsed:   p.sessionsUsed,
+            purchasedAt:    p.purchasedAt,
+            expiresAt:      p.expiresAt,
+            stripeSessionId: p.stripeSessionId ?? null,
+          }))
+        );
+      })
+    );
+  }
+
+  if (rewards !== undefined) {
+    ops.push(
+      db.delete(customerRewards).where(eq(customerRewards.customerId, id)).then(() => {
+        if (!rewards.length) return;
+        return db.insert(customerRewards).values(
+          rewards.map(r => ({
+            id:          r.id,
+            customerId:  id,
+            name:        r.name,
+            pointsCost:  r.pointsCost,
+            redeemedAt:  r.redeemedAt,
+          }))
+        );
+      })
+    );
+  }
+
+  await Promise.all(ops);
+
+  const result = await getCustomerById(id);
+  return result ?? null;
 }
 
 export function calcTier(points: number): Customer["tier"] {

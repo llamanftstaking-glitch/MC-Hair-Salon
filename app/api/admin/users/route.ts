@@ -7,8 +7,8 @@ export async function GET() {
   const denied = await requireAdmin();
   if (denied) return denied;
 
-  const admins = getAllAdmins();
-  const customers = getAllCustomers();
+  const admins = await getAllAdmins();
+  const customers = await getAllCustomers();
 
   const adminEmails = new Set(admins.map((a) => a.email.toLowerCase()));
 
@@ -44,12 +44,12 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === "grant") {
-    const entry = addAdmin(email, s?.email ?? "system");
+    const entry = await addAdmin(email, s?.email ?? "system");
     return NextResponse.json({ success: true, entry });
   }
 
   if (action === "revoke") {
-    const removed = removeAdmin(email);
+    const removed = await removeAdmin(email);
     return NextResponse.json({ success: removed });
   }
 

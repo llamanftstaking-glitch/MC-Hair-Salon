@@ -37,7 +37,7 @@ export const SERVICES = [
     tagline: "Salon-quality smoothness in under an hour — the most efficient way to look your best.",
     items: [
       { name: "Blow Out & Style", price: 40, priceLabel: "$40+", description: "Professional wash, condition, and blow-dry using a round brush for volume, smoothness, and shape. Our most popular weekday service. Looking to save? We offer blowout packages — visit our Packages page." },
-      { name: "Updo & Special Event Styling", price: 75, priceLabel: "$75+", description: "Elegant updos, French twists, braided styles, chignons, and event-ready looks designed to last all night. Ideal for galas, weddings, proms, and milestone occasions." },
+      { name: "Updo & Special Event Styling", price: 85, priceLabel: "$85+", description: "Elegant updos, French twists, braided styles, chignons, and event-ready looks designed to last all night. Ideal for galas, weddings, proms, and milestone occasions." },
     ],
   },
   {

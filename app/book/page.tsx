@@ -300,11 +300,9 @@ function DaySmartWidget({
         srcDoc={DAYSMART_SRCDOC}
         title="Book Appointment — MC Hair Salon & Spa"
         width="100%"
-        height="900"
         frameBorder="0"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"
-        className="w-full border-0 rounded-sm overflow-hidden"
-        style={{ minHeight: 800 }}
+        className="w-full border-0"
+        style={{ height: 1100, minHeight: 1100 }}
       />
 
       {/* Manual confirm fallback */}

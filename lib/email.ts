@@ -25,11 +25,11 @@ function getResend(): Resend {
 
 // Set RESEND_FROM_EMAIL to your verified domain address once you verify in Resend dashboard.
 // Until then, use onboarding@resend.dev for testing (Resend's default test sender).
-const FROM = process.env.RESEND_FROM_EMAIL || "MC Hair Salon <hello@mchairsalon.com>";
+const FROM = process.env.RESEND_FROM_EMAIL || "MC Hair Salon <info@mchairsalon.com>";
 
 // Salon-bound notifications (new contact, new booking, new gift card) are routed here.
 // Override with SALON_INBOX_EMAIL env var if the owner wants a different address.
-const SALON_INBOX = process.env.SALON_INBOX_EMAIL || "hello@mchairsalon.com";
+const SALON_INBOX = process.env.SALON_INBOX_EMAIL || "info@mchairsalon.com";
 
 // ── Shared HTML snippets ───────────────────────────────────────────────────────
 const baseStyle = `font-family:'Georgia',serif;background:#000;color:#f5f0e8;max-width:600px;margin:0 auto;padding:40px 32px;`;

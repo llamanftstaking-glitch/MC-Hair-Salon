@@ -39,7 +39,7 @@ const ABOUT_FAQ = [
   },
   {
     q: "Who are the stylists at MC Hair Salon?",
-    a: "Our team includes Kato (Master Stylist, specializing in precision cuts and advanced color), Megan (Senior Stylist & Color Expert, L'Oréal certified), Sofia (Spa Specialist, lash extensions and facials), Marcus (Men's Grooming Expert), and Dhariana (Resident Makeup Artist, specializing in bridal and airbrush). Each stylist has years of experience in their specialty.",
+    a: "Our team includes Maria (versatile stylist specializing in color, balayage, and curly cuts), Meagan (Senior Stylist & L'Oréal Color Expert), Sally (multi-texture specialist for haircuts, keratin, balayage, and waxing), Kato (30-year veteran specializing in precision cuts and natural highlights), Juany (smoothing and keratin treatment specialist), and Dhariana Suriel (Resident Makeup Artist with 18 years of bridal and special event experience). Each member has years of experience in their specialty.",
   },
   {
     q: "Does MC Hair Salon accept walk-ins?",
@@ -236,7 +236,7 @@ export default function AboutPage() {
             <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2">Our People</p>
             <h2 className="font-serif text-2xl font-bold text-white mb-2">Meet the Team</h2>
             <p className="text-[#555] text-sm leading-relaxed max-w-sm">
-              Kato, Megan, Sofia, Marcus, and Dhariana — five specialists with one shared commitment
+              Maria, Meagan, Sally, Kato, Juany, and Dhariana — six specialists with one shared commitment
               to your best look.
             </p>
           </div>

@@ -101,11 +101,16 @@ export default function Navbar() {
         {/* ── Main bar ── */}
         <div className="grid grid-cols-3 items-center h-[56px] sm:h-[60px] px-4 sm:px-10 border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/95 backdrop-blur-md">
 
-          {/* Left — Book shortcut on mobile */}
-          <div className="flex items-center">
+          {/* Left — Book + Services shortcuts */}
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link href="/book"
               className="text-[10px] sm:text-[11px] uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer whitespace-nowrap">
               + Book
+            </Link>
+            <span className="text-[var(--mc-border)] text-xs hidden sm:block">·</span>
+            <Link href="/services"
+              className="hidden sm:block text-[10px] sm:text-[11px] uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer whitespace-nowrap">
+              Services
             </Link>
           </div>
 

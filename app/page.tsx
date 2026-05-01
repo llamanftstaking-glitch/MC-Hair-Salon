@@ -78,40 +78,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICES PREVIEW */}
-      <section className="py-16 sm:py-24 px-6 bg-black">
-        <div className="max-w-7xl mx-auto">
-          <FadeIn className="text-center mb-10 sm:mb-16">
-            <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">What We Offer</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">Our Services</h2>
-          </FadeIn>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {SERVICES.map((s, i) => (
-              <FadeIn key={s.category} delay={i * 70}>
-                <div className="luxury-card p-6 sm:p-8 cursor-pointer h-full">
-                  <div className="text-[var(--mc-accent)] mb-6">{iconMap[s.icon]}</div>
-                  <h3 className="font-serif text-xl font-semibold text-white mb-3">{s.category}</h3>
-                  <p className="text-[var(--mc-text-dim)] text-sm leading-relaxed mb-6">
-                    {s.items.length} services available, from ${Math.min(...s.items.map(item => item.price))}+
-                  </p>
-                  <Link href="/services" className="text-[var(--mc-accent)] text-xs uppercase tracking-widest hover:text-[var(--mc-accent-2)] transition-colors flex items-center gap-2 cursor-pointer">
-                    Explore <ChevronRight size={14} />
-                  </Link>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link href="/services"
-              className="border border-[var(--mc-accent)] text-[var(--mc-accent)] px-10 py-4 uppercase tracking-widest text-sm hover:bg-[var(--mc-accent)] hover:text-black transition-all duration-300 cursor-pointer">
-              View Full Menu & Pricing
-            </Link>
-          </div>
-        </div>
-      </section>
-
       <SectionDivider />
 
       <ResultsGallery />

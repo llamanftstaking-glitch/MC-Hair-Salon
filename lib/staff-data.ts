@@ -66,10 +66,10 @@ const STAFF: StaffMember[] = [
     portfolio: [],
   },
   {
-    id: "isabella",
-    name: "Isabella",
+    id: "dhariani",
+    name: "Dhariani",
     role: "Makeup Artist",
-    bio: "Isabella is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry, she tailors every look to your unique features and personal style.",
+    bio: "Dhariani is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry, she tailors every look to your unique features and personal style.",
     specialties: ["Bridal Makeup", "Eye Makeup", "Lashes", "Makeup Lessons"],
     image: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
     portfolio: [],

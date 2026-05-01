@@ -48,7 +48,7 @@ const SERVICES = [
   "Other (specify in notes)",
 ];
 
-const STYLISTS = ["No preference", "Maria", "Meagan", "Sally", "Kato", "Juany", "Isabella"];
+const STYLISTS = ["No preference", "Maria", "Meagan", "Sally", "Kato", "Juany", "Dhariani"];
 
 const TIME_SLOTS = [
   "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",

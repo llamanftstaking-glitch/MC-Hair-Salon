@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Meet Our Team",
   description:
-    "Meet the stylists at MC Hair Salon & Spa — Upper East Side NYC. Kato, Megan, Sofia, Marcus & Isabella. Expert cuts, color, lashes & makeup.",
+    "Meet the stylists at MC Hair Salon & Spa — Upper East Side NYC. Kato, Megan, Sofia, Marcus & Dhariani. Expert cuts, color, lashes & makeup.",
   keywords: [
     "hair stylist Upper East Side NYC", "balayage specialist Manhattan",
     "best hair colorist NYC", "makeup artist Upper East Side",

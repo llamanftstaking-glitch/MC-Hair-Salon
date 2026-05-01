@@ -54,13 +54,13 @@ export const SERVICES = [
   {
     category: "Makeup",
     icon: "brush",
-    tagline: "Editorial precision meets wearable luxury — by resident artist Isabella.",
+    tagline: "Editorial precision meets wearable luxury — by resident artist Dhariani.",
     items: [
-      { name: "Makeup Application", price: 125, priceLabel: "$125+", description: "Full face application by Isabella — foundation matched to your undertone, contouring, eye design, and lip color. Perfect for date nights, professional portraits, events, or simply a night out." },
+      { name: "Makeup Application", price: 125, priceLabel: "$125+", description: "Full face application by Dhariani — foundation matched to your undertone, contouring, eye design, and lip color. Perfect for date nights, professional portraits, events, or simply a night out." },
       { name: "Bridal Makeup", price: 250, priceLabel: "$250", description: "Wedding day looks designed to photograph beautifully, last through tears and dancing, and feel like you — just the most radiant version. Trial session strongly recommended 4–6 weeks before." },
       { name: "Eye Makeup", price: 75, priceLabel: "$75", description: "Focused eye artistry — eyeshadow, liner, and lash application tailored to your eye shape and occasion. Perfect as a standalone service or paired with your own base." },
       { name: "Lashes", price: 25, priceLabel: "$25+", description: "Individual or strip lash application for added volume, length, and drama. Choose from natural to full-glam styles. Add-on or standalone service." },
-      { name: "Makeup Lesson (1 hr)", price: 150, priceLabel: "$150+", description: "One-on-one coaching session with Isabella. Learn your ideal foundation formula, contouring for your specific bone structure, and receive personalized product recommendations to take home." },
+      { name: "Makeup Lesson (1 hr)", price: 150, priceLabel: "$150+", description: "One-on-one coaching session with Dhariani. Learn your ideal foundation formula, contouring for your specific bone structure, and receive personalized product recommendations to take home." },
     ],
   },
 ];
@@ -102,9 +102,9 @@ export const TEAM = [
     image: "/instagram/mchairsalonspa_1708007392_3303327885522806092_509340228.jpg",
   },
   {
-    name: "Isabella",
+    name: "Dhariani",
     role: "Makeup Artist",
-    bio: "Isabella is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry, she tailors every look to your unique features and personal style.",
+    bio: "Dhariani is MC's in-house beauty expert, bringing editorial precision to every look. From subtle everyday glam to showstopping bridal artistry, she tailors every look to your unique features and personal style.",
     specialties: ["Bridal Makeup", "Eye Makeup", "Lashes", "Makeup Lessons"],
     image: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg",
     isMakeupArtist: true,
@@ -167,7 +167,7 @@ export const PACKAGES: PackageDef[] = [
     price: 500,
     originalValue: 625,
     sessions: 5,
-    services: ["5 × Makeup Application by Isabella"],
+    services: ["5 × Makeup Application by Dhariani"],
     highlight: "Save $125 — events, date nights, and more",
     validityDays: 365,
   },
@@ -244,7 +244,7 @@ export const WEDDING_TESTIMONIALS = [
   {
     name: "Danielle R.",
     wedding: "June 2023",
-    review: "Isabella's bridal makeup was flawless. We did a trial 6 weeks before and she nailed my vision on the first try. I looked like myself — but the most radiant version. Cannot recommend enough.",
+    review: "Dhariani's bridal makeup was flawless. We did a trial 6 weeks before and she nailed my vision on the first try. I looked like myself — but the most radiant version. Cannot recommend enough.",
     rating: 5,
   },
   {
@@ -271,7 +271,7 @@ export const WEDDING_GALLERY = [
 ];
 
 export const MAKEUP_GALLERY = [
-  { src: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg", alt: "Makeup artistry by Isabella", label: "Glam" },
+  { src: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg", alt: "Makeup artistry by Dhariani", label: "Glam" },
   { src: "/instagram/mchairsalonspa_1594335004_2349774783581733215_509340228.jpg", alt: "Special event look", label: "Event" },
   { src: "/instagram/mchairsalonspa_1584025690_2263293995516827575_509340228.jpg", alt: "Bridal makeup", label: "Bridal" },
   { src: "/instagram/mchairsalonspa_1583862336_2261923681251816316_509340228.jpg", alt: "Editorial makeup look", label: "Editorial" },
@@ -294,10 +294,10 @@ export const GALLERY_IMAGES = [
   { src: "/instagram/mchairsalonspa_1605369692_2442340457025232327_509340228.jpg", alt: "Sun-kissed balayage highlights result Upper East Side salon" },
   { src: "/instagram/mchairsalonspa_1599674928_2394569313405054579_509340228.jpg", alt: "Professional blowout and style at MC Hair Salon Upper East Side" },
   { src: "/instagram/mchairsalonspa_1597866646_2379400348672402563_509340228.jpg", alt: "Hair color transformation at MC Hair Salon & Spa Manhattan" },
-  { src: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg", alt: "Makeup artistry by Isabella at MC Hair Salon Upper East Side" },
+  { src: "/instagram/mchairsalonspa_1595346452_2358259426203129087_509340228.jpg", alt: "Makeup artistry by Dhariani at MC Hair Salon Upper East Side" },
   { src: "/instagram/mchairsalonspa_1594335004_2349774783581733215_509340228.jpg", alt: "Special event glam makeup at MC Hair Salon & Spa NYC" },
   { src: "/instagram/mchairsalonspa_1584025690_2263293995516827575_509340228.jpg", alt: "Bridal makeup trial result at MC Hair Salon New York" },
-  { src: "/instagram/mchairsalonspa_1583862336_2261923681251816316_509340228.jpg", alt: "Editorial makeup look by Isabella at MC Hair Salon Upper East Side" },
+  { src: "/instagram/mchairsalonspa_1583862336_2261923681251816316_509340228.jpg", alt: "Editorial makeup look by Dhariani at MC Hair Salon Upper East Side" },
   { src: "/instagram/mchairsalonspa_1583176666_2256171862533820128_509340228.jpg", alt: "Natural glam makeup application at MC Hair Salon & Spa NYC" },
   { src: "/instagram/mchairsalonspa_1581106935_2238809697447493007_509340228.jpg", alt: "Airbrush makeup finish for special event at MC Hair Salon" },
   { src: "/instagram/mchairsalonspa_1579289740_2223565962392628495_509340228.jpg", alt: "Smoky eye glam makeup at MC Hair Salon Upper East Side NYC" },
@@ -368,7 +368,7 @@ export const TESTIMONIALS = [
   {
     name: "Christine M.",
     rating: 5,
-    text: "Booked MC for my wedding party — five people, hair and makeup. Everything ran on schedule (a genuine miracle), Isabella matched each bridesmaid's skin tone perfectly, and Kato's updo survived a six-hour reception without a single pin falling. My mother-in-law, who is notoriously hard to impress, asked for the team's card before we left.",
+    text: "Booked MC for my wedding party — five people, hair and makeup. Everything ran on schedule (a genuine miracle), Dhariani matched each bridesmaid's skin tone perfectly, and Kato's updo survived a six-hour reception without a single pin falling. My mother-in-law, who is notoriously hard to impress, asked for the team's card before we left.",
     service: "Bridal Party Hair & Makeup",
     date: "October 2024",
   },

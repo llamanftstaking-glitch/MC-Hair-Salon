@@ -39,7 +39,7 @@ const ABOUT_FAQ = [
   },
   {
     q: "Who are the stylists at MC Hair Salon?",
-    a: "Our team includes Kato (Master Stylist, specializing in precision cuts and advanced color), Megan (Senior Stylist & Color Expert, L'Oréal certified), Sofia (Spa Specialist, lash extensions and facials), Marcus (Men's Grooming Expert), and Isabella (Resident Makeup Artist, specializing in bridal and airbrush). Each stylist has years of experience in their specialty.",
+    a: "Our team includes Kato (Master Stylist, specializing in precision cuts and advanced color), Megan (Senior Stylist & Color Expert, L'Oréal certified), Sofia (Spa Specialist, lash extensions and facials), Marcus (Men's Grooming Expert), and Dhariani (Resident Makeup Artist, specializing in bridal and airbrush). Each stylist has years of experience in their specialty.",
   },
   {
     q: "Does MC Hair Salon accept walk-ins?",
@@ -51,7 +51,7 @@ const ABOUT_FAQ = [
   },
   {
     q: "Does MC Hair Salon offer bridal and event services?",
-    a: "Yes — bridal and special event services are one of our signature offerings. We provide full bridal packages including hair styling, updos, makeup, and spa treatments for the entire wedding party. Our in-house makeup artist Isabella specializes in bridal looks, and we offer trial sessions to ensure your look is perfect on the day.",
+    a: "Yes — bridal and special event services are one of our signature offerings. We provide full bridal packages including hair styling, updos, makeup, and spa treatments for the entire wedding party. Our in-house makeup artist Dhariani specializes in bridal looks, and we offer trial sessions to ensure your look is perfect on the day.",
   },
 ];
 
@@ -236,7 +236,7 @@ export default function AboutPage() {
             <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2">Our People</p>
             <h2 className="font-serif text-2xl font-bold text-white mb-2">Meet the Team</h2>
             <p className="text-[#555] text-sm leading-relaxed max-w-sm">
-              Kato, Megan, Sofia, Marcus, and Isabella — five specialists with one shared commitment
+              Kato, Megan, Sofia, Marcus, and Dhariani — five specialists with one shared commitment
               to your best look.
             </p>
           </div>

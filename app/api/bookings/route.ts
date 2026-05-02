@@ -103,6 +103,14 @@ export async function PATCH(req: NextRequest) {
       updated = all.find(b => b.id === id) ?? { id, status } as Parameters<typeof sendBookingConfirmedEmail>[0];
     }
 
+    // Auto-deduct inventory when service is confirmed
+    if (status === "confirmed" && updated && "service" in updated) {
+      import("@/lib/inventory").then(({ deductServiceInventory }) =>
+        deductServiceInventory((updated as { service: string }).service, id)
+          .catch(e => console.error("[bookings] Inventory deduct failed:", e))
+      );
+    }
+
     // Auto-send emails on status transitions
     if (status === "confirmed") {
       sendBookingConfirmedEmail(updated as Parameters<typeof sendBookingConfirmedEmail>[0]).catch(e =>

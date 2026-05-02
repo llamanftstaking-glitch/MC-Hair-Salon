@@ -11,9 +11,10 @@ import {
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
 import TimeClockTab from "./TimeClockTab";
+import InventoryTab from "./InventoryTab";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-type Tab = "reservations" | "clients" | "newsletter" | "reports" | "messages" | "staff" | "settings" | "rewards" | "users" | "timeclock";
+type Tab = "reservations" | "clients" | "newsletter" | "reports" | "messages" | "staff" | "settings" | "rewards" | "users" | "timeclock" | "inventory";
 
 interface RewardCustomer {
   id: string;
@@ -409,6 +410,7 @@ export default function AdminPage() {
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
     { id: "reservations", label: "Reservations", icon: <Calendar size={15} /> },
     { id: "timeclock",    label: "Time Clock",   icon: <Clock size={15} /> },
+    { id: "inventory",   label: "Inventory",    icon: <QrCode size={15} /> },
     { id: "clients",      label: "Clients",      icon: <Users size={15} /> },
     { id: "rewards",      label: "Rewards",      icon: <Gift size={15} /> },
     { id: "messages",     label: "Messages",     icon: <MessageSquare size={15} />, badge: unreadMessages },
@@ -966,6 +968,7 @@ export default function AdminPage() {
 
         {/* ── TIME CLOCK ───────────────────────────────────────────────────── */}
         {tab === "timeclock" && <TimeClockTab />}
+        {tab === "inventory" && <InventoryTab />}
 
         {/* ── MESSAGES ─────────────────────────────────────────────────────── */}
         {tab === "messages" && (

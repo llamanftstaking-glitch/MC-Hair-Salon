@@ -176,6 +176,41 @@ export const rateLimits = pgTable("rate_limits", {
   windowStart: bigint("window_start", { mode: "number" }).notNull().default(0),
 });
 
+// ── products ──────────────────────────────────────────────────────────────────
+export const products = pgTable("products", {
+  id:           text("id").primaryKey(),
+  name:         text("name").notNull(),
+  brand:        text("brand"),
+  category:     text("category").notNull().default("general"),
+  sku:          text("sku"),
+  costPrice:    real("cost_price").notNull().default(0),
+  retailPrice:  real("retail_price"),
+  unit:         text("unit").notNull().default("each"),
+  currentStock: real("current_stock").notNull().default(0),
+  minStock:     real("min_stock").notNull().default(1),
+  vendor:       text("vendor"),
+  notes:        text("notes"),
+  isActive:     boolean("is_active").notNull().default(true),
+  createdAt:    text("created_at").notNull(),
+  updatedAt:    text("updated_at").notNull(),
+  serviceUsage: jsonb("service_usage").$type<{ service: string; qty: number }[]>().default([]),
+});
+
+// ── inventory_transactions ─────────────────────────────────────────────────────
+export const inventoryTransactions = pgTable("inventory_transactions", {
+  id:          text("id").primaryKey(),
+  productId:   text("product_id").notNull(),
+  productName: text("product_name").notNull(),
+  type:        text("type").notNull(), // received | used | sold | adjustment | waste
+  quantity:    real("quantity").notNull(),
+  date:        text("date").notNull(),
+  staffName:   text("staff_name"),
+  bookingId:   text("booking_id"),
+  notes:       text("notes"),
+  costAtTime:  real("cost_at_time"),
+  createdAt:   text("created_at").notNull(),
+});
+
 // ── time_entries ──────────────────────────────────────────────────────────────
 export const timeEntries = pgTable("time_entries", {
   id:        text("id").primaryKey(),

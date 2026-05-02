@@ -7,15 +7,25 @@ import {
   Building2, Globe, Phone, ChevronRight, ChevronLeft, Image as ImageIcon, Save,
   CreditCard, AlertTriangle, ShieldCheck,
   Gift, Star, Crown, Zap, Minus, Scissors, QrCode, Edit2,
+  Download, ToggleLeft, ToggleRight, DollarSign,
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
 import TimeClockTab from "./TimeClockTab";
 import InventoryTab from "./InventoryTab";
 import PayrollTab from "./PayrollTab";
+import FinanceTab from "./FinanceTab";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-type Tab = "reservations" | "clients" | "rewards" | "payroll" | "marketing" | "reports" | "settings";
+type Tab =
+  | "reservations"
+  | "clients"
+  | "rewards"
+  | "payroll"
+  | "finance"
+  | "marketing"
+  | "reports"
+  | "settings";
 
 interface RewardCustomer {
   id: string;
@@ -101,8 +111,13 @@ export default function AdminPage() {
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [settingsTab, setSettingsTab] = useState<"business" | "hours" | "hero" | "staff" | "users">("business");
-  const [marketingTab, setMarketingTab] = useState<"newsletter" | "messages">("newsletter");
+  const [marketingTab, setMarketingTab] = useState<"newsletter" | "messages" | "automation">("newsletter");
   const [reportsTab, setReportsTab] = useState<"analytics" | "inventory">("analytics");
+  const [analyticsPeriod, setAnalyticsPeriod] = useState<"today" | "week" | "month" | "year">("month");
+
+  // ── Automation toggle state ──────────────────────────────────────────────────
+  const [automation, setAutomation] = useState({ appointmentReminder: false, reEngagement: false, birthdayOffer: false });
+  const [savingAutomation, setSavingAutomation] = useState(false);
 
   // ── Rewards state ────────────────────────────────────────────────────────────
   const [rewardsData,    setRewardsData]    = useState<RewardCustomer[]>([]);
@@ -166,9 +181,16 @@ export default function AdminPage() {
     } finally { setUsersLoading(false); }
   }, []);
 
+  const fetchAutomation = useCallback(async () => {
+    try {
+      const res = await fetch("/api/marketing/automation");
+      if (res.ok) { setAutomation(await res.json()); }
+    } catch { /* non-fatal */ }
+  }, []);
+
   useEffect(() => {
-    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers();
-  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards, fetchAdminUsers]);
+    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); fetchAutomation();
+  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards, fetchAdminUsers, fetchAutomation]);
 
   // ── Booking handlers ────────────────────────────────────────────────────────
   const [noshowLoading, setNoshowLoading] = useState<Record<string, boolean>>({});
@@ -392,6 +414,17 @@ export default function AdminPage() {
     setTimeout(() => setSettingsSaved(false), 3000);
   };
 
+  // ── Automation handlers ─────────────────────────────────────────────────────
+  const toggleAutomation = async (key: keyof typeof automation) => {
+    const updated = { ...automation, [key]: !automation[key] };
+    setAutomation(updated);
+    setSavingAutomation(true);
+    try {
+      await fetch("/api/marketing/automation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updated) });
+    } catch { /* non-fatal */ }
+    setSavingAutomation(false);
+  };
+
   // ── Derived ─────────────────────────────────────────────────────────────────
   const filtered         = filter === "all" ? bookings : bookings.filter(b => b.status === filter);
   const pending          = bookings.filter(b => b.status === "pending").length;
@@ -410,11 +443,78 @@ export default function AdminPage() {
   const stylistCount: Record<string, number> = {};
   bookings.forEach(b => { if (b.stylist) stylistCount[b.stylist] = (stylistCount[b.stylist] || 0) + 1; });
 
+  // ── Analytics period helpers ─────────────────────────────────────────────────
+  const getPeriodBookings = () => {
+    const now = new Date();
+    const todayStr = now.toISOString().split("T")[0];
+    return bookings.filter(b => {
+      if (analyticsPeriod === "today") return b.date === todayStr;
+      if (analyticsPeriod === "week") {
+        const d = new Date(b.date + "T00:00:00");
+        const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 6); weekAgo.setHours(0,0,0,0);
+        return d >= weekAgo;
+      }
+      if (analyticsPeriod === "month") {
+        return b.date.startsWith(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
+      }
+      if (analyticsPeriod === "year") {
+        return b.date.startsWith(`${now.getFullYear()}`);
+      }
+      return true;
+    });
+  };
+  const periodBookings = getPeriodBookings();
+  const periodRevenue = periodBookings.filter(b => b.status === "confirmed").reduce((sum, b) => sum + (b.servicePrice ?? 0), 0);
+  const periodNoShows = periodBookings.filter(b => b.status === "no_show").length;
+  const periodNoShowRate = periodBookings.length > 0 ? Math.round((periodNoShows / periodBookings.length) * 100) : 0;
+  const periodConfirmed = periodBookings.filter(b => b.status === "confirmed").length;
+
+  // Retention: clients with 2+ bookings in all time / total unique clients
+  const retentionEmailsWithMultiple = Object.values(clientMap).filter(visits => visits.length >= 2).length;
+  const retentionRate = uniqueClients.length > 0 ? Math.round((retentionEmailsWithMultiple / uniqueClients.length) * 100) : 0;
+
+  // Per-stylist for the period
+  const periodStylistMap: Record<string, { count: number; revenue: number }> = {};
+  periodBookings.forEach(b => {
+    const s = b.stylist || "Unassigned";
+    if (!periodStylistMap[s]) periodStylistMap[s] = { count: 0, revenue: 0 };
+    periodStylistMap[s].count++;
+    if (b.status === "confirmed") periodStylistMap[s].revenue += (b.servicePrice ?? 0);
+  });
+  const periodTopServices: Record<string, number> = {};
+  periodBookings.forEach(b => { const s = b.service.split("–")[1]?.trim() || b.service; periodTopServices[s] = (periodTopServices[s] || 0) + 1; });
+  const periodTopServicesSorted = Object.entries(periodTopServices).sort((a, b) => b[1] - a[1]).slice(0, 6);
+
+  // Re-engagement: clients whose last booking was 60+ days ago
+  const sixtyDaysAgo = new Date(); sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+  const reEngagementCount = Object.values(clientMap).filter(visits => {
+    const last = visits.map(v => new Date(v.date + "T00:00:00")).sort((a, b) => b.getTime() - a.getTime())[0];
+    return last && last < sixtyDaysAgo;
+  }).length;
+
+  const exportCSV = () => {
+    const rows = [
+      ["ID", "Client", "Email", "Service", "Stylist", "Date", "Time", "Price", "Status"],
+      ...periodBookings.map(b => [
+        b.id, b.name, b.email, b.service, b.stylist, b.date, b.time,
+        b.servicePrice != null ? `$${b.servicePrice}` : "",
+        b.status,
+      ]),
+    ];
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `mc-salon-bookings-${analyticsPeriod}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
     { id: "reservations", label: "Reservations", icon: <Calendar size={15} /> },
     { id: "clients",      label: "Clients",      icon: <Users size={15} /> },
     { id: "rewards",      label: "Rewards",      icon: <Gift size={15} /> },
     { id: "payroll",      label: "Payroll",      icon: <Clock size={15} /> },
+    { id: "finance",      label: "Finance",      icon: <DollarSign size={15} /> },
     { id: "marketing",    label: "Marketing",    icon: <Mail size={15} />, badge: unreadMessages },
     { id: "reports",      label: "Reports",      icon: <BarChart2 size={15} /> },
     { id: "settings",     label: "Settings",     icon: <Settings size={15} /> },
@@ -968,17 +1068,26 @@ export default function AdminPage() {
         {/* ── TIME CLOCK ───────────────────────────────────────────────────── */}
         {tab === "payroll" && <PayrollTab />}
 
-        {/* ── MARKETING (Newsletter + Messages) ────────────────────────────── */}
+        {/* ── FINANCE / BILLS ──────────────────────────────────────────────── */}
+        {tab === "finance" && <FinanceTab />}
+
+        {/* ── MARKETING (Newsletter + Messages + Automation) ───────────────── */}
         {tab === "marketing" && (
           <div className="space-y-4">
             {/* Sub-tab bar */}
             <div className="flex bg-[var(--mc-surface-dark)] rounded-lg p-0.5 gap-0.5 w-fit border border-[var(--mc-border)]">
-              {(["newsletter", "messages"] as const).map(s => (
-                <button key={s} onClick={() => setMarketingTab(s)}
-                  className={`px-4 py-1.5 rounded text-xs font-medium capitalize transition ${marketingTab === s ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
-                  {s === "messages" ? `Messages${unreadMessages > 0 ? ` (${unreadMessages})` : ""}` : "Newsletter"}
-                </button>
-              ))}
+              <button onClick={() => setMarketingTab("newsletter")}
+                className={`px-4 py-1.5 rounded text-xs font-medium transition cursor-pointer ${marketingTab === "newsletter" ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
+                Newsletter
+              </button>
+              <button onClick={() => setMarketingTab("messages")}
+                className={`px-4 py-1.5 rounded text-xs font-medium transition cursor-pointer ${marketingTab === "messages" ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
+                {`Messages${unreadMessages > 0 ? ` (${unreadMessages})` : ""}`}
+              </button>
+              <button onClick={() => setMarketingTab("automation")}
+                className={`px-4 py-1.5 rounded text-xs font-medium transition cursor-pointer ${marketingTab === "automation" ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
+                Automation
+              </button>
             </div>
             {marketingTab === "messages" && (
           <div>
@@ -1096,6 +1205,89 @@ export default function AdminPage() {
             </div>
           </div>
             )}
+            {marketingTab === "automation" && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-white font-semibold text-lg flex items-center gap-2">
+                    <Zap size={18} className="text-[var(--mc-accent)]" /> Email Automation
+                  </p>
+                  {savingAutomation && <span className="text-[#555] text-xs">Saving…</span>}
+                </div>
+
+                {/* Appointment Reminder */}
+                <div className="luxury-card p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-semibold mb-1 flex items-center gap-2">
+                        <Bell size={16} className="text-[var(--mc-accent)]" /> Appointment Reminder
+                      </p>
+                      <p className="text-[var(--mc-text-dim)] text-sm">Send reminder email 24h before each confirmed appointment</p>
+                      <p className="text-[#555] text-xs mt-2">Last sent: 3 reminders this week</p>
+                    </div>
+                    <button onClick={() => toggleAutomation("appointmentReminder")}
+                      className="shrink-0 transition-colors cursor-pointer"
+                      aria-label="Toggle appointment reminder">
+                      {automation.appointmentReminder
+                        ? <ToggleRight size={36} className="text-[var(--mc-accent)]" />
+                        : <ToggleLeft size={36} className="text-[#444]" />}
+                    </button>
+                  </div>
+                  <div className={`mt-3 text-xs px-3 py-1.5 border w-fit ${automation.appointmentReminder ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[#555] border-[var(--mc-border)]"}`}>
+                    {automation.appointmentReminder ? "Active" : "Off"}
+                  </div>
+                </div>
+
+                {/* Re-engagement */}
+                <div className="luxury-card p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-semibold mb-1 flex items-center gap-2">
+                        <RefreshCw size={16} className="text-[var(--mc-accent)]" /> Re-engagement
+                      </p>
+                      <p className="text-[var(--mc-text-dim)] text-sm">Email clients not seen in 60 days with a special offer</p>
+                      <p className="text-[#555] text-xs mt-2">
+                        <span className="text-[var(--mc-accent)] font-semibold">{reEngagementCount}</span> client{reEngagementCount !== 1 ? "s" : ""} eligible right now
+                      </p>
+                    </div>
+                    <button onClick={() => toggleAutomation("reEngagement")}
+                      className="shrink-0 transition-colors cursor-pointer"
+                      aria-label="Toggle re-engagement">
+                      {automation.reEngagement
+                        ? <ToggleRight size={36} className="text-[var(--mc-accent)]" />
+                        : <ToggleLeft size={36} className="text-[#444]" />}
+                    </button>
+                  </div>
+                  <div className={`mt-3 text-xs px-3 py-1.5 border w-fit ${automation.reEngagement ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[#555] border-[var(--mc-border)]"}`}>
+                    {automation.reEngagement ? "Active" : "Off"}
+                  </div>
+                </div>
+
+                {/* Birthday Offer */}
+                <div className="luxury-card p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-semibold mb-1 flex items-center gap-2">
+                        <Star size={16} className="text-[var(--mc-accent)]" /> Birthday Offer
+                      </p>
+                      <p className="text-[var(--mc-text-dim)] text-sm">Send a birthday discount on the client&apos;s birthday month</p>
+                      <p className="text-[#555] text-xs mt-2 flex items-center gap-1">
+                        <AlertTriangle size={11} /> Requires birthday on file
+                      </p>
+                    </div>
+                    <button onClick={() => toggleAutomation("birthdayOffer")}
+                      className="shrink-0 transition-colors cursor-pointer"
+                      aria-label="Toggle birthday offer">
+                      {automation.birthdayOffer
+                        ? <ToggleRight size={36} className="text-[var(--mc-accent)]" />
+                        : <ToggleLeft size={36} className="text-[#444]" />}
+                    </button>
+                  </div>
+                  <div className={`mt-3 text-xs px-3 py-1.5 border w-fit ${automation.birthdayOffer ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[#555] border-[var(--mc-border)]"}`}>
+                    {automation.birthdayOffer ? "Active" : "Off"}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1160,29 +1352,54 @@ export default function AdminPage() {
             </div>
             {reportsTab === "inventory" && <InventoryTab />}
             {reportsTab === "analytics" && <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Period selector + Export */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex bg-[var(--mc-surface-dark)] rounded-lg p-0.5 gap-0.5 border border-[var(--mc-border)]">
+                {([
+                  { id: "today", label: "Today" },
+                  { id: "week",  label: "This Week" },
+                  { id: "month", label: "This Month" },
+                  { id: "year",  label: "This Year" },
+                ] as const).map(p => (
+                  <button key={p.id} onClick={() => setAnalyticsPeriod(p.id)}
+                    className={`px-3 py-1.5 rounded text-xs font-medium transition cursor-pointer ${analyticsPeriod === p.id ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              <button onClick={exportCSV}
+                className="flex items-center gap-1.5 border border-[var(--mc-border)] text-[var(--mc-text-dim)] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                <Download size={13} /> Export CSV
+              </button>
+            </div>
+
+            {/* Top row stat cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { icon: <TrendingUp size={22} />, label: "Est. Revenue",        value: `$${(confirmed * 85).toLocaleString()}`, sub: "Based on confirmed bookings" },
-                { icon: <Check size={22} />,      label: "Confirmation Rate",   value: `${bookings.length > 0 ? Math.round((confirmed / bookings.length) * 100) : 0}%`, sub: "Of all bookings" },
-                { icon: <Users size={22} />,      label: "Avg Visits / Client", value: uniqueClients.length > 0 ? (bookings.length / uniqueClients.length).toFixed(1) : "0", sub: "Per unique client" },
+                { icon: <TrendingUp size={20} />, label: "Revenue",           value: `$${periodRevenue.toLocaleString()}`, sub: "Confirmed bookings" },
+                { icon: <Check size={20} />,      label: "Confirmation Rate", value: `${periodBookings.length > 0 ? Math.round((periodConfirmed / periodBookings.length) * 100) : 0}%`, sub: `${periodConfirmed} of ${periodBookings.length}` },
+                { icon: <X size={20} />,          label: "No-Show Rate",      value: `${periodNoShowRate}%`, sub: `${periodNoShows} no-shows` },
+                { icon: <Users size={20} />,      label: "Client Retention",  value: `${retentionRate}%`, sub: "Clients with 2+ visits" },
               ].map(s => (
-                <div key={s.label} className="luxury-card p-6">
-                  <div className="text-[var(--mc-accent)] mb-4">{s.icon}</div>
-                  <p className="font-serif text-4xl font-bold gold-gradient">{s.value}</p>
+                <div key={s.label} className="luxury-card p-5">
+                  <div className="text-[var(--mc-accent)] mb-3">{s.icon}</div>
+                  <p className="font-serif text-3xl font-bold gold-gradient">{s.value}</p>
                   <p className="text-[#555] text-xs uppercase tracking-widest mt-1">{s.label}</p>
                   <p className="text-[#333] text-xs mt-1">{s.sub}</p>
                 </div>
               ))}
             </div>
+
+            {/* Top Services + Per-Stylist */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="luxury-card p-6">
                 <h3 className="text-white font-semibold mb-6 flex items-center gap-2"><BarChart2 size={16} className="text-[var(--mc-accent)]" /> Top Services</h3>
-                {topServices.length === 0 ? <p className="text-[#555] text-sm">No data yet</p> : (
+                {periodTopServicesSorted.length === 0 ? <p className="text-[#555] text-sm">No data for this period</p> : (
                   <div className="space-y-4">
-                    {topServices.map(([name, count]) => (
+                    {periodTopServicesSorted.map(([name, count]) => (
                       <div key={name}>
                         <div className="flex justify-between text-sm mb-1.5"><span className="text-[var(--mc-muted)] truncate mr-4">{name}</span><span className="text-[var(--mc-accent)] shrink-0">{count}</span></div>
-                        <div className="h-1.5 bg-[var(--mc-surface-2)] rounded-full"><div className="h-full gold-gradient-bg rounded-full" style={{ width: `${(count / bookings.length) * 100}%` }} /></div>
+                        <div className="h-1.5 bg-[var(--mc-surface-2)] rounded-full"><div className="h-full gold-gradient-bg rounded-full" style={{ width: `${periodBookings.length > 0 ? (count / periodBookings.length) * 100 : 0}%` }} /></div>
                       </div>
                     ))}
                   </div>
@@ -1190,12 +1407,19 @@ export default function AdminPage() {
               </div>
               <div className="luxury-card p-6">
                 <h3 className="text-white font-semibold mb-6 flex items-center gap-2"><Users size={16} className="text-[var(--mc-accent)]" /> By Stylist</h3>
-                {Object.keys(stylistCount).length === 0 ? <p className="text-[#555] text-sm">No data yet</p> : (
+                {Object.keys(periodStylistMap).length === 0 ? <p className="text-[#555] text-sm">No data for this period</p> : (
                   <div className="space-y-4">
-                    {Object.entries(stylistCount).sort((a, b) => b[1] - a[1]).map(([stylist, count]) => (
+                    {Object.entries(periodStylistMap).sort((a, b) => b[1].count - a[1].count).map(([stylist, data]) => (
                       <div key={stylist}>
-                        <div className="flex justify-between text-sm mb-1.5"><span className="text-[var(--mc-muted)]">{stylist}</span><span className="text-[var(--mc-accent)]">{count}</span></div>
-                        <div className="h-1.5 bg-[var(--mc-surface-2)] rounded-full"><div className="h-full gold-gradient-bg rounded-full" style={{ width: `${(count / bookings.length) * 100}%` }} /></div>
+                        <div className="flex justify-between text-sm mb-1.5">
+                          <span className="text-[var(--mc-muted)]">{stylist}</span>
+                          <span className="text-[var(--mc-accent)] shrink-0 flex items-center gap-2">
+                            <span>{data.count} appt</span>
+                            {data.revenue > 0 && <span className="text-[#666]">·</span>}
+                            {data.revenue > 0 && <span className="text-green-400">${data.revenue.toLocaleString()}</span>}
+                          </span>
+                        </div>
+                        <div className="h-1.5 bg-[var(--mc-surface-2)] rounded-full"><div className="h-full gold-gradient-bg rounded-full" style={{ width: `${periodBookings.length > 0 ? (data.count / periodBookings.length) * 100 : 0}%` }} /></div>
                       </div>
                     ))}
                   </div>

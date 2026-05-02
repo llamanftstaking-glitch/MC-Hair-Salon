@@ -80,12 +80,14 @@ function VideoColumn({ startIdx, swapEvery }: { startIdx: number; swapEvery: num
   );
 }
 
+const SERVICES = ["Hair", "Color", "Balayage", "Blowouts", "Lash Extensions", "Facials", "Makeup"];
+
 export default function HeroLogo() {
   return (
-    <section className="mc-hero relative flex flex-col items-center justify-center overflow-hidden bg-black mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)] max-w-[100vw]">
+    <section className="mc-hero relative flex flex-col items-center md:justify-center overflow-hidden bg-black mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)] max-w-[100vw]">
 
-      {/* ── 3-column video background ── */}
-      <div className="absolute inset-0 flex">
+      {/* ══════════════ DESKTOP: 3-column full-height bg ══════════════ */}
+      <div className="absolute inset-0 hidden md:flex">
         <div className="flex-1 relative border-r border-white/[0.06]">
           <VideoColumn startIdx={0} swapEvery={10000} />
         </div>
@@ -97,100 +99,129 @@ export default function HeroLogo() {
         </div>
       </div>
 
-      {/* ── Gradient overlays ── */}
-      <div
-        className="absolute inset-0 pointer-events-none hidden sm:block"
-        style={{
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.30) 30%, rgba(0,0,0,0.30) 60%, rgba(0,0,0,0.75) 100%)",
-        }}
-      />
-      <div
-        className="absolute inset-0 pointer-events-none sm:hidden"
-        style={{
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.55) 18%, rgba(0,0,0,0.90) 32%, rgba(0,0,0,1) 45%)",
-        }}
-      />
-      <div
-        className="absolute inset-0 pointer-events-none hidden sm:block"
-        style={{ background: "radial-gradient(ellipse 70% 50% at 50% 38%, var(--mc-hero-glow) 0%, transparent 70%)" }}
-      />
+      {/* Desktop gradient overlays */}
+      <div className="absolute inset-0 pointer-events-none hidden md:block"
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.30) 30%, rgba(0,0,0,0.30) 60%, rgba(0,0,0,0.75) 100%)" }} />
+      <div className="absolute inset-0 pointer-events-none hidden md:block"
+        style={{ background: "radial-gradient(ellipse 70% 50% at 50% 38%, var(--mc-hero-glow) 0%, transparent 70%)" }} />
 
-      {/* ── Content ── */}
-      <div className="relative z-10 flex flex-col items-center py-8 sm:py-12 px-4 text-center w-full max-w-full">
-
-        <div className="relative w-36 h-36 sm:w-56 sm:h-56 md:w-72 md:h-72">
+      {/* Desktop content */}
+      <div className="relative z-10 hidden md:flex flex-col items-center py-12 px-4 text-center w-full max-w-full">
+        <div className="relative w-72 h-72">
           <Image src="/mc-logo-bw.png"    alt="MC Hair Salon & Spa" fill className="logo-bw    object-contain" priority />
           <Image src="/mc-logo-black.png" alt="MC Hair Salon & Spa" fill className="logo-light object-contain" priority />
         </div>
-
-        <div
-          className="mt-6 sm:mt-10 h-px w-32"
-          style={{ background: "linear-gradient(90deg, transparent, var(--mc-accent), transparent)" }}
-        />
-
-        <p className="uppercase tracking-[0.3em] sm:tracking-[0.5em] text-[10px] sm:text-xs font-semibold mt-4 sm:mt-6"
-          style={{ color: "var(--mc-accent)" }}>
+        <div className="mt-10 h-px w-32"
+          style={{ background: "linear-gradient(90deg, transparent, var(--mc-accent), transparent)" }} />
+        <p className="uppercase tracking-[0.5em] text-xs font-semibold mt-6" style={{ color: "var(--mc-accent)" }}>
           Upper East Side · New York City · Est. 2011
         </p>
-
-        <h1 className="font-serif font-bold mt-4 sm:mt-6 leading-[1.25] px-4 w-full">
-          <span className="gold-gradient block text-5xl sm:text-6xl md:text-8xl pb-4">Every Service.</span>
-          <span className="gold-gradient block text-5xl sm:text-6xl md:text-8xl">One Studio.</span>
+        <h1 className="font-serif font-bold mt-6 leading-[1.25] px-4 w-full">
+          <span className="gold-gradient block text-6xl md:text-8xl pb-4">Every Service.</span>
+          <span className="gold-gradient block text-6xl md:text-8xl">One Studio.</span>
         </h1>
-
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mt-8 max-w-xl">
-          {["Hair", "Color", "Balayage", "Blowouts", "Lash Extensions", "Facials", "Makeup"].map((s, i) => (
+          {SERVICES.map((s, i) => (
             <span key={s} className="flex items-center gap-2 whitespace-nowrap">
               {i > 0 && <span className="text-[var(--mc-border)] text-[10px]">·</span>}
-              <span className="text-[var(--mc-muted)] text-[10px] sm:text-xs uppercase tracking-widest">{s}</span>
+              <span className="text-[var(--mc-muted)] text-xs uppercase tracking-widest">{s}</span>
             </span>
           ))}
         </div>
-
         <p className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest mt-4">
           10,000+ Clients · 5-Star Rated · Serving New York Since 2011
         </p>
-
-        <div className="mt-6 sm:mt-10 flex items-center gap-3 px-5 py-3 border border-[var(--mc-accent)]/40 bg-[var(--mc-accent)]/5">
+        <div className="mt-10 flex items-center gap-3 px-5 py-3 border border-[var(--mc-accent)]/40 bg-[var(--mc-accent)]/5">
           <span className="text-base">🌸</span>
-          <p className="text-[11px] sm:text-xs uppercase tracking-widest font-semibold" style={{ color: "var(--mc-accent)" }}>
+          <p className="text-xs uppercase tracking-widest font-semibold" style={{ color: "var(--mc-accent)" }}>
             Mother&apos;s Day — Gift a luxury experience.&nbsp;
             <a href="/gift-card" className="underline underline-offset-2 hover:opacity-80 transition-opacity">Send a Gift Card →</a>
           </p>
         </div>
-
-        <div className="flex flex-row gap-3 sm:gap-4 mt-5 sm:mt-6">
-          <Link
-            href="/book"
-            className="gold-gradient-bg text-black font-bold px-6 sm:px-12 py-3 sm:py-4 uppercase tracking-widest text-xs sm:text-sm hover:opacity-90 transition-opacity cursor-pointer text-center"
-          >
+        <div className="flex flex-row gap-4 mt-6">
+          <Link href="/book"
+            className="gold-gradient-bg text-black font-bold px-12 py-4 uppercase tracking-widest text-sm hover:opacity-90 transition-opacity cursor-pointer text-center">
             Book Now
           </Link>
-          <Link
-            href="/services"
-            className="font-semibold px-6 sm:px-12 py-3 sm:py-4 uppercase tracking-widest text-xs sm:text-sm transition-all duration-300 cursor-pointer text-center"
+          <Link href="/services"
+            className="font-semibold px-12 py-4 uppercase tracking-widest text-sm transition-all duration-300 cursor-pointer text-center"
             style={{ border: "1px solid var(--mc-accent)", color: "var(--mc-accent)" }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.background = "var(--mc-accent)";
-              (e.currentTarget as HTMLElement).style.color = "var(--mc-bg)";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.background = "transparent";
-              (e.currentTarget as HTMLElement).style.color = "var(--mc-accent)";
-            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--mc-accent)"; (e.currentTarget as HTMLElement).style.color = "var(--mc-bg)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--mc-accent)"; }}
           >
             View Services
           </Link>
         </div>
-
-        <div className="hidden sm:flex mt-8 flex-col items-center opacity-40">
-          <div
-            className="w-px h-14"
-            style={{ background: "linear-gradient(to bottom, var(--mc-accent), transparent)" }}
-          />
+        <div className="flex mt-8 flex-col items-center opacity-40">
+          <div className="w-px h-14" style={{ background: "linear-gradient(to bottom, var(--mc-accent), transparent)" }} />
         </div>
-
       </div>
+
+      {/* ══════════════ MOBILE: 2-column video zone (top) ══════════════ */}
+      <div className="md:hidden relative w-full flex shrink-0" style={{ height: "46vh" }}>
+        <div className="flex-1 relative">
+          <VideoColumn startIdx={0} swapEvery={10000} />
+        </div>
+        <div className="flex-1 relative border-l border-white/[0.06]">
+          <VideoColumn startIdx={3} swapEvery={12000} />
+        </div>
+        {/* Fade videos to black at bottom */}
+        <div className="absolute inset-0 pointer-events-none z-10"
+          style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0.88) 82%, rgba(0,0,0,1) 100%)" }} />
+        {/* Logo centered over the 2 columns */}
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pb-6">
+          <div className="relative w-36 h-36">
+            <Image src="/mc-logo-bw.png"    alt="MC Hair Salon & Spa" fill className="logo-bw    object-contain" priority />
+            <Image src="/mc-logo-black.png" alt="MC Hair Salon & Spa" fill className="logo-light object-contain" priority />
+          </div>
+          <div className="mt-5 h-px w-28"
+            style={{ background: "linear-gradient(90deg, transparent, var(--mc-accent), transparent)" }} />
+        </div>
+      </div>
+
+      {/* Mobile text content (pure black bg from section) */}
+      <div className="md:hidden relative z-10 flex flex-col items-center px-4 pb-8 text-center w-full max-w-full">
+        <p className="uppercase tracking-[0.3em] text-[10px] font-semibold mt-5" style={{ color: "var(--mc-accent)" }}>
+          Upper East Side · New York City · Est. 2011
+        </p>
+        <h1 className="font-serif font-bold mt-4 leading-[1.25] px-2 w-full">
+          <span className="gold-gradient block text-5xl pb-3">Every Service.</span>
+          <span className="gold-gradient block text-5xl">One Studio.</span>
+        </h1>
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mt-6 max-w-sm">
+          {SERVICES.map((s, i) => (
+            <span key={s} className="flex items-center gap-2 whitespace-nowrap">
+              {i > 0 && <span className="text-[var(--mc-border)] text-[10px]">·</span>}
+              <span className="text-[var(--mc-muted)] text-[10px] uppercase tracking-widest">{s}</span>
+            </span>
+          ))}
+        </div>
+        <p className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest mt-3">
+          10,000+ Clients · 5-Star Rated · Serving New York Since 2011
+        </p>
+        <div className="mt-5 flex items-center gap-3 px-4 py-3 border border-[var(--mc-accent)]/40 bg-[var(--mc-accent)]/5 w-full">
+          <span className="text-base shrink-0">🌸</span>
+          <p className="text-[11px] uppercase tracking-widest font-semibold text-left" style={{ color: "var(--mc-accent)" }}>
+            Mother&apos;s Day — Gift a luxury experience.&nbsp;
+            <a href="/gift-card" className="underline underline-offset-2 hover:opacity-80 transition-opacity">Send a Gift Card →</a>
+          </p>
+        </div>
+        <div className="flex flex-row gap-3 mt-5 w-full">
+          <Link href="/book"
+            className="gold-gradient-bg text-black font-bold flex-1 py-3 uppercase tracking-widest text-xs hover:opacity-90 transition-opacity cursor-pointer text-center">
+            Book Now
+          </Link>
+          <Link href="/services"
+            className="font-semibold flex-1 py-3 uppercase tracking-widest text-xs transition-all duration-300 cursor-pointer text-center"
+            style={{ border: "1px solid var(--mc-accent)", color: "var(--mc-accent)" }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--mc-accent)"; (e.currentTarget as HTMLElement).style.color = "var(--mc-bg)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--mc-accent)"; }}
+          >
+            View Services
+          </Link>
+        </div>
+      </div>
+
     </section>
   );
 }

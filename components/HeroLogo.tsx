@@ -25,6 +25,7 @@ export default function HeroLogo() {
         className="absolute top-0 left-0 w-full h-auto sm:inset-0 sm:h-full sm:object-cover"
         style={{ filter: "brightness(0.65) saturate(0.85)", objectPosition: "center 20%" }}
       >
+        <source src="/videos/hero.webm" type="video/webm" />
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
 

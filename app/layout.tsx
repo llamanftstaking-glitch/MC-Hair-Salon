@@ -3,6 +3,11 @@ import Script from "next/script";
 import "./globals.css";
 import JsonLd from "@/components/JsonLd";
 import PublicShell from "@/components/PublicShell";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import MobileBookBar from "@/components/MobileBookBar";
+import CurlyBot from "@/components/CurlyBot";
+import PromoPopup from "@/components/PromoPopup";
 
 const SITE_URL = "https://mchairsalon.com";
 
@@ -87,7 +92,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <JsonLd />
-        <PublicShell>{children}</PublicShell>
+        <PublicShell
+          navbar={<Navbar />}
+          footer={<Footer />}
+          mobileBookBar={<MobileBookBar />}
+          curlyBot={<CurlyBot />}
+          promoPopup={<PromoPopup />}
+        >
+          {children}
+        </PublicShell>
       </body>
     </html>
   );

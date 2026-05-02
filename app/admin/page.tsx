@@ -115,11 +115,17 @@ export default function AdminPage() {
   const [usersLoading,     setUsersLoading]     = useState(false);
 
   // ── Reservations view/edit state ─────────────────────────────────────────────
-  const [viewMode,       setViewMode]       = useState<"list" | "weekly">("list");
+  const [viewMode,       setViewMode]       = useState<"list" | "weekly" | "daily">("daily");
   const [weekOffset,     setWeekOffset]     = useState(0);
+  const [dailyDate,      setDailyDate]      = useState<string>(new Date().toISOString().split("T")[0]);
   const [editBookingId,  setEditBookingId]  = useState<string | null>(null);
   const [editForm,       setEditForm]       = useState<Partial<Booking>>({});
   const [editLoading,    setEditLoading]    = useState(false);
+
+  // ── Create booking state (admin walk-in / phone) ─────────────────────────────
+  const [createBookingOpen, setCreateBookingOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: "", email: "", phone: "", service: "", stylist: "", date: new Date().toISOString().split("T")[0], time: "", notes: "" });
+  const [createLoading, setCreateLoading] = useState(false);
 
   // ── Fetch functions ─────────────────────────────────────────────────────────
   const fetchBookings = useCallback(async () => {
@@ -411,6 +417,23 @@ export default function AdminPage() {
     { id: "users",        label: "Users",        icon: <ShieldCheck size={15} /> },
   ];
 
+  // ── Shared booking form constants ────────────────────────────────────────────
+  const SERVICES_LIST = [
+    "Women's Haircut","Men's Haircut","Kids' Haircut","Curly Cut",
+    "Blowout / Blow Dry","Updo & Special Event Styling",
+    "Balayage","Highlights","Baby Lights","Hair Color","Color Correction",
+    "Keratin Treatment","Hair Botox Treatment","Relaxer",
+    "Bridal Makeup","Makeup Application","Eyebrow & Lip Wax",
+    "Other (specify in notes)",
+  ];
+  const STYLISTS_LIST_ALL = ["Maria","Meagan","Sally","Kato","Juany","Dhariana"];
+  const TIME_SLOTS_LIST = [
+    "9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM",
+    "12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM",
+    "3:00 PM","3:30 PM","4:00 PM","4:30 PM","5:00 PM","5:30 PM",
+    "6:00 PM","6:30 PM","7:00 PM",
+  ];
+
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-black pt-28">
@@ -475,18 +498,24 @@ export default function AdminPage() {
                   </button>
                 ))}
               </div>
-              <div className="flex gap-2 shrink-0">
-                <button onClick={() => setViewMode("list")}
+              <div className="flex gap-2 shrink-0 flex-wrap">
+                <button onClick={() => setViewMode("daily")}
                   className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all flex items-center gap-1.5 ${
-                    viewMode === "list" ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
+                    viewMode === "daily" ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
                   }`}>
-                  <BarChart2 size={12} /> List
+                  <Clock size={12} /> Daily
                 </button>
                 <button onClick={() => setViewMode("weekly")}
                   className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all flex items-center gap-1.5 ${
                     viewMode === "weekly" ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
                   }`}>
                   <Calendar size={12} /> Weekly
+                </button>
+                <button onClick={() => setViewMode("list")}
+                  className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all flex items-center gap-1.5 ${
+                    viewMode === "list" ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
+                  }`}>
+                  <BarChart2 size={12} /> List
                 </button>
               </div>
             </div>
@@ -561,7 +590,99 @@ export default function AdminPage() {
                   </div>
                 );
               })()
-            ) : filtered.length === 0 ? (
+            ) : viewMode === "daily" ? (() => {
+              const STYLIST_COLS = [...STYLISTS_LIST_ALL, "Unassigned"];
+              const dayBookings = bookings
+                .filter(b => b.date === dailyDate)
+                .filter(b => filter === "all" || b.status === filter);
+              const isToday = dailyDate === new Date().toISOString().split("T")[0];
+              const dateObj = new Date(dailyDate + "T12:00:00");
+              const dateLabel = dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+              const prevDay = () => { const d = new Date(dailyDate + "T12:00:00"); d.setDate(d.getDate() - 1); setDailyDate(d.toISOString().split("T")[0]); };
+              const nextDay = () => { const d = new Date(dailyDate + "T12:00:00"); d.setDate(d.getDate() + 1); setDailyDate(d.toISOString().split("T")[0]); };
+              const openCreate = (time: string, stylist: string) => {
+                setCreateForm(f => ({ ...f, date: dailyDate, time, stylist }));
+                setCreateBookingOpen(true);
+              };
+              return (
+                <div>
+                  {/* Day nav + New Booking */}
+                  <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+                    <button onClick={prevDay} className="flex items-center gap-1 border border-[var(--mc-border)] text-[#555] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                      <ChevronLeft size={12} /> Prev
+                    </button>
+                    <div className="flex items-center gap-3 flex-wrap justify-center">
+                      <p className={`text-sm font-semibold ${isToday ? "text-[var(--mc-accent)]" : "text-white"}`}>{dateLabel}</p>
+                      <button onClick={() => setDailyDate(new Date().toISOString().split("T")[0])} className="text-[#444] text-xs hover:text-[var(--mc-accent)] transition-colors cursor-pointer">Today</button>
+                      <input type="date" value={dailyDate} onChange={e => setDailyDate(e.target.value)}
+                        className="bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white text-xs px-2 py-1 focus:outline-none focus:border-[var(--mc-accent)] cursor-pointer" style={{ colorScheme: "dark" }} />
+                      <button onClick={() => { setCreateForm(f => ({ ...f, date: dailyDate, time: "", stylist: "" })); setCreateBookingOpen(true); }}
+                        className="flex items-center gap-1.5 gold-gradient-bg text-black text-xs font-bold px-3 py-1.5 uppercase tracking-wider cursor-pointer hover:opacity-90 transition-opacity">
+                        <Plus size={12} /> New Booking
+                      </button>
+                    </div>
+                    <button onClick={nextDay} className="flex items-center gap-1 border border-[var(--mc-border)] text-[#555] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                      Next <ChevronRight size={12} />
+                    </button>
+                  </div>
+
+                  {/* DaySmart-style grid */}
+                  <div className="overflow-x-auto border border-[#1a1a1a]">
+                    <div style={{ minWidth: `${80 + STYLIST_COLS.length * 130}px` }}>
+                      {/* Header */}
+                      <div className="grid border-b border-[#1a1a1a] bg-[#080808]" style={{ gridTemplateColumns: `80px repeat(${STYLIST_COLS.length}, 1fr)` }}>
+                        <div className="border-r border-[#1a1a1a] py-2.5" />
+                        {STYLIST_COLS.map(col => {
+                          const colCount = dayBookings.filter(b => col === "Unassigned" ? !b.stylist : b.stylist === col).length;
+                          return (
+                            <div key={col} className="border-r border-[#1a1a1a] py-2.5 px-2 text-center last:border-r-0">
+                              <p className={`text-xs font-bold uppercase tracking-widest ${col === "Unassigned" ? "text-[#333]" : "text-[var(--mc-accent)]"}`}>{col}</p>
+                              {colCount > 0 && <p className="text-[10px] text-[#555] mt-0.5">{colCount} appt{colCount !== 1 ? "s" : ""}</p>}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Time rows */}
+                      {TIME_SLOTS_LIST.map((slot, si) => (
+                        <div key={slot} className={`grid border-b ${si % 2 === 0 ? "border-[#181818]" : "border-[#111]"}`} style={{ gridTemplateColumns: `80px repeat(${STYLIST_COLS.length}, 1fr)` }}>
+                          <div className="border-r border-[#1a1a1a] px-2 py-2 flex items-center">
+                            <span className={`text-[10px] whitespace-nowrap ${slot.endsWith("00 AM") || slot.endsWith("00 PM") ? "text-[#555] font-semibold" : "text-[#2a2a2a]"}`}>{slot}</span>
+                          </div>
+                          {STYLIST_COLS.map(col => {
+                            const cellBookings = dayBookings.filter(b =>
+                              b.time === slot && (col === "Unassigned" ? !b.stylist : b.stylist === col)
+                            );
+                            return (
+                              <div key={col}
+                                className="border-r border-[#111] min-h-[48px] p-1 last:border-r-0 cursor-pointer hover:bg-[var(--mc-accent)]/[0.03] transition-colors group"
+                                onClick={() => { if (!cellBookings.length) openCreate(slot, col === "Unassigned" ? "" : col); }}
+                              >
+                                {cellBookings.length === 0 && (
+                                  <div className="w-full h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Plus size={10} className="text-[var(--mc-accent)]/40" />
+                                  </div>
+                                )}
+                                {cellBookings.map(b => (
+                                  <button key={b.id}
+                                    onClick={e => { e.stopPropagation(); startEditBooking(b); }}
+                                    className={`w-full text-left px-2 py-1.5 border cursor-pointer hover:opacity-80 transition-opacity mb-0.5 ${statusColors[b.status]}`}>
+                                    <p className="text-[10px] font-bold truncate">{b.name.split(" ")[0]}</p>
+                                    <p className="text-[10px] opacity-70 truncate">{b.service.split("(")[0].split("–")[0].trim()}</p>
+                                  </button>
+                                ))}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[#333] text-[10px] mt-2 text-center">Click any empty cell to create a booking · Click a booking chip to edit</p>
+                </div>
+              );
+            })()
+            : filtered.length === 0 ? (
               <div className="text-center py-20 luxury-card"><Calendar size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No bookings found</p></div>
             ) : (
               <div className="space-y-3">
@@ -652,21 +773,7 @@ export default function AdminPage() {
             )}
             {/* Edit booking modal */}
             {editBookingId && (() => {
-              const SERVICES_LIST = [
-                "Women's Haircut","Men's Haircut","Kids' Haircut","Curly Cut",
-                "Blowout / Blow Dry","Updo & Special Event Styling",
-                "Balayage","Highlights","Baby Lights","Hair Color","Color Correction",
-                "Keratin Treatment","Hair Botox Treatment","Relaxer",
-                "Bridal Makeup","Makeup Application","Eyebrow & Lip Wax",
-                "Other (specify in notes)",
-              ];
-              const STYLISTS_LIST = ["","Maria","Meagan","Sally","Kato","Juany","Dhariana"];
-              const TIME_SLOTS_LIST = [
-                "9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM",
-                "12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM",
-                "3:00 PM","3:30 PM","4:00 PM","4:30 PM","5:00 PM","5:30 PM",
-                "6:00 PM","6:30 PM","7:00 PM",
-              ];
+              const STYLISTS_LIST = ["", ...STYLISTS_LIST_ALL];
               const booking = bookings.find(b => b.id === editBookingId);
               return (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4" onClick={() => setEditBookingId(null)}>
@@ -743,6 +850,112 @@ export default function AdminPage() {
                         {editLoading ? <><Loader size={14} className="animate-spin" /> Saving…</> : <><Save size={14} /> Save Changes</>}
                       </button>
                       <button onClick={() => setEditBookingId(null)}
+                        className="px-5 border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-sm">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* ── Create Booking Modal ─────────────────────────────────────── */}
+            {createBookingOpen && (() => {
+              const submitCreate = async () => {
+                if (!createForm.name || !createForm.email || !createForm.phone || !createForm.service || !createForm.date || !createForm.time) return;
+                setCreateLoading(true);
+                try {
+                  const res = await fetch("/api/bookings", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(createForm),
+                  });
+                  if (res.ok) {
+                    const created = await res.json();
+                    await fetch("/api/bookings", {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ id: created.id, status: "confirmed" }),
+                    });
+                    setCreateBookingOpen(false);
+                    setCreateForm({ name: "", email: "", phone: "", service: "", stylist: "", date: dailyDate, time: "", notes: "" });
+                    fetchBookings();
+                  }
+                } finally { setCreateLoading(false); }
+              };
+              const canSubmit = !!(createForm.name && createForm.email && createForm.phone && createForm.service && createForm.date && createForm.time);
+              return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4" onClick={() => setCreateBookingOpen(false)}>
+                  <div className="luxury-card w-full max-w-lg p-6 md:p-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="font-serif text-xl font-bold text-white">New Booking</h3>
+                        <p className="text-[#555] text-xs mt-0.5">Walk-in or phone booking — auto-confirmed</p>
+                      </div>
+                      <button onClick={() => setCreateBookingOpen(false)} className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:text-white transition-colors cursor-pointer">
+                        <X size={16} />
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className={labelCls}>Client Name</label>
+                        <input type="text" value={createForm.name} onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))}
+                          className={inputCls} placeholder="Full name" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className={labelCls}>Email</label>
+                          <input type="email" value={createForm.email} onChange={e => setCreateForm(f => ({ ...f, email: e.target.value }))}
+                            className={inputCls} placeholder="email@example.com" />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Phone</label>
+                          <input type="tel" value={createForm.phone} onChange={e => setCreateForm(f => ({ ...f, phone: e.target.value }))}
+                            className={inputCls} placeholder="(212) 555-0000" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className={labelCls}>Service</label>
+                        <select value={createForm.service} onChange={e => setCreateForm(f => ({ ...f, service: e.target.value }))} className={inputCls}>
+                          <option value="">Select service…</option>
+                          {SERVICES_LIST.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls}>Stylist</label>
+                        <select value={createForm.stylist} onChange={e => setCreateForm(f => ({ ...f, stylist: e.target.value }))} className={inputCls}>
+                          <option value="">No preference</option>
+                          {STYLISTS_LIST_ALL.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className={labelCls}>Date</label>
+                          <input type="date" value={createForm.date} onChange={e => setCreateForm(f => ({ ...f, date: e.target.value }))}
+                            className={inputCls} style={{ colorScheme: "dark" }} />
+                        </div>
+                        <div>
+                          <label className={labelCls}>Time</label>
+                          <select value={createForm.time} onChange={e => setCreateForm(f => ({ ...f, time: e.target.value }))} className={inputCls}>
+                            <option value="">Select time…</option>
+                            {TIME_SLOTS_LIST.map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className={labelCls}>Notes</label>
+                        <textarea value={createForm.notes} onChange={e => setCreateForm(f => ({ ...f, notes: e.target.value }))}
+                          rows={2} className={`${inputCls} resize-none`} placeholder="Walk-in, phone booking, special requests…" />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 mt-6">
+                      <button onClick={submitCreate} disabled={createLoading || !canSubmit}
+                        className="flex-1 gold-gradient-bg text-black font-bold py-3 text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2">
+                        {createLoading ? <><Loader size={14} className="animate-spin" /> Creating…</> : <><Plus size={14} /> Create &amp; Confirm</>}
+                      </button>
+                      <button onClick={() => setCreateBookingOpen(false)}
                         className="px-5 border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-sm">
                         Cancel
                       </button>

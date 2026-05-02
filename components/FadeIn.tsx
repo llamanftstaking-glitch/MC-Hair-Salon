@@ -38,6 +38,7 @@ export default function FadeIn({ children, className = "", delay = 0 }: Props) {
         opacity: 0,
         animation: `fadeUp 0.55s ease-out both paused`,
         animationDelay: `${delay}ms`,
+        willChange: "opacity, transform",
       }}
     >
       {children}

@@ -24,7 +24,7 @@ export default function ResultsGallery() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10 sm:mb-16">
           <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Client Transformations</p>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">The Work</h2>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--mc-text)]">The Work</h2>
           <p className="text-[var(--mc-muted)] text-sm mt-4 max-w-lg mx-auto">Every look is personal. Every result is intentional.</p>
         </div>
 
@@ -42,7 +42,7 @@ export default function ResultsGallery() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300" />
               <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-5 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                <p className="text-white font-serif font-bold text-base sm:text-lg leading-tight">{item.label}</p>
+                <p className="mc-img-label text-white font-serif font-bold text-base sm:text-lg leading-tight">{item.label}</p>
                 <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   Book this look →
                 </p>

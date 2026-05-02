@@ -166,6 +166,43 @@ html[data-theme="light"] .mc-navbar .logo-bw {
   mix-blend-mode: normal;
 }
 
+/* ── SECTIONS THAT ARE ALWAYS DARK (video / image bg) ─────────────────────── */
+/* Use light-lavender palette so text is readable on the dark visual background */
+html[data-theme="light"] .mc-hero,
+html[data-theme="light"] .mc-dark-section {
+  --mc-accent:     #c4b5fd;
+  --mc-accent-2:   #a78bfa;
+  --mc-muted:      rgba(196, 181, 253, 0.9);
+  --mc-text-dim:   rgba(221, 214, 254, 0.6);
+  --mc-border:     rgba(196, 181, 253, 0.35);
+  --mc-title-grad: linear-gradient(135deg, #ede9fe 0%, #ffffff 50%, #ddd6fe 100%);
+  --mc-hero-glow:  rgba(196, 181, 253, 0.14);
+  --mc-hero-pulse: rgba(196, 181, 253, 0.25);
+}
+/* Keep the section itself dark — video/images are the background */
+html[data-theme="light"] .mc-hero.bg-black,
+html[data-theme="light"] .mc-dark-section.bg-black {
+  background-color: #000000 !important;
+}
+/* text-white must stay white on these dark sections */
+html[data-theme="light"] .mc-hero .text-white,
+html[data-theme="light"] .mc-hero h1.text-white,
+html[data-theme="light"] .mc-hero h2.text-white,
+html[data-theme="light"] .mc-hero p.text-white,
+html[data-theme="light"] .mc-hero span.text-white,
+html[data-theme="light"] .mc-dark-section .text-white,
+html[data-theme="light"] .mc-dark-section h1.text-white,
+html[data-theme="light"] .mc-dark-section h2.text-white,
+html[data-theme="light"] .mc-dark-section h3.text-white,
+html[data-theme="light"] .mc-dark-section p.text-white,
+html[data-theme="light"] .mc-dark-section span.text-white {
+  color: #ffffff !important;
+}
+/* Image overlay labels (gallery photo captions on dark photo gradients) */
+html[data-theme="light"] .mc-img-label {
+  color: #ffffff !important;
+}
+
 /* ── LIGHT MODE OVERRIDES ──────────────────────────────────────────────────── */
 
 /* ---- Backgrounds ---- */
@@ -188,6 +225,16 @@ html[data-theme="light"] footer {
 
 /* ---- Text: white text is invisible on light bg — force to --mc-text ---- */
 html[data-theme="light"] .text-white {
+  color: var(--mc-text) !important;
+}
+
+/* ---- Headings with text-white on light bg sections ---- */
+html[data-theme="light"] h1.text-white,
+html[data-theme="light"] h2.text-white,
+html[data-theme="light"] h3.text-white,
+html[data-theme="light"] h4.text-white,
+html[data-theme="light"] p.text-white,
+html[data-theme="light"] span.text-white {
   color: var(--mc-text) !important;
 }
 
@@ -215,16 +262,6 @@ html[data-theme="light"] [class*="bg-[#111"] {
 html[data-theme="light"] .luxury-card {
   background: var(--mc-card-bg) !important;
   border-color: var(--mc-card-border) !important;
-}
-
-/* ---- Headings that use text-white inside theamed sections ---- */
-html[data-theme="light"] h1.text-white,
-html[data-theme="light"] h2.text-white,
-html[data-theme="light"] h3.text-white,
-html[data-theme="light"] h4.text-white,
-html[data-theme="light"] p.text-white,
-html[data-theme="light"] span.text-white {
-  color: var(--mc-text) !important;
 }
 
 /* ── SCROLLBAR ─────────────────────────────────────────────────────────────── */

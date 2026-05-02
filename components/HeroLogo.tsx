@@ -12,7 +12,7 @@ export default function HeroLogo() {
   }, []);
 
   return (
-    <section className="relative flex flex-col items-center justify-center overflow-hidden bg-black mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)]">
+    <section className="mc-hero relative flex flex-col items-center justify-center overflow-hidden bg-black mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)]">
 
       {/* ── Background video ── */}
       <video

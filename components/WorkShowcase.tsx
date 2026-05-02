@@ -55,7 +55,7 @@ export default function WorkShowcase() {
   const slide = SLIDES[active];
 
   return (
-    <section className="relative w-full bg-black overflow-hidden" style={{ height: "80vh", minHeight: 560 }}>
+    <section className="mc-dark-section relative w-full bg-black overflow-hidden" style={{ height: "80vh", minHeight: 560 }}>
 
       {/* Slides — stacked, cross-fade via opacity */}
       {SLIDES.map((s, i) => (

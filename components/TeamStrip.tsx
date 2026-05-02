@@ -8,7 +8,7 @@ export default function TeamStrip() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-10 sm:mb-14">
           <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">The Team</p>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white">Meet Your Stylists</h2>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--mc-text)]">Meet Your Stylists</h2>
           <p className="text-[var(--mc-muted)] text-sm mt-4 max-w-lg mx-auto">
             Six specialists. One vision — making you look and feel extraordinary.
           </p>

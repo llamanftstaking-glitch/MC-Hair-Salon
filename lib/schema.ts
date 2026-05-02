@@ -7,6 +7,7 @@ import {
   jsonb,
   timestamp,
   real,
+  numeric,
 } from "drizzle-orm/pg-core";
 
 // ── customers ────────────────────────────────────────────────────────────────
@@ -228,4 +229,17 @@ export const timeEntries = pgTable("time_entries", {
 export const stripeEvents = pgTable("stripe_events", {
   eventId:     text("event_id").primaryKey(),
   processedAt: text("processed_at").notNull(),
+});
+
+// ── finance_bills ─────────────────────────────────────────────────────────────
+export const financeBills = pgTable("finance_bills", {
+  id:        text("id").primaryKey(),
+  name:      text("name").notNull(),
+  category:  text("category").notNull().default("general"), // rent | utilities | supplies | subscriptions | general
+  amount:    numeric("amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  dueDay:    integer("due_day").notNull().default(1), // day of month 1-31
+  isPaid:    boolean("is_paid").notNull().default(false),
+  autoPay:   boolean("auto_pay").notNull().default(false),
+  notes:     text("notes"),
+  createdAt: text("created_at").notNull(),
 });

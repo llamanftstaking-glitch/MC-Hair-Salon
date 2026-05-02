@@ -54,8 +54,8 @@ export default function WorkShowcase() {
           style={{
             opacity: i === active ? 1 : 0,
             transition: "opacity 0.9s ease",
-            willChange: "opacity",
-            transform: "translateZ(0)",
+            willChange: i === active ? "opacity" : "auto",
+            transform: i === active ? "translateZ(0)" : "none",
           }}>
           <Image
             src={s.src}

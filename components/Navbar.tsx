@@ -99,7 +99,7 @@ export default function Navbar() {
         </div>
 
         {/* ── Main bar ── */}
-        <div className="grid grid-cols-3 items-center h-[56px] sm:h-[60px] px-4 sm:px-10 border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/95 backdrop-blur-md">
+        <div className="grid grid-cols-3 items-center h-[56px] sm:h-[60px] px-4 sm:px-10 border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/95">
 
           {/* Left — Book + Services shortcuts */}
           <div className="flex items-center gap-3 sm:gap-4">
@@ -173,7 +173,10 @@ export default function Navbar() {
           backdropFilter: "blur(4px)",
           opacity: menuOpen ? 1 : 0,
           pointerEvents: menuOpen ? "auto" : "none",
-          transition: "opacity 0.3s ease",
+          visibility: menuOpen ? "visible" : "hidden",
+          transition: menuOpen
+            ? "opacity 0.3s ease, visibility 0s 0s"
+            : "opacity 0.3s ease, visibility 0s 0.3s",
         }}
         onClick={() => setMenuOpen(false)}
       />

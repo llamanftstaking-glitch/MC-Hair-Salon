@@ -93,6 +93,9 @@ export const bookings = pgTable("bookings", {
   cardBrand:            text("card_brand"),
   noshowChargeId:       text("noshow_charge_id"),
   cancellationChargeId: text("cancellation_charge_id"),
+  paymentStatus:        text("payment_status").default("unpaid"),
+  tipAmount:            real("tip_amount"),
+  paymentIntentId:      text("payment_intent_id"),
 });
 
 // ── gift_cards ────────────────────────────────────────────────────────────────

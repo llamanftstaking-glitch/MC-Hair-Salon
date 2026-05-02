@@ -22,6 +22,9 @@ export interface Booking {
   cardBrand?: string;
   noshowChargeId?: string;
   cancellationChargeId?: string;
+  paymentStatus?: "unpaid" | "paid";
+  tipAmount?: number;
+  paymentIntentId?: string;
 }
 
 function rowToBooking(row: typeof bookingsTable.$inferSelect): Booking {
@@ -44,6 +47,9 @@ function rowToBooking(row: typeof bookingsTable.$inferSelect): Booking {
     cardBrand:             row.cardBrand ?? undefined,
     noshowChargeId:        row.noshowChargeId ?? undefined,
     cancellationChargeId:  row.cancellationChargeId ?? undefined,
+    paymentStatus:         (row.paymentStatus as Booking["paymentStatus"]) ?? "unpaid",
+    tipAmount:             row.tipAmount ?? undefined,
+    paymentIntentId:       row.paymentIntentId ?? undefined,
   };
 }
 
@@ -105,6 +111,9 @@ export async function updateBooking(
   if ("cardBrand" in updates)                      dbUpdates.cardBrand = updates.cardBrand ?? null;
   if ("noshowChargeId" in updates)                 dbUpdates.noshowChargeId = updates.noshowChargeId ?? null;
   if ("cancellationChargeId" in updates)           dbUpdates.cancellationChargeId = updates.cancellationChargeId ?? null;
+  if (updates.paymentStatus !== undefined)         dbUpdates.paymentStatus = updates.paymentStatus;
+  if ("tipAmount" in updates)                      dbUpdates.tipAmount = updates.tipAmount ?? null;
+  if ("paymentIntentId" in updates)                dbUpdates.paymentIntentId = updates.paymentIntentId ?? null;
 
   if (Object.keys(dbUpdates).length === 0) {
     const rows = await db.select().from(bookingsTable).where(eq(bookingsTable.id, id));

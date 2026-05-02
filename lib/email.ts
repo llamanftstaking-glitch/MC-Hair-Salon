@@ -83,12 +83,23 @@ export async function sendBookingPendingEmail(booking: Booking): Promise<void> {
 
 // ── Booking Confirmed (sent when admin confirms) ────────────────────────────────
 export async function sendBookingConfirmedEmail(booking: Booking): Promise<void> {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mchairsalon.com";
+  const payBlock = booking.servicePrice && booking.servicePrice > 0 ? `
+    <div style="text-align:center;margin:28px 0;">
+      <p style="color:#a89070;font-size:13px;margin:0 0 14px;">Pay for your service online — tip included, all at once.</p>
+      <a href="${siteUrl}/pay/${booking.id}" style="display:inline-block;background:linear-gradient(135deg,#B8860B,#FFD700);color:#000;font-weight:bold;font-size:14px;padding:14px 36px;text-decoration:none;letter-spacing:2px;text-transform:uppercase;">
+        Pay Online
+      </a>
+      <p style="color:#444;font-size:11px;margin:12px 0 0;">Secure payment powered by Stripe</p>
+    </div>` : "";
+
   const html = `
     <div style="${baseStyle}">
       ${header}
       <h2 style="font-size:22px;color:#fff;text-align:center;margin-bottom:8px;">Appointment Confirmed</h2>
       <p style="color:#a89070;text-align:center;margin-bottom:32px;">Your appointment is confirmed. We look forward to seeing you!</p>
       ${bookingDetailsTable(booking)}
+      ${payBlock}
       <p style="color:#555;font-size:13px;text-align:center;">Need to reschedule? Call <a href="tel:2129885252" style="color:#C9A84C;">(212) 988-5252</a> at least 24 hours in advance.</p>
       ${footer()}
     </div>`;

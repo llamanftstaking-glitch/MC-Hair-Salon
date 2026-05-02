@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
-import { updateBookingStatus } from "@/lib/bookings";
+import { updateBookingStatus, updateBooking, getBookings } from "@/lib/bookings";
 import { createGiftCard } from "@/lib/gift-cards";
 import { getCustomerById, updateCustomer } from "@/lib/customers";
 import { claimEvent, releaseEvent } from "@/lib/webhook-events";
@@ -140,6 +140,24 @@ export async function POST(req: NextRequest) {
       case "checkout.session.expired": {
         const session = event.data.object as Stripe.Checkout.Session;
         console.log(`[stripe/webhook] Checkout expired — session=${session.id}`);
+        break;
+      }
+
+      case "payment_intent.succeeded": {
+        const intent = event.data.object as Stripe.PaymentIntent;
+        const { bookingId, tipAmount } = intent.metadata ?? {};
+        if (bookingId) {
+          const all = await getBookings();
+          const booking = all.find(b => b.id === bookingId);
+          if (booking && booking.paymentStatus !== "paid") {
+            await updateBooking(bookingId, {
+              paymentStatus:   "paid",
+              tipAmount:       tipAmount ? parseFloat(tipAmount) : 0,
+              paymentIntentId: intent.id,
+            });
+            console.log(`[stripe/webhook] Booking ${bookingId} marked paid via webhook`);
+          }
+        }
         break;
       }
 

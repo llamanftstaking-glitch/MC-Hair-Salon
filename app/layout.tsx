@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
-import CurlyBot from "@/components/CurlyBot";
-import MobileBookBar from "@/components/MobileBookBar";
-import PromoPopup from "@/components/PromoPopup";
+import PublicShell from "@/components/PublicShell";
 
 const SITE_URL = "https://mchairsalon.com";
 
@@ -91,12 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <JsonLd />
-<Navbar />
-        <main>{children}</main>
-        <Footer />
-        <MobileBookBar />
-        <CurlyBot />
-        <PromoPopup />
+        <PublicShell>{children}</PublicShell>
       </body>
     </html>
   );

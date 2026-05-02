@@ -470,7 +470,7 @@ export default function AdminPage() {
               className={`relative flex items-center gap-1.5 px-3 py-2 text-[11px] uppercase tracking-wider font-semibold transition-all cursor-pointer border-b-2 -mb-px whitespace-nowrap ${
                 tab === t.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
               }`}>
-              {t.icon} <span className="hidden sm:inline">{t.label}</span>
+              {t.icon} {t.label}
               {t.badge && t.badge > 0 ? (
                 <span className="bg-[var(--mc-accent)] text-black text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shrink-0">{t.badge}</span>
               ) : null}

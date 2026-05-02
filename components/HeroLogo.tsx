@@ -82,17 +82,17 @@ function VideoColumn({ startIdx, swapEvery }: { startIdx: number; swapEvery: num
 
 export default function HeroLogo() {
   return (
-    <section className="mc-hero relative flex flex-col items-center justify-center overflow-hidden bg-black mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)]">
+    <section className="mc-hero relative flex flex-col items-center justify-center overflow-hidden bg-black mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)] max-w-[100vw]">
 
       {/* ── 3-column video background ── */}
       <div className="absolute inset-0 flex">
-        <div className="hidden md:block flex-1 relative border-r border-white/[0.06]">
+        <div className="flex-1 relative border-r border-white/[0.06]">
           <VideoColumn startIdx={0} swapEvery={10000} />
         </div>
         <div className="flex-1 relative">
           <VideoColumn startIdx={2} swapEvery={13000} />
         </div>
-        <div className="hidden md:block flex-1 relative border-l border-white/[0.06]">
+        <div className="flex-1 relative border-l border-white/[0.06]">
           <VideoColumn startIdx={4} swapEvery={11000} />
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function HeroLogo() {
       />
 
       {/* ── Content ── */}
-      <div className="relative z-10 flex flex-col items-center py-8 sm:py-12 px-4 text-center">
+      <div className="relative z-10 flex flex-col items-center py-8 sm:py-12 px-4 text-center w-full max-w-full">
 
         <div className="relative w-36 h-36 sm:w-56 sm:h-56 md:w-72 md:h-72">
           <Image src="/mc-logo-bw.png"    alt="MC Hair Salon & Spa" fill className="logo-bw    object-contain" priority />
@@ -133,7 +133,7 @@ export default function HeroLogo() {
           Upper East Side · New York City · Est. 2011
         </p>
 
-        <h1 className="font-serif font-bold mt-4 sm:mt-6 leading-[1.25] px-4 overflow-visible">
+        <h1 className="font-serif font-bold mt-4 sm:mt-6 leading-[1.25] px-4 w-full">
           <span className="gold-gradient block text-5xl sm:text-6xl md:text-8xl pb-4">Every Service.</span>
           <span className="gold-gradient block text-5xl sm:text-6xl md:text-8xl">One Studio.</span>
         </h1>

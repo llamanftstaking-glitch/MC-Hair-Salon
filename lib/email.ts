@@ -45,23 +45,51 @@ const footer = (year = new Date().getFullYear()) => `
   ${goldLine}
   <p style="color:#333;font-size:11px;text-align:center;">&copy; ${year} MC Hair Salon &amp; Spa. All rights reserved.</p>`;
 
-// ── Booking Confirmation ───────────────────────────────────────────────────────
-export async function sendBookingConfirmation(booking: Booking): Promise<void> {
+function bookingDetailsTable(booking: Booking): string {
+  return `
+    <div style="background:#0f0f0f;border:1px solid #2a2a2a;padding:24px;margin-bottom:24px;">
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid #1a1a1a;">Client</td><td style="color:#fff;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;">${escapeHtml(booking.name)}</td></tr>
+        <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid #1a1a1a;">Service</td><td style="color:#fff;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;">${escapeHtml(booking.service)}</td></tr>
+        <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid #1a1a1a;">Stylist</td><td style="color:#fff;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;">${escapeHtml(booking.stylist || "No preference")}</td></tr>
+        <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid #1a1a1a;">Date</td><td style="color:#C9A84C;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;font-weight:bold;">${escapeHtml(booking.date)}</td></tr>
+        <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;">Time</td><td style="color:#C9A84C;text-align:right;padding:8px 0;font-weight:bold;">${escapeHtml(booking.time)}</td></tr>
+      </table>
+    </div>`;
+}
+
+// ── Booking Pending (sent on creation) ─────────────────────────────────────────
+export async function sendBookingPendingEmail(booking: Booking): Promise<void> {
   const html = `
     <div style="${baseStyle}">
       ${header}
-      <h2 style="font-size:22px;color:#fff;text-align:center;margin-bottom:8px;">Booking Confirmed</h2>
-      <p style="color:#a89070;text-align:center;margin-bottom:32px;">Your appointment has been confirmed. We look forward to seeing you!</p>
-      <div style="background:#0f0f0f;border:1px solid #2a2a2a;padding:24px;margin-bottom:24px;">
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid #1a1a1a;">Client</td><td style="color:#fff;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;">${booking.name}</td></tr>
-          <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid #1a1a1a;">Service</td><td style="color:#fff;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;">${booking.service}</td></tr>
-          <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid #1a1a1a;">Stylist</td><td style="color:#fff;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;">${booking.stylist || "No preference"}</td></tr>
-          <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;border-bottom:1px solid #1a1a1a;">Date</td><td style="color:#C9A84C;text-align:right;padding:8px 0;border-bottom:1px solid #1a1a1a;font-weight:bold;">${booking.date}</td></tr>
-          <tr><td style="color:#666;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 0;">Time</td><td style="color:#C9A84C;text-align:right;padding:8px 0;font-weight:bold;">${booking.time}</td></tr>
-        </table>
+      <h2 style="font-size:22px;color:#fff;text-align:center;margin-bottom:8px;">Request Received</h2>
+      <p style="color:#a89070;text-align:center;margin-bottom:32px;">We've received your appointment request and will confirm within 24 hours.</p>
+      ${bookingDetailsTable(booking)}
+      <div style="background:#0a0800;border:1px solid #C9A84C44;padding:16px;margin-bottom:24px;text-align:center;">
+        <p style="color:#C9A84C;font-size:13px;margin:0;">You'll receive a confirmation email once your appointment is approved by our team.</p>
       </div>
-      <p style="color:#555;font-size:13px;text-align:center;">Need to reschedule? Call <a href="tel:2129885252" style="color:#C9A84C;">(212) 988-5252</a></p>
+      <p style="color:#555;font-size:13px;text-align:center;">Questions? Call <a href="tel:2129885252" style="color:#C9A84C;">(212) 988-5252</a></p>
+      ${footer()}
+    </div>`;
+
+  await getResend().emails.send({
+    from:    FROM,
+    to:      booking.email,
+    subject: `Appointment Request Received — MC Hair Salon & Spa`,
+    html,
+  });
+}
+
+// ── Booking Confirmed (sent when admin confirms) ────────────────────────────────
+export async function sendBookingConfirmedEmail(booking: Booking): Promise<void> {
+  const html = `
+    <div style="${baseStyle}">
+      ${header}
+      <h2 style="font-size:22px;color:#fff;text-align:center;margin-bottom:8px;">Appointment Confirmed</h2>
+      <p style="color:#a89070;text-align:center;margin-bottom:32px;">Your appointment is confirmed. We look forward to seeing you!</p>
+      ${bookingDetailsTable(booking)}
+      <p style="color:#555;font-size:13px;text-align:center;">Need to reschedule? Call <a href="tel:2129885252" style="color:#C9A84C;">(212) 988-5252</a> at least 24 hours in advance.</p>
       ${footer()}
     </div>`;
 
@@ -72,6 +100,33 @@ export async function sendBookingConfirmation(booking: Booking): Promise<void> {
     html,
   });
 }
+
+// ── Booking Cancelled (sent when admin declines/cancels) ───────────────────────
+export async function sendBookingCancelledEmail(booking: Booking): Promise<void> {
+  const html = `
+    <div style="${baseStyle}">
+      ${header}
+      <h2 style="font-size:22px;color:#fff;text-align:center;margin-bottom:8px;">Appointment Cancelled</h2>
+      <p style="color:#a89070;text-align:center;margin-bottom:32px;">We regret to inform you that your appointment request has been cancelled.</p>
+      ${bookingDetailsTable(booking)}
+      <div style="background:#0f0f0f;border:1px solid #2a2a2a;padding:20px;margin-bottom:24px;text-align:center;">
+        <p style="color:#a89070;font-size:14px;margin:0 0 16px;">We apologize for any inconvenience. Please contact us to reschedule at a time that works for you.</p>
+        <a href="tel:2129885252" style="display:inline-block;background:linear-gradient(135deg,#B8860B,#FFD700);color:#000;font-weight:bold;font-size:14px;padding:12px 28px;text-decoration:none;letter-spacing:2px;">(212) 988-5252</a>
+      </div>
+      <p style="color:#555;font-size:13px;text-align:center;">You can also book online at <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://mchairsalon.com"}/book" style="color:#C9A84C;">mchairsalon.com/book</a></p>
+      ${footer()}
+    </div>`;
+
+  await getResend().emails.send({
+    from:    FROM,
+    to:      booking.email,
+    subject: `Appointment Update — MC Hair Salon & Spa`,
+    html,
+  });
+}
+
+// Keep alias for any legacy callers
+export const sendBookingConfirmation = sendBookingConfirmedEmail;
 
 // ── Newsletter Blast ───────────────────────────────────────────────────────────
 export async function sendNewsletterEmail(

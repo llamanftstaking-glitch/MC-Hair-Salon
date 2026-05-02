@@ -4,9 +4,9 @@ import {
   Calendar, Users, TrendingUp, Clock, Check, X, Trash2,
   RefreshCw, Mail, Send, Bell, UserCheck, BarChart2, Plus, Loader,
   MessageSquare, MailCheck, Upload, Film, Pencil, User, Settings,
-  Building2, Globe, Phone, ChevronRight, Image as ImageIcon, Save,
+  Building2, Globe, Phone, ChevronRight, ChevronLeft, Image as ImageIcon, Save,
   CreditCard, AlertTriangle, ShieldCheck,
-  Gift, Star, Crown, Zap, Minus, Scissors, QrCode,
+  Gift, Star, Crown, Zap, Minus, Scissors, QrCode, Edit2,
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
@@ -114,6 +114,13 @@ export default function AdminPage() {
   const [adminGrantLoading, setAdminGrantLoading] = useState(false);
   const [usersLoading,     setUsersLoading]     = useState(false);
 
+  // ── Reservations view/edit state ─────────────────────────────────────────────
+  const [viewMode,       setViewMode]       = useState<"list" | "weekly">("list");
+  const [weekOffset,     setWeekOffset]     = useState(0);
+  const [editBookingId,  setEditBookingId]  = useState<string | null>(null);
+  const [editForm,       setEditForm]       = useState<Partial<Booking>>({});
+  const [editLoading,    setEditLoading]    = useState(false);
+
   // ── Fetch functions ─────────────────────────────────────────────────────────
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -158,16 +165,41 @@ export default function AdminPage() {
 
   const updateStatus = async (id: string, status: Booking["status"]) => {
     await fetch("/api/bookings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status }) });
-    if (status === "confirmed") await sendConfirmationEmail(id);
+    setEmailStatus(p => ({ ...p, [id]: status === "confirmed" ? "sent" : status === "cancelled" ? "cancelled" : p[id] }));
     fetchBookings();
   };
-  const sendConfirmationEmail = async (bookingId: string) => {
+  const resendConfirmationEmail = async (bookingId: string) => {
     setEmailStatus(p => ({ ...p, [bookingId]: "sending" }));
     try {
       const res = await fetch("/api/email", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "confirm_booking", bookingId }) });
       const data = await res.json();
       setEmailStatus(p => ({ ...p, [bookingId]: data.success ? "sent" : "failed" }));
     } catch { setEmailStatus(p => ({ ...p, [bookingId]: "failed" })); }
+  };
+
+  const startEditBooking = (booking: Booking) => {
+    setEditBookingId(booking.id);
+    setEditForm({
+      service: booking.service,
+      stylist:  booking.stylist,
+      date:     booking.date,
+      time:     booking.time,
+      status:   booking.status,
+      notes:    booking.notes ?? "",
+    });
+  };
+
+  const saveEditedBooking = async () => {
+    if (!editBookingId) return;
+    setEditLoading(true);
+    await fetch("/api/bookings", {
+      method:  "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ id: editBookingId, ...editForm }),
+    });
+    setEditLoading(false);
+    setEditBookingId(null);
+    fetchBookings();
   };
   const chargeNoShow = async (id: string) => {
     if (!confirm("Charge the 30% cancellation fee to the card on file?")) return;
@@ -431,18 +463,104 @@ export default function AdminPage() {
         {/* ── RESERVATIONS ─────────────────────────────────────────────────── */}
         {tab === "reservations" && (
           <div>
-            <div className="flex gap-3 mb-6 flex-wrap">
-              {(["all", "pending", "confirmed", "cancelled", "no_show"] as const).map(f => (
-                <button key={f} onClick={() => setFilter(f)}
-                  className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all ${
-                    filter === f ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
+            {/* Toolbar: filters + view toggle */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+              <div className="flex gap-2 flex-wrap">
+                {(["all", "pending", "confirmed", "cancelled", "no_show"] as const).map(f => (
+                  <button key={f} onClick={() => setFilter(f)}
+                    className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all ${
+                      filter === f ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
+                    }`}>
+                    {f} ({f === "all" ? bookings.length : bookings.filter(b => b.status === f).length})
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button onClick={() => setViewMode("list")}
+                  className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all flex items-center gap-1.5 ${
+                    viewMode === "list" ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
                   }`}>
-                  {f} ({f === "all" ? bookings.length : bookings.filter(b => b.status === f).length})
+                  <BarChart2 size={12} /> List
                 </button>
-              ))}
+                <button onClick={() => setViewMode("weekly")}
+                  className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all flex items-center gap-1.5 ${
+                    viewMode === "weekly" ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
+                  }`}>
+                  <Calendar size={12} /> Weekly
+                </button>
+              </div>
             </div>
             {loading ? (
               <div className="text-center py-20 text-[#555]">Loading...</div>
+            ) : viewMode === "weekly" ? (
+              (() => {
+                const today = new Date();
+                const monday = new Date(today);
+                monday.setDate(today.getDate() - ((today.getDay() + 6) % 7) + weekOffset * 7);
+                const weekDays = Array.from({ length: 7 }, (_, i) => {
+                  const d = new Date(monday);
+                  d.setDate(monday.getDate() + i);
+                  return d;
+                });
+                const weekStart = weekDays[0].toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                const weekEnd   = weekDays[6].toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                return (
+                  <div>
+                    {/* Week navigation */}
+                    <div className="flex items-center justify-between mb-4">
+                      <button onClick={() => setWeekOffset(o => o - 1)} className="flex items-center gap-1 border border-[var(--mc-border)] text-[#555] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                        <ChevronLeft size={12} /> Prev
+                      </button>
+                      <div className="text-center">
+                        <p className="text-white text-sm font-semibold">{weekStart} – {weekEnd}</p>
+                        <button onClick={() => setWeekOffset(0)} className="text-[#444] text-xs hover:text-[var(--mc-accent)] transition-colors cursor-pointer">Today</button>
+                      </div>
+                      <button onClick={() => setWeekOffset(o => o + 1)} className="flex items-center gap-1 border border-[var(--mc-border)] text-[#555] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                        Next <ChevronRight size={12} />
+                      </button>
+                    </div>
+                    {/* 7-day grid */}
+                    <div className="overflow-x-auto">
+                      <div className="grid grid-cols-7 gap-2 min-w-[700px]">
+                        {weekDays.map(day => {
+                          const iso = day.toISOString().split("T")[0];
+                          const isToday = iso === new Date().toISOString().split("T")[0];
+                          const dayBookings = bookings
+                            .filter(b => b.date === iso)
+                            .filter(b => filter === "all" || b.status === filter)
+                            .sort((a, b) => a.time.localeCompare(b.time));
+                          return (
+                            <div key={iso} className={`border ${isToday ? "border-[var(--mc-accent)]/40" : "border-[#1a1a1a]"} bg-[#080808] min-h-[180px]`}>
+                              <div className={`px-2 py-1.5 border-b ${isToday ? "border-[var(--mc-accent)]/40 bg-[#0a0800]" : "border-[#1a1a1a]"}`}>
+                                <p className={`text-xs font-bold uppercase tracking-widest ${isToday ? "text-[var(--mc-accent)]" : "text-[#555]"}`}>
+                                  {day.toLocaleDateString("en-US", { weekday: "short" })}
+                                </p>
+                                <p className={`text-sm font-semibold ${isToday ? "text-white" : "text-[#444]"}`}>
+                                  {day.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                </p>
+                              </div>
+                              <div className="p-1.5 space-y-1.5">
+                                {dayBookings.length === 0 ? (
+                                  <p className="text-[#2a2a2a] text-[10px] text-center py-2">—</p>
+                                ) : dayBookings.map(b => (
+                                  <button key={b.id} onClick={() => startEditBooking(b)}
+                                    className={`w-full text-left p-1.5 border cursor-pointer transition-all hover:opacity-80 ${statusColors[b.status]}`}>
+                                    <p className="text-[10px] font-bold">{b.time}</p>
+                                    <p className="text-[10px] truncate font-semibold">{b.name.split(" ")[0]}</p>
+                                    <p className="text-[10px] truncate opacity-70">{b.service.split("(")[0].split("–")[0].trim()}</p>
+                                    {b.stylist && <p className="text-[10px] opacity-60">{b.stylist}</p>}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <p className="text-[#444] text-xs mt-3 text-center">Click any reservation to edit</p>
+                  </div>
+                );
+              })()
             ) : filtered.length === 0 ? (
               <div className="text-center py-20 luxury-card"><Calendar size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No bookings found</p></div>
             ) : (
@@ -491,7 +609,7 @@ export default function AdminPage() {
                           </button>
                         )}
                         {booking.status === "confirmed" && (
-                          <button onClick={() => sendConfirmationEmail(booking.id)}
+                          <button onClick={() => resendConfirmationEmail(booking.id)}
                             className="w-9 h-9 flex items-center justify-center border border-[var(--mc-accent)]/30 text-[var(--mc-accent)] hover:bg-[var(--mc-accent)]/10 transition-colors cursor-pointer" title="Resend email">
                             <Send size={14} />
                           </button>
@@ -518,6 +636,10 @@ export default function AdminPage() {
                             Cancel Fee
                           </button>
                         )}
+                        <button onClick={() => startEditBooking(booking)} title="Edit reservation"
+                          className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                          <Edit2 size={14} />
+                        </button>
                         <button onClick={() => deleteBooking(booking.id)}
                           className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-red-500/50 hover:text-red-400 transition-all cursor-pointer">
                           <Trash2 size={16} />
@@ -528,6 +650,107 @@ export default function AdminPage() {
                 ))}
               </div>
             )}
+            {/* Edit booking modal */}
+            {editBookingId && (() => {
+              const SERVICES_LIST = [
+                "Women's Haircut","Men's Haircut","Kids' Haircut","Curly Cut",
+                "Blowout / Blow Dry","Updo & Special Event Styling",
+                "Balayage","Highlights","Baby Lights","Hair Color","Color Correction",
+                "Keratin Treatment","Hair Botox Treatment","Relaxer",
+                "Bridal Makeup","Makeup Application","Eyebrow & Lip Wax",
+                "Other (specify in notes)",
+              ];
+              const STYLISTS_LIST = ["","Maria","Meagan","Sally","Kato","Juany","Dhariana"];
+              const TIME_SLOTS_LIST = [
+                "9:00 AM","9:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM",
+                "12:00 PM","12:30 PM","1:00 PM","1:30 PM","2:00 PM","2:30 PM",
+                "3:00 PM","3:30 PM","4:00 PM","4:30 PM","5:00 PM","5:30 PM",
+                "6:00 PM","6:30 PM","7:00 PM",
+              ];
+              const booking = bookings.find(b => b.id === editBookingId);
+              return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4" onClick={() => setEditBookingId(null)}>
+                  <div className="luxury-card w-full max-w-lg p-6 md:p-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="font-serif text-xl font-bold text-white">Edit Reservation</h3>
+                        {booking && <p className="text-[#555] text-xs mt-0.5">{booking.name} · {booking.id}</p>}
+                      </div>
+                      <button onClick={() => setEditBookingId(null)} className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:text-white transition-colors cursor-pointer">
+                        <X size={16} />
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Status */}
+                      <div>
+                        <label className={labelCls}>Status</label>
+                        <select value={editForm.status ?? ""} onChange={e => setEditForm(f => ({ ...f, status: e.target.value as Booking["status"] }))}
+                          className={inputCls}>
+                          <option value="pending">Pending</option>
+                          <option value="confirmed">Confirmed</option>
+                          <option value="cancelled">Cancelled</option>
+                          <option value="no_show">No Show</option>
+                        </select>
+                      </div>
+
+                      {/* Service */}
+                      <div>
+                        <label className={labelCls}>Service</label>
+                        <select value={editForm.service ?? ""} onChange={e => setEditForm(f => ({ ...f, service: e.target.value }))}
+                          className={inputCls}>
+                          {SERVICES_LIST.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+
+                      {/* Stylist */}
+                      <div>
+                        <label className={labelCls}>Stylist</label>
+                        <select value={editForm.stylist ?? ""} onChange={e => setEditForm(f => ({ ...f, stylist: e.target.value }))}
+                          className={inputCls}>
+                          <option value="">No preference</option>
+                          {STYLISTS_LIST.filter(Boolean).map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+
+                      {/* Date */}
+                      <div>
+                        <label className={labelCls}>Date</label>
+                        <input type="date" value={editForm.date ?? ""} onChange={e => setEditForm(f => ({ ...f, date: e.target.value }))}
+                          className={inputCls} style={{ colorScheme: "dark" }} />
+                      </div>
+
+                      {/* Time */}
+                      <div>
+                        <label className={labelCls}>Time</label>
+                        <select value={editForm.time ?? ""} onChange={e => setEditForm(f => ({ ...f, time: e.target.value }))}
+                          className={inputCls}>
+                          {TIME_SLOTS_LIST.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                      </div>
+
+                      {/* Notes */}
+                      <div>
+                        <label className={labelCls}>Notes</label>
+                        <textarea value={editForm.notes ?? ""} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))}
+                          rows={2} className={`${inputCls} resize-none`} placeholder="Optional notes" />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 mt-6">
+                      <button onClick={saveEditedBooking} disabled={editLoading}
+                        className="flex-1 gold-gradient-bg text-black font-bold py-3 text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2">
+                        {editLoading ? <><Loader size={14} className="animate-spin" /> Saving…</> : <><Save size={14} /> Save Changes</>}
+                      </button>
+                      <button onClick={() => setEditBookingId(null)}
+                        className="px-5 border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-sm">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 

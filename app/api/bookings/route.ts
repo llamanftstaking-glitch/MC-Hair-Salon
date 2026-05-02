@@ -8,7 +8,7 @@ import {
 } from "@/lib/bookings";
 import { getStripe } from "@/lib/stripe";
 import { requireAdmin } from "@/lib/auth";
-import { sendBookingConfirmation, sendNewBookingNotification } from "@/lib/email";
+import { sendBookingPendingEmail, sendBookingConfirmedEmail, sendBookingCancelledEmail, sendNewBookingNotification } from "@/lib/email";
 
 // GET — admin only
 export async function GET() {
@@ -68,9 +68,9 @@ export async function POST(req: NextRequest) {
       cardBrand,
     });
 
-    // Confirmation to client — non-fatal if Resend key isn't configured yet
-    sendBookingConfirmation(booking).catch(err =>
-      console.error("[bookings] Confirmation failed:", err)
+    // Pending notification to client — non-fatal if Resend key isn't configured yet
+    sendBookingPendingEmail(booking).catch(err =>
+      console.error("[bookings] Pending email failed:", err)
     );
     // Notify the salon inbox so the owner sees the new booking in their email
     sendNewBookingNotification(booking).catch(err =>
@@ -90,14 +90,31 @@ export async function PATCH(req: NextRequest) {
   try {
     const { id, status, ...rest } = await req.json();
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+
+    let updated;
     if (Object.keys(rest).length > 0) {
-      const updated = await updateBooking(id, { status, ...rest });
+      updated = await updateBooking(id, { status, ...rest });
       if (!updated) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
-      return NextResponse.json(updated);
+    } else {
+      const ok = await updateBookingStatus(id, status);
+      if (!ok) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+      // Re-fetch to get full booking data for emails
+      const all = await getBookings();
+      updated = all.find(b => b.id === id) ?? { id, status } as Parameters<typeof sendBookingConfirmedEmail>[0];
     }
-    const ok = await updateBookingStatus(id, status);
-    if (!ok) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
-    return NextResponse.json({ success: true });
+
+    // Auto-send emails on status transitions
+    if (status === "confirmed") {
+      sendBookingConfirmedEmail(updated as Parameters<typeof sendBookingConfirmedEmail>[0]).catch(e =>
+        console.error("[bookings] Confirmed email failed:", e)
+      );
+    } else if (status === "cancelled") {
+      sendBookingCancelledEmail(updated as Parameters<typeof sendBookingCancelledEmail>[0]).catch(e =>
+        console.error("[bookings] Cancelled email failed:", e)
+      );
+    }
+
+    return NextResponse.json(updated ?? { success: true });
   } catch {
     return NextResponse.json({ error: "Failed to update booking" }, { status: 500 });
   }

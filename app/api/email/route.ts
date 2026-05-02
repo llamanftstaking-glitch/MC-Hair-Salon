@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendBookingConfirmation, sendContactReply } from "@/lib/email";
+import { sendBookingConfirmedEmail, sendBookingCancelledEmail, sendContactReply } from "@/lib/email";
 import { getBookings } from "@/lib/bookings";
 
 export async function POST(req: NextRequest) {
@@ -10,8 +10,16 @@ export async function POST(req: NextRequest) {
       const bookings = await getBookings();
       const booking = bookings.find(b => b.id === body.bookingId);
       if (!booking) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
-      await sendBookingConfirmation(booking);
+      await sendBookingConfirmedEmail(booking);
       return NextResponse.json({ success: true, message: `Confirmation sent to ${booking.email}` });
+    }
+
+    if (body.action === "cancel_booking") {
+      const bookings = await getBookings();
+      const booking = bookings.find(b => b.id === body.bookingId);
+      if (!booking) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+      await sendBookingCancelledEmail(booking);
+      return NextResponse.json({ success: true, message: `Cancellation sent to ${booking.email}` });
     }
 
     if (body.action === "contact_reply") {

@@ -436,7 +436,7 @@ export default function AdminPage() {
 
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-black pt-20">
+    <div className="min-h-screen bg-black">
       {/* Compact top bar: title + stats + refresh all in one line */}
       <div className="border-b border-[var(--mc-border)] bg-[var(--mc-surface-dark)]">
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center gap-4 flex-wrap">

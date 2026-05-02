@@ -436,48 +436,43 @@ export default function AdminPage() {
 
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-black pt-28">
-      {/* Header */}
+    <div className="min-h-screen bg-black pt-20">
+      {/* Compact top bar: title + stats + refresh all in one line */}
       <div className="border-b border-[var(--mc-border)] bg-[var(--mc-surface-dark)]">
-        <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="font-serif text-2xl font-bold gold-gradient">MC Admin Panel</h1>
-            <p className="text-[#555] text-sm mt-1">Reservations · Staff · Settings · Reports</p>
+        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center gap-4 flex-wrap">
+          <h1 className="font-serif text-base font-bold gold-gradient shrink-0">MC Admin</h1>
+          <div className="flex items-center gap-3 flex-1 flex-wrap">
+            {[
+              { icon: <Calendar size={13} />, label: "Bookings", value: bookings.length },
+              { icon: <Clock size={13} />,    label: "Pending",  value: pending },
+              { icon: <MessageSquare size={13} />, label: "Msgs", value: unreadMessages },
+              { icon: <Bell size={13} />,     label: "Subs",     value: activeSubscribers },
+            ].map((s) => (
+              <div key={s.label} className="flex items-center gap-1.5 border border-[var(--mc-border)] px-2.5 py-1">
+                <span className="text-[var(--mc-accent)]">{s.icon}</span>
+                <span className="text-white text-xs font-bold">{s.value}</span>
+                <span className="text-[#444] text-[10px] uppercase tracking-wider">{s.label}</span>
+              </div>
+            ))}
           </div>
           <button onClick={() => { fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); }}
-            className="flex items-center gap-2 border border-[var(--mc-border)] text-[var(--mc-text-dim)] px-4 py-2 text-sm hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
-            <RefreshCw size={14} /> Refresh
+            className="flex items-center gap-1.5 border border-[var(--mc-border)] text-[#555] px-3 py-1 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
+            <RefreshCw size={12} /> Refresh
           </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {[
-            { icon: <Calendar size={20} />, label: "Total Bookings",   value: bookings.length },
-            { icon: <Clock size={20} />,    label: "Pending",          value: pending },
-            { icon: <MessageSquare size={20} />, label: "Unread Msgs", value: unreadMessages },
-            { icon: <Bell size={20} />,     label: "Subscribers",      value: activeSubscribers },
-          ].map((s) => (
-            <div key={s.label} className="luxury-card p-5">
-              <div className="text-[var(--mc-accent)] mb-3">{s.icon}</div>
-              <p className="font-serif text-3xl font-bold text-white">{s.value}</p>
-              <p className="text-[#555] text-xs uppercase tracking-wider mt-1">{s.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)] overflow-x-auto">
+      <div className="max-w-7xl mx-auto px-4 py-5">
+        {/* Tabs — icon + short label, no scroll */}
+        <div className="flex mb-6 border-b border-[var(--mc-border)]">
           {tabs.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-2 px-5 py-3 text-sm uppercase tracking-widest font-semibold transition-all cursor-pointer border-b-2 -mb-px whitespace-nowrap ${
+              className={`relative flex items-center gap-1.5 px-3 py-2 text-[11px] uppercase tracking-wider font-semibold transition-all cursor-pointer border-b-2 -mb-px whitespace-nowrap ${
                 tab === t.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
               }`}>
-              {t.icon} {t.label}
+              {t.icon} <span className="hidden sm:inline">{t.label}</span>
               {t.badge && t.badge > 0 ? (
-                <span className="ml-1 bg-[var(--mc-accent)] text-black text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0">{t.badge}</span>
+                <span className="bg-[var(--mc-accent)] text-black text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center shrink-0">{t.badge}</span>
               ) : null}
             </button>
           ))}

@@ -19,6 +19,8 @@ export interface StaffMember {
   portfolio?: PortfolioItem[];
   isMakeupArtist?: boolean;
   order?: number;
+  hourlyRate?: number;
+  commissionRate?: number; // % house keeps (e.g. 40 = stylist earns 60% of service)
 }
 
 // Default seed data — used if DB is empty
@@ -122,6 +124,8 @@ function rowToStaff(row: typeof staffTable.$inferSelect): StaffMember {
     portfolio:      (row.portfolio as PortfolioItem[] | null) ?? [],
     isMakeupArtist: row.isMakeupArtist,
     order:          row.order,
+    hourlyRate:     row.hourlyRate ?? undefined,
+    commissionRate: row.commissionRate ?? undefined,
   };
 }
 
@@ -188,6 +192,8 @@ export async function updateStaff(
   if ("portfolio" in updates)              dbUpdates.portfolio = updates.portfolio ?? [];
   if ("isMakeupArtist" in updates)         dbUpdates.isMakeupArtist = updates.isMakeupArtist ?? false;
   if ("order" in updates)                  dbUpdates.order = updates.order ?? 0;
+  if ("hourlyRate" in updates)             dbUpdates.hourlyRate = updates.hourlyRate ?? null;
+  if ("commissionRate" in updates)         dbUpdates.commissionRate = updates.commissionRate ?? null;
 
   if (Object.keys(dbUpdates).length > 0) {
     await db.update(staffTable).set(dbUpdates).where(eq(staffTable.id, id));

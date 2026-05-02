@@ -146,6 +146,8 @@ export const staff = pgTable("staff", {
   portfolio:     jsonb("portfolio").$type<{ type: "image" | "video"; src: string; caption?: string }[]>().default([]),
   isMakeupArtist: boolean("is_makeup_artist").notNull().default(false),
   order:         integer("order").notNull().default(0),
+  hourlyRate:    real("hourly_rate"),
+  commissionRate: real("commission_rate"), // % the house keeps (e.g. 40 = stylist keeps 60%)
 });
 
 // ── site_settings ─────────────────────────────────────────────────────────────

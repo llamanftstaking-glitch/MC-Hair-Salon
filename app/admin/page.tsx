@@ -12,9 +12,10 @@ import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
 import TimeClockTab from "./TimeClockTab";
 import InventoryTab from "./InventoryTab";
+import PayrollTab from "./PayrollTab";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-type Tab = "reservations" | "clients" | "newsletter" | "reports" | "messages" | "staff" | "settings" | "rewards" | "users" | "timeclock" | "inventory";
+type Tab = "reservations" | "clients" | "rewards" | "payroll" | "marketing" | "reports" | "settings";
 
 interface RewardCustomer {
   id: string;
@@ -99,7 +100,9 @@ export default function AdminPage() {
   const [settingsForm, setSettingsForm] = useState<SiteSettings | null>(null);
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<"business" | "hours" | "hero">("business");
+  const [settingsTab, setSettingsTab] = useState<"business" | "hours" | "hero" | "staff" | "users">("business");
+  const [marketingTab, setMarketingTab] = useState<"newsletter" | "messages">("newsletter");
+  const [reportsTab, setReportsTab] = useState<"analytics" | "inventory">("analytics");
 
   // ── Rewards state ────────────────────────────────────────────────────────────
   const [rewardsData,    setRewardsData]    = useState<RewardCustomer[]>([]);
@@ -409,16 +412,12 @@ export default function AdminPage() {
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
     { id: "reservations", label: "Reservations", icon: <Calendar size={15} /> },
-    { id: "timeclock",    label: "Time Clock",   icon: <Clock size={15} /> },
-    { id: "inventory",   label: "Inventory",    icon: <QrCode size={15} /> },
     { id: "clients",      label: "Clients",      icon: <Users size={15} /> },
     { id: "rewards",      label: "Rewards",      icon: <Gift size={15} /> },
-    { id: "messages",     label: "Messages",     icon: <MessageSquare size={15} />, badge: unreadMessages },
-    { id: "newsletter",   label: "Newsletter",   icon: <Mail size={15} /> },
+    { id: "payroll",      label: "Payroll",      icon: <Clock size={15} /> },
+    { id: "marketing",    label: "Marketing",    icon: <Mail size={15} />, badge: unreadMessages },
     { id: "reports",      label: "Reports",      icon: <BarChart2 size={15} /> },
-    { id: "staff",        label: "Staff",        icon: <UserCheck size={15} /> },
     { id: "settings",     label: "Settings",     icon: <Settings size={15} /> },
-    { id: "users",        label: "Users",        icon: <ShieldCheck size={15} /> },
   ];
 
   // ── Shared booking form constants ────────────────────────────────────────────
@@ -967,11 +966,21 @@ export default function AdminPage() {
         )}
 
         {/* ── TIME CLOCK ───────────────────────────────────────────────────── */}
-        {tab === "timeclock" && <TimeClockTab />}
-        {tab === "inventory" && <InventoryTab />}
+        {tab === "payroll" && <PayrollTab />}
 
-        {/* ── MESSAGES ─────────────────────────────────────────────────────── */}
-        {tab === "messages" && (
+        {/* ── MARKETING (Newsletter + Messages) ────────────────────────────── */}
+        {tab === "marketing" && (
+          <div className="space-y-4">
+            {/* Sub-tab bar */}
+            <div className="flex bg-[var(--mc-surface-dark)] rounded-lg p-0.5 gap-0.5 w-fit border border-[var(--mc-border)]">
+              {(["newsletter", "messages"] as const).map(s => (
+                <button key={s} onClick={() => setMarketingTab(s)}
+                  className={`px-4 py-1.5 rounded text-xs font-medium capitalize transition ${marketingTab === s ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
+                  {s === "messages" ? `Messages${unreadMessages > 0 ? ` (${unreadMessages})` : ""}` : "Newsletter"}
+                </button>
+              ))}
+            </div>
+            {marketingTab === "messages" && (
           <div>
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
               <div>
@@ -1023,56 +1032,7 @@ export default function AdminPage() {
             )}
           </div>
         )}
-
-        {/* ── CLIENTS ──────────────────────────────────────────────────────── */}
-        {tab === "clients" && (
-          <div>
-            <div className="mb-6"><p className="text-[#555] text-sm">{uniqueClients.length} unique client{uniqueClients.length !== 1 ? "s" : ""}</p></div>
-            {uniqueClients.length === 0 ? (
-              <div className="text-center py-20 luxury-card"><Users size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No clients yet</p></div>
-            ) : (
-              <div className="space-y-4">
-                {uniqueClients.map(client => {
-                  const visits   = clientMap[client.email] || [];
-                  const lastVisit = visits.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-                  return (
-                    <div key={client.email} className="luxury-card p-6">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
-                        <div>
-                          <p className="text-white font-semibold text-lg">{client.name}</p>
-                          <p className="text-[var(--mc-text-dim)] text-sm">{client.email}</p>
-                          <p className="text-[var(--mc-text-dim)] text-sm">{client.phone}</p>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="font-serif text-3xl gold-gradient font-bold">{visits.length}</p>
-                          <p className="text-[#555] text-xs">appointment{visits.length !== 1 ? "s" : ""}</p>
-                          <span className={`text-xs px-2 py-0.5 border mt-2 inline-block ${statusColors[lastVisit?.status || "pending"]}`}>Last: {lastVisit?.status}</span>
-                        </div>
-                      </div>
-                      <div className="border-t border-[var(--mc-border)] pt-4 space-y-2">
-                        <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">Appointment History</p>
-                        {visits.map(v => (
-                          <div key={v.id} className="flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-1">
-                            <div>
-                              <span className="text-[var(--mc-muted)]">{v.date} at {v.time}</span>
-                              <span className="text-[var(--mc-text-dim)] mx-2">·</span>
-                              <span className="text-[var(--mc-text-dim)]">{v.service.split("–")[1]?.trim() || v.service}</span>
-                              {v.stylist && <><span className="text-[var(--mc-text-dim)] mx-2">·</span><span className="text-[#555]">{v.stylist}</span></>}
-                            </div>
-                            <span className={`text-xs px-2 py-0.5 border ${statusColors[v.status]}`}>{v.status}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── NEWSLETTER ───────────────────────────────────────────────────── */}
-        {tab === "newsletter" && (
+            {marketingTab === "newsletter" && (
           <div className="space-y-6">
             <div className="luxury-card p-6">
               <h3 className="text-white font-semibold text-lg mb-6 flex items-center gap-2"><Send size={18} className="text-[var(--mc-accent)]" /> Compose Newsletter</h3>
@@ -1135,11 +1095,71 @@ export default function AdminPage() {
               )}
             </div>
           </div>
+            )}
+          </div>
         )}
 
-        {/* ── REPORTS ──────────────────────────────────────────────────────── */}
+        {/* ── CLIENTS ──────────────────────────────────────────────────────── */}
+        {tab === "clients" && (
+          <div>
+            <div className="mb-6"><p className="text-[#555] text-sm">{uniqueClients.length} unique client{uniqueClients.length !== 1 ? "s" : ""}</p></div>
+            {uniqueClients.length === 0 ? (
+              <div className="text-center py-20 luxury-card"><Users size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No clients yet</p></div>
+            ) : (
+              <div className="space-y-4">
+                {uniqueClients.map(client => {
+                  const visits   = clientMap[client.email] || [];
+                  const lastVisit = visits.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+                  return (
+                    <div key={client.email} className="luxury-card p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                        <div>
+                          <p className="text-white font-semibold text-lg">{client.name}</p>
+                          <p className="text-[var(--mc-text-dim)] text-sm">{client.email}</p>
+                          <p className="text-[var(--mc-text-dim)] text-sm">{client.phone}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-serif text-3xl gold-gradient font-bold">{visits.length}</p>
+                          <p className="text-[#555] text-xs">appointment{visits.length !== 1 ? "s" : ""}</p>
+                          <span className={`text-xs px-2 py-0.5 border mt-2 inline-block ${statusColors[lastVisit?.status || "pending"]}`}>Last: {lastVisit?.status}</span>
+                        </div>
+                      </div>
+                      <div className="border-t border-[var(--mc-border)] pt-4 space-y-2">
+                        <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">Appointment History</p>
+                        {visits.map(v => (
+                          <div key={v.id} className="flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-1">
+                            <div>
+                              <span className="text-[var(--mc-muted)]">{v.date} at {v.time}</span>
+                              <span className="text-[var(--mc-text-dim)] mx-2">·</span>
+                              <span className="text-[var(--mc-text-dim)]">{v.service.split("–")[1]?.trim() || v.service}</span>
+                              {v.stylist && <><span className="text-[var(--mc-text-dim)] mx-2">·</span><span className="text-[#555]">{v.stylist}</span></>}
+                            </div>
+                            <span className={`text-xs px-2 py-0.5 border ${statusColors[v.status]}`}>{v.status}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── REPORTS (Analytics + Inventory) ──────────────────────────────── */}
         {tab === "reports" && (
-          <div className="space-y-6">
+          <div className="space-y-4">
+            {/* Sub-tab bar */}
+            <div className="flex bg-[var(--mc-surface-dark)] rounded-lg p-0.5 gap-0.5 w-fit border border-[var(--mc-border)]">
+              {(["analytics", "inventory"] as const).map(s => (
+                <button key={s} onClick={() => setReportsTab(s)}
+                  className={`px-4 py-1.5 rounded text-xs font-medium capitalize transition ${reportsTab === s ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
+                  {s === "analytics" ? "Analytics" : "Inventory"}
+                </button>
+              ))}
+            </div>
+            {reportsTab === "inventory" && <InventoryTab />}
+            {reportsTab === "analytics" && <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 { icon: <TrendingUp size={22} />, label: "Est. Revenue",        value: `$${(confirmed * 85).toLocaleString()}`, sub: "Based on confirmed bookings" },
@@ -1182,11 +1202,13 @@ export default function AdminPage() {
                 )}
               </div>
             </div>
+          </div>}
           </div>
         )}
 
-        {/* ── STAFF ────────────────────────────────────────────────────────── */}
-        {tab === "staff" && (
+
+        {/* ── STAFF (inside Settings > Staff) ──────────────────────────────── */}
+        {tab === "settings" && settingsTab === "staff" && (
           <div>
             {/* Header */}
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
@@ -1703,8 +1725,8 @@ export default function AdminPage() {
             </div>
 
             {/* Sub-tabs */}
-            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)]">
-              {(["business", "hours", "hero"] as const).map(s => (
+            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)] overflow-x-auto">
+              {(["business", "hours", "hero", "staff", "users"] as const).map(s => (
                 <button key={s} onClick={() => setSettingsTab(s)}
                   className={`px-6 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all ${
                     settingsTab === s ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
@@ -1825,8 +1847,8 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── USERS ────────────────────────────────────────────────────────── */}
-        {tab === "users" && (
+        {/* ── USERS (inside Settings > Users) ──────────────────────────────── */}
+        {tab === "settings" && settingsTab === "users" && (
           <div>
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
               <div>

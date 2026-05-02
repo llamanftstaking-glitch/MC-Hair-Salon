@@ -176,6 +176,17 @@ export const rateLimits = pgTable("rate_limits", {
   windowStart: bigint("window_start", { mode: "number" }).notNull().default(0),
 });
 
+// ── time_entries ──────────────────────────────────────────────────────────────
+export const timeEntries = pgTable("time_entries", {
+  id:        text("id").primaryKey(),
+  staffId:   text("staff_id").notNull(),
+  staffName: text("staff_name").notNull(),
+  clockIn:   text("clock_in").notNull(),
+  clockOut:  text("clock_out"),
+  date:      text("date").notNull(),
+  notes:     text("notes"),
+});
+
 // ── stripe_events ─────────────────────────────────────────────────────────────
 export const stripeEvents = pgTable("stripe_events", {
   eventId:     text("event_id").primaryKey(),

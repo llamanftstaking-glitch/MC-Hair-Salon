@@ -8,6 +8,7 @@ import {
   CreditCard, AlertTriangle, ShieldCheck,
   Gift, Star, Crown, Zap, Minus, Scissors, QrCode, Edit2,
   Download, ToggleLeft, ToggleRight, DollarSign,
+  CalendarClock, Wrench, Tag, Ticket,
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
@@ -15,6 +16,10 @@ import TimeClockTab from "./TimeClockTab";
 import InventoryTab from "./InventoryTab";
 import PayrollTab from "./PayrollTab";
 import FinanceTab from "./FinanceTab";
+import ScheduleTab from "./ScheduleTab";
+import ServicesTab from "./ServicesTab";
+import GiftCardsTab from "./GiftCardsTab";
+import PromoCodesTab from "./PromoCodesTab";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Tab =
@@ -22,7 +27,11 @@ type Tab =
   | "clients"
   | "rewards"
   | "payroll"
+  | "schedule"
   | "finance"
+  | "gift-cards"
+  | "promo-codes"
+  | "services"
   | "marketing"
   | "reports"
   | "settings";
@@ -514,7 +523,11 @@ export default function AdminPage() {
     { id: "clients",      label: "Clients",      icon: <Users size={15} /> },
     { id: "rewards",      label: "Rewards",      icon: <Gift size={15} /> },
     { id: "payroll",      label: "Payroll",      icon: <Clock size={15} /> },
+    { id: "schedule",     label: "Schedule",     icon: <CalendarClock size={15} /> },
     { id: "finance",      label: "Finance",      icon: <DollarSign size={15} /> },
+    { id: "gift-cards",   label: "Gift Cards",   icon: <Gift size={15} /> },
+    { id: "promo-codes",  label: "Promos",       icon: <Ticket size={15} /> },
+    { id: "services",     label: "Services",     icon: <Wrench size={15} /> },
     { id: "marketing",    label: "Marketing",    icon: <Mail size={15} />, badge: unreadMessages },
     { id: "reports",      label: "Reports",      icon: <BarChart2 size={15} /> },
     { id: "settings",     label: "Settings",     icon: <Settings size={15} /> },
@@ -1070,6 +1083,10 @@ export default function AdminPage() {
 
         {/* ── FINANCE / BILLS ──────────────────────────────────────────────── */}
         {tab === "finance" && <FinanceTab />}
+        {tab === "schedule" && <ScheduleTab />}
+        {tab === "services" && <ServicesTab />}
+        {tab === "gift-cards" && <GiftCardsTab />}
+        {tab === "promo-codes" && <PromoCodesTab />}
 
         {/* ── MARKETING (Newsletter + Messages + Automation) ───────────────── */}
         {tab === "marketing" && (
@@ -1302,6 +1319,7 @@ export default function AdminPage() {
                 {uniqueClients.map(client => {
                   const visits   = clientMap[client.email] || [];
                   const lastVisit = visits.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+                  const totalSpend = visits.filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
                   return (
                     <div key={client.email} className="luxury-card p-6">
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
@@ -1310,10 +1328,18 @@ export default function AdminPage() {
                           <p className="text-[var(--mc-text-dim)] text-sm">{client.email}</p>
                           <p className="text-[var(--mc-text-dim)] text-sm">{client.phone}</p>
                         </div>
-                        <div className="text-right shrink-0">
-                          <p className="font-serif text-3xl gold-gradient font-bold">{visits.length}</p>
-                          <p className="text-[#555] text-xs">appointment{visits.length !== 1 ? "s" : ""}</p>
-                          <span className={`text-xs px-2 py-0.5 border mt-2 inline-block ${statusColors[lastVisit?.status || "pending"]}`}>Last: {lastVisit?.status}</span>
+                        <div className="text-right shrink-0 flex flex-col items-end gap-2">
+                          <div>
+                            <p className="font-serif text-3xl gold-gradient font-bold">{visits.length}</p>
+                            <p className="text-[#555] text-xs">appointment{visits.length !== 1 ? "s" : ""}</p>
+                          </div>
+                          {totalSpend > 0 && (
+                            <div>
+                              <p className="font-serif text-xl text-green-400 font-bold">${totalSpend.toFixed(0)}</p>
+                              <p className="text-[#555] text-xs">total spent</p>
+                            </div>
+                          )}
+                          <span className={`text-xs px-2 py-0.5 border inline-block ${statusColors[lastVisit?.status || "pending"]}`}>Last: {lastVisit?.status}</span>
                         </div>
                       </div>
                       <div className="border-t border-[var(--mc-border)] pt-4 space-y-2">

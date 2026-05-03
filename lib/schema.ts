@@ -8,6 +8,8 @@ import {
   timestamp,
   real,
   numeric,
+  uuid,
+  unique,
 } from "drizzle-orm/pg-core";
 
 // ── customers ────────────────────────────────────────────────────────────────
@@ -223,6 +225,44 @@ export const timeEntries = pgTable("time_entries", {
   clockOut:  text("clock_out"),
   date:      text("date").notNull(),
   notes:     text("notes"),
+});
+
+// ── staff_schedule ────────────────────────────────────────────────────────────
+export const staffSchedule = pgTable("staff_schedule", {
+  id:          uuid("id").primaryKey().defaultRandom(),
+  staffName:   text("staff_name").notNull(),
+  dayOfWeek:   integer("day_of_week").notNull(), // 0=Mon, 6=Sun
+  isWorking:   boolean("is_working").notNull().default(false),
+  startTime:   text("start_time").notNull().default("09:00"),
+  endTime:     text("end_time").notNull().default("18:00"),
+}, (t) => ({
+  unq: unique().on(t.staffName, t.dayOfWeek),
+}));
+
+// ── salon_services ────────────────────────────────────────────────────────────
+export const salonServices = pgTable("salon_services", {
+  id:           text("id").primaryKey(),
+  name:         text("name").notNull(),
+  category:     text("category").notNull().default("Other"),
+  priceMin:     numeric("price_min", { precision: 10, scale: 2 }).notNull().default("0"),
+  priceMax:     numeric("price_max", { precision: 10, scale: 2 }),
+  durationMins: integer("duration_mins"),
+  isActive:     boolean("is_active").notNull().default(true),
+  sortOrder:    integer("sort_order").notNull().default(0),
+  createdAt:    timestamp("created_at").notNull().defaultNow(),
+});
+
+// ── promo_codes ───────────────────────────────────────────────────────────────
+export const promoCodes = pgTable("promo_codes", {
+  id:            uuid("id").primaryKey().defaultRandom(),
+  code:          text("code").notNull().unique(),
+  discountType:  text("discount_type").notNull(), // "percent" | "flat"
+  discountValue: numeric("discount_value", { precision: 10, scale: 2 }).notNull(),
+  expiryDate:    text("expiry_date"),              // nullable ISO date string
+  maxUses:       integer("max_uses"),              // nullable
+  usedCount:     integer("used_count").notNull().default(0),
+  isActive:      boolean("is_active").notNull().default(true),
+  createdAt:     timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ── stripe_events ─────────────────────────────────────────────────────────────

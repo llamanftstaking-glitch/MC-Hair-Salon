@@ -1,11 +1,16 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { Save, Loader, Copy, Check } from "lucide-react";
+import { Save, Loader, Copy, Check, Plus, Trash2, X, CalendarOff } from "lucide-react";
 
 const STAFF = ["Maria", "Meagan", "Sally", "Kato", "Juany", "Dhariana", "Nazareth", "Nathaly"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-const labelCls = "block text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-1";
+const labelCls  = "block text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-1";
+const inputCls  = "w-full bg-[#0f0f0f] border border-[var(--mc-border)] text-white px-3 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444]";
+
+interface StaffBlock {
+  id: string; staffName: string; startDate: string; endDate: string; reason?: string;
+}
 const timeCls =
   "bg-[#0f0f0f] border border-[var(--mc-border)] text-white text-xs px-2 py-1.5 w-full focus:outline-none focus:border-[var(--mc-accent)] transition-colors";
 
@@ -51,6 +56,39 @@ export default function ScheduleTab() {
   const [saving, setSaving] = useState<Record<string, boolean>>({});
   const [saved, setSaved] = useState<Record<string, boolean>>({});
 
+  // Block-off state
+  const [blocks, setBlocks] = useState<StaffBlock[]>([]);
+  const [blockModal, setBlockModal] = useState(false);
+  const [blockForm, setBlockForm] = useState({ staffName: STAFF[0], startDate: "", endDate: "", reason: "" });
+  const [blockSaving, setBlockSaving] = useState(false);
+
+  const fetchBlocks = useCallback(async () => {
+    const res = await fetch("/api/schedule/blocks");
+    if (res.ok) setBlocks(await res.json());
+  }, []);
+
+  const addBlock = async () => {
+    if (!blockForm.startDate || !blockForm.endDate) return;
+    setBlockSaving(true);
+    try {
+      await fetch("/api/schedule/blocks", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(blockForm),
+      });
+      setBlockModal(false);
+      setBlockForm({ staffName: STAFF[0], startDate: "", endDate: "", reason: "" });
+      fetchBlocks();
+    } finally { setBlockSaving(false); }
+  };
+
+  const deleteBlock = async (id: string) => {
+    await fetch("/api/schedule/blocks", {
+      method: "DELETE", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    setBlocks(b => b.filter(x => x.id !== id));
+  };
+
   const fetchSchedules = useCallback(async () => {
     setLoading(true);
     try {
@@ -66,7 +104,8 @@ export default function ScheduleTab() {
 
   useEffect(() => {
     fetchSchedules();
-  }, [fetchSchedules]);
+    fetchBlocks();
+  }, [fetchSchedules, fetchBlocks]);
 
   const updateDay = (staffName: string, dayOfWeek: number, patch: Partial<DaySchedule>) => {
     setSchedules((prev) => ({
@@ -118,7 +157,7 @@ export default function ScheduleTab() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-[#555] text-sm">Loading schedules…</div>
+        <div className="text-center py-12 text-[#555] text-sm">Loading…</div>
       ) : (
         <div className="space-y-4">
           {STAFF.map((staffName) => {
@@ -228,6 +267,90 @@ export default function ScheduleTab() {
               </div>
             );
           })}
+        </div>
+      )}
+      {/* ── Blocked Dates ─────────────────────────────────────────────── */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold flex items-center gap-2">
+            <CalendarOff size={13} /> Blocked Dates
+          </p>
+          <button onClick={() => setBlockModal(true)}
+            className="flex items-center gap-1.5 gold-gradient-bg text-black font-bold px-3 py-1.5 text-[10px] uppercase tracking-widest hover:opacity-90 cursor-pointer">
+            <Plus size={11} /> Block Time Off
+          </button>
+        </div>
+
+        {blocks.length === 0 ? (
+          <div className="border border-[#1a1a1a] py-8 text-center text-[#333] text-sm">No blocked dates</div>
+        ) : (
+          <div className="border border-[#1a1a1a] overflow-hidden">
+            <div className="grid bg-[#080808] border-b border-[#1a1a1a] text-[10px] uppercase tracking-widest text-[#444]"
+              style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr auto" }}>
+              {["Stylist", "From", "To", "Reason", ""].map((h, i) => (
+                <div key={i} className="px-3 py-2">{h}</div>
+              ))}
+            </div>
+            {blocks.map(b => (
+              <div key={b.id} className="grid border-b border-[#111] hover:bg-[#0a0a0a] transition-colors"
+                style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr auto" }}>
+                <div className="px-3 py-2.5 text-sm text-white font-medium">{b.staffName}</div>
+                <div className="px-3 py-2.5 text-sm text-[#888]">{b.startDate}</div>
+                <div className="px-3 py-2.5 text-sm text-[#888]">{b.endDate}</div>
+                <div className="px-3 py-2.5 text-sm text-[#555]">{b.reason || "—"}</div>
+                <div className="px-3 py-2.5 flex items-center">
+                  <button onClick={() => deleteBlock(b.id)}
+                    className="w-7 h-7 flex items-center justify-center border border-[#1a1a1a] text-[#444] hover:border-red-500/40 hover:text-red-400 transition-all cursor-pointer">
+                    <Trash2 size={11} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add Block Modal */}
+      {blockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4" onClick={() => setBlockModal(false)}>
+          <div className="luxury-card w-full max-w-sm p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-serif text-lg font-bold text-white">Block Time Off</h3>
+              <button onClick={() => setBlockModal(false)} className="w-7 h-7 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:text-white cursor-pointer"><X size={14} /></button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className={labelCls}>Stylist</label>
+                <select value={blockForm.staffName} onChange={e => setBlockForm(f => ({ ...f, staffName: e.target.value }))} className={inputCls}>
+                  {STAFF.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>From</label>
+                  <input type="date" value={blockForm.startDate} onChange={e => setBlockForm(f => ({ ...f, startDate: e.target.value }))}
+                    className={inputCls} style={{ colorScheme: "dark" }} />
+                </div>
+                <div>
+                  <label className={labelCls}>To</label>
+                  <input type="date" value={blockForm.endDate} onChange={e => setBlockForm(f => ({ ...f, endDate: e.target.value }))}
+                    className={inputCls} style={{ colorScheme: "dark" }} />
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>Reason <span className="text-[#333] normal-case font-normal tracking-normal">(optional)</span></label>
+                <input type="text" value={blockForm.reason} onChange={e => setBlockForm(f => ({ ...f, reason: e.target.value }))}
+                  className={inputCls} placeholder="Vacation, sick day, training…" />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button onClick={addBlock} disabled={blockSaving || !blockForm.startDate || !blockForm.endDate}
+                className="flex-1 gold-gradient-bg text-black font-bold py-2.5 text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2">
+                {blockSaving ? <Loader size={13} className="animate-spin" /> : <CalendarOff size={13} />} Block Dates
+              </button>
+              <button onClick={() => setBlockModal(false)} className="px-4 border border-[var(--mc-border)] text-[#555] hover:text-white text-xs cursor-pointer">Cancel</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

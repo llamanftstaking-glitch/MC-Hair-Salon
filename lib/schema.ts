@@ -265,6 +265,16 @@ export const promoCodes = pgTable("promo_codes", {
   createdAt:     timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// ── staff_blocks ──────────────────────────────────────────────────────────────
+export const staffBlocks = pgTable("staff_blocks", {
+  id:        uuid("id").primaryKey().defaultRandom(),
+  staffName: text("staff_name").notNull(),
+  startDate: text("start_date").notNull(), // ISO date "YYYY-MM-DD"
+  endDate:   text("end_date").notNull(),
+  reason:    text("reason"),
+  createdAt: text("created_at").notNull(),
+});
+
 // ── stripe_events ─────────────────────────────────────────────────────────────
 export const stripeEvents = pgTable("stripe_events", {
   eventId:     text("event_id").primaryKey(),

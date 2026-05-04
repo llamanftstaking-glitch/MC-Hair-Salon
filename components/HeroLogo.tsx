@@ -3,33 +3,35 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
 
-const VIDEOS = [
-  "/videos/col/v1.mp4",
-  "/videos/col/v2.mp4",
-  "/videos/col/v3.mp4",
-  "/videos/col/v4.mp4",
-  "/videos/col/v5.mp4",
-  "/videos/col/v6.mp4",
-  "/videos/col/v7.mp4",
-];
+// Each column gets its own exclusive video list — no shared videos between concurrent columns.
+// Desktop (3 cols): [v1,v4,v7] | [v2,v5] | [v3,v6]
+// Mobile  (2 cols): [v1,v3,v5,v7] | [v2,v4,v6]
+const COL_VIDEOS: Record<string, string[]> = {
+  "d0": ["/videos/col/v1.mp4", "/videos/col/v4.mp4", "/videos/col/v7.mp4"],
+  "d1": ["/videos/col/v2.mp4", "/videos/col/v5.mp4"],
+  "d2": ["/videos/col/v3.mp4", "/videos/col/v6.mp4"],
+  "m0": ["/videos/col/v1.mp4", "/videos/col/v3.mp4", "/videos/col/v5.mp4", "/videos/col/v7.mp4"],
+  "m1": ["/videos/col/v2.mp4", "/videos/col/v4.mp4", "/videos/col/v6.mp4"],
+};
 
-function VideoColumn({ startIdx, swapEvery }: { startIdx: number; swapEvery: number }) {
+function VideoColumn({ colKey, swapEvery }: { colKey: string; swapEvery: number }) {
+  const videos = COL_VIDEOS[colKey];
   const ref0 = useRef<HTMLVideoElement>(null);
   const ref1 = useRef<HTMLVideoElement>(null);
   const slotRef = useRef(0);
-  const nextVideoRef = useRef((startIdx + 1) % VIDEOS.length);
+  const nextVideoRef = useRef(1 % videos.length);
   const [slot, setSlot] = useState(0);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const v0 = ref0.current!;
-    v0.src = VIDEOS[startIdx % VIDEOS.length];
+    v0.src = videos[0];
     v0.load();
     if (!mq.matches) v0.play().catch(() => {});
 
     const v1 = ref1.current!;
-    v1.src = VIDEOS[nextVideoRef.current];
+    v1.src = videos[nextVideoRef.current];
     v1.load();
 
     if (mq.matches) return;
@@ -46,20 +48,21 @@ function VideoColumn({ startIdx, swapEvery }: { startIdx: number; swapEvery: num
       slotRef.current = next;
       setSlot(next);
 
-      const afterNext = (nextVideoIdx + 1) % VIDEOS.length;
+      const afterNext = (nextVideoIdx + 1) % videos.length;
       nextVideoRef.current = afterNext;
 
       setTimeout(() => {
         const oldVid = curr === 0 ? ref0.current : ref1.current;
         if (!oldVid) return;
         oldVid.pause();
-        oldVid.src = VIDEOS[afterNext];
+        oldVid.src = videos[afterNext];
         oldVid.load();
       }, 1000);
     }, swapEvery);
 
     return () => clearInterval(timer);
-  }, [startIdx, swapEvery]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [colKey, swapEvery]);
 
   const vidStyle = (i: number): React.CSSProperties => ({
     position: "absolute",
@@ -89,13 +92,13 @@ export default function HeroLogo() {
       {/* ══════════════ DESKTOP: 3-column full-height bg ══════════════ */}
       <div className="absolute inset-0 hidden md:flex">
         <div className="flex-1 relative border-r border-white/[0.06]">
-          <VideoColumn startIdx={0} swapEvery={10000} />
+          <VideoColumn colKey="d0" swapEvery={10000} />
         </div>
         <div className="flex-1 relative">
-          <VideoColumn startIdx={2} swapEvery={13000} />
+          <VideoColumn colKey="d1" swapEvery={13000} />
         </div>
         <div className="flex-1 relative border-l border-white/[0.06]">
-          <VideoColumn startIdx={4} swapEvery={11000} />
+          <VideoColumn colKey="d2" swapEvery={11000} />
         </div>
       </div>
 
@@ -160,10 +163,10 @@ export default function HeroLogo() {
       {/* ══════════════ MOBILE: 2-column video zone (top) ══════════════ */}
       <div className="md:hidden relative w-full flex shrink-0" style={{ height: "min(46vh, 280px)" }}>
         <div className="flex-1 relative">
-          <VideoColumn startIdx={0} swapEvery={10000} />
+          <VideoColumn colKey="m0" swapEvery={10000} />
         </div>
         <div className="flex-1 relative border-l border-white/[0.06]">
-          <VideoColumn startIdx={3} swapEvery={12000} />
+          <VideoColumn colKey="m1" swapEvery={12000} />
         </div>
         {/* Fade videos to black at bottom */}
         <div className="absolute inset-0 pointer-events-none z-10"

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import TimeClockTab from "./TimeClockTab";
+import { DollarSign, Clock, Users, Edit2, Check, X, Loader, BarChart2, Calendar } from "lucide-react";
 
 interface StaffMember {
   id: string; name: string; role: string;
@@ -25,12 +26,15 @@ const PERIOD_OPTIONS = [
 ] as const;
 type PeriodId = typeof PERIOD_OPTIONS[number]["id"];
 
+const inputCls = "w-full bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white px-3 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444]";
+const labelCls = "block text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-1.5";
+
 function getDateRange(period: PeriodId, customFrom: string, customTo: string): { from: string; to: string } {
   const today = new Date();
   const fmt = (d: Date) => d.toISOString().split("T")[0];
   if (period === "custom") return { from: customFrom, to: customTo };
   if (period === "this_week") {
-    const dow = today.getDay(); // 0=Sun
+    const dow = today.getDay();
     const mon = new Date(today); mon.setDate(today.getDate() - ((dow + 6) % 7));
     const sun = new Date(mon);   sun.setDate(mon.getDate() + 6);
     return { from: fmt(mon), to: fmt(sun) };
@@ -41,7 +45,6 @@ function getDateRange(period: PeriodId, customFrom: string, customTo: string): {
     const sun = new Date(mon);   sun.setDate(mon.getDate() + 6);
     return { from: fmt(mon), to: fmt(sun) };
   }
-  // this_month
   const from = new Date(today.getFullYear(), today.getMonth(), 1);
   const to   = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   return { from: fmt(from), to: fmt(to) };
@@ -57,18 +60,16 @@ export default function PayrollTab() {
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Staff edit state
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editHourly, setEditHourly] = useState("");
+  const [editingId,    setEditingId]    = useState<string | null>(null);
+  const [editHourly,   setEditHourly]   = useState("");
   const [editCommission, setEditCommission] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // Payroll report state
-  const [period, setPeriod] = useState<PeriodId>("this_week");
+  const [period,     setPeriod]     = useState<PeriodId>("this_week");
   const [customFrom, setCustomFrom] = useState("");
-  const [customTo, setCustomTo] = useState("");
-  const [entries, setEntries] = useState<TimeEntry[]>([]);
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [customTo,   setCustomTo]   = useState("");
+  const [entries,    setEntries]    = useState<TimeEntry[]>([]);
+  const [bookings,   setBookings]   = useState<Booking[]>([]);
   const [reportLoading, setReportLoading] = useState(false);
 
   const loadStaff = useCallback(async () => {
@@ -113,126 +114,137 @@ export default function PayrollTab() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sub, period]);
 
-  // ── Per-staff payroll calc ────────────────────────────────────────────────────
   function calcPayroll(member: StaffMember) {
-    const myEntries = entries.filter(e => e.staffName === member.name);
-    const totalHours = myEntries.reduce((s, e) => s + hoursWorked(e), 0);
-    const hourlyPay  = totalHours * (member.hourlyRate ?? 0);
-
-    const myBookings = bookings.filter(b =>
-      b.stylist?.toLowerCase() === member.name.toLowerCase()
-    );
+    const myEntries    = entries.filter(e => e.staffName === member.name);
+    const totalHours   = myEntries.reduce((s, e) => s + hoursWorked(e), 0);
+    const hourlyPay    = totalHours * (member.hourlyRate ?? 0);
+    const myBookings   = bookings.filter(b => b.stylist?.toLowerCase() === member.name.toLowerCase());
     const serviceTotal = myBookings.reduce((s, b) => s + (b.servicePrice ?? 0), 0);
     const stylistPct   = 1 - (member.commissionRate ?? 0) / 100;
     const commissionPay = serviceTotal * stylistPct;
-
-    return { totalHours, hourlyPay, serviceTotal, commissionPay,
-             totalPay: hourlyPay + commissionPay, bookingCount: myBookings.length };
+    return { totalHours, hourlyPay, serviceTotal, commissionPay, totalPay: hourlyPay + commissionPay, bookingCount: myBookings.length };
   }
 
-  if (loading) return <div className="text-zinc-400 py-12 text-center">Loading…</div>;
+  if (loading) return <div className="text-[#555] py-12 text-center text-sm">Loading…</div>;
+
+  const subTabs: { id: SubTab; label: string; icon: React.ReactNode }[] = [
+    { id: "staff",     label: "Staff Rates",     icon: <Users size={13} /> },
+    { id: "timeclock", label: "Time Clock",       icon: <Clock size={13} /> },
+    { id: "payroll",   label: "Payroll Report",   icon: <BarChart2 size={13} /> },
+  ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Sub-tab bar */}
-      <div className="flex bg-zinc-800 rounded-lg p-0.5 gap-0.5 w-fit">
-        {(["staff", "timeclock", "payroll"] as SubTab[]).map(s => (
-          <button key={s} onClick={() => setSub(s)}
-            className={`px-4 py-1.5 rounded text-xs font-medium capitalize transition ${sub === s ? "bg-amber-500 text-black" : "text-zinc-400 hover:text-white"}`}>
-            {s === "timeclock" ? "Time Clock" : s === "payroll" ? "Payroll Report" : "Staff Rates"}
+      <div className="flex bg-[var(--mc-surface-dark)] p-0.5 gap-0.5 w-fit border border-[var(--mc-border)]">
+        {subTabs.map(s => (
+          <button key={s.id} onClick={() => setSub(s.id)}
+            className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest transition-all cursor-pointer ${
+              sub === s.id ? "gold-gradient-bg text-black" : "text-[#555] hover:text-white"
+            }`}>
+            {s.icon} {s.label}
           </button>
         ))}
       </div>
 
-      {/* ── Staff Rates sub-tab ──────────────────────────────────────────────── */}
+      {/* ── Staff Rates ───────────────────────────────────────────────────────── */}
       {sub === "staff" && (
-        <div className="space-y-2">
-          <p className="text-xs text-zinc-500">Set each stylist's hourly rate and the house commission percentage (e.g. 40 = house keeps 40%, stylist keeps 60%).</p>
-          {staff.map(m => (
-            <div key={m.id} className="bg-zinc-800 rounded-lg p-4 flex flex-wrap items-center gap-4">
-              <div className="flex-1 min-w-0">
-                <p className="text-white font-semibold text-sm">{m.name}</p>
-                <p className="text-zinc-400 text-xs">{m.role}</p>
-              </div>
+        <div>
+          <p className="text-[#444] text-xs mb-4">Set each stylist's hourly rate and the house commission percentage (e.g. 40 = house keeps 40%, stylist keeps 60%).</p>
+          <div className="space-y-2">
+            {staff.map(m => (
+              <div key={m.id} className="luxury-card p-4 flex flex-wrap items-center gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-semibold text-sm">{m.name}</p>
+                  <p className="text-[#555] text-xs">{m.role}</p>
+                </div>
 
-              {editingId === m.id ? (
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="space-y-0.5">
-                    <label className="text-[10px] text-zinc-500 uppercase tracking-wider">Hourly Rate ($)</label>
-                    <input type="number" value={editHourly} onChange={e => setEditHourly(e.target.value)}
-                      placeholder="0.00" min="0" step="0.01"
-                      className="w-24 bg-zinc-700 border border-zinc-600 rounded px-2 py-1.5 text-white text-sm focus:outline-none focus:border-amber-500" />
+                {editingId === m.id ? (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div>
+                      <label className={labelCls}>Hourly Rate ($)</label>
+                      <input type="number" value={editHourly} onChange={e => setEditHourly(e.target.value)}
+                        placeholder="0.00" min="0" step="0.01"
+                        className="w-28 bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)]" />
+                    </div>
+                    <div>
+                      <label className={labelCls}>House % (commission)</label>
+                      <input type="number" value={editCommission} onChange={e => setEditCommission(e.target.value)}
+                        placeholder="0–100" min="0" max="100"
+                        className="w-28 bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)]" />
+                    </div>
+                    <div className="flex gap-2 self-end pb-0.5">
+                      <button onClick={() => saveRates(m.id)} disabled={saving}
+                        className="flex items-center gap-1.5 gold-gradient-bg text-black font-bold px-4 py-1.5 text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 cursor-pointer">
+                        {saving ? <Loader size={12} className="animate-spin" /> : <Check size={12} />} Save
+                      </button>
+                      <button onClick={() => setEditingId(null)}
+                        className="px-3 py-1.5 border border-[var(--mc-border)] text-[#555] hover:text-white text-xs cursor-pointer">
+                        <X size={12} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="space-y-0.5">
-                    <label className="text-[10px] text-zinc-500 uppercase tracking-wider">House % (commission)</label>
-                    <input type="number" value={editCommission} onChange={e => setEditCommission(e.target.value)}
-                      placeholder="0–100" min="0" max="100"
-                      className="w-24 bg-zinc-700 border border-zinc-600 rounded px-2 py-1.5 text-white text-sm focus:outline-none focus:border-amber-500" />
-                  </div>
-                  <div className="flex gap-1.5 self-end pb-0.5">
-                    <button onClick={() => saveRates(m.id)} disabled={saving}
-                      className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black rounded text-xs font-bold disabled:opacity-50">
-                      {saving ? "…" : "Save"}
+                ) : (
+                  <div className="flex items-center gap-5">
+                    <div className="text-center">
+                      <p className="text-[var(--mc-accent)] font-bold text-sm">{m.hourlyRate != null ? `$${m.hourlyRate.toFixed(2)}/hr` : "—"}</p>
+                      <p className="text-[#444] text-[10px] uppercase tracking-wider mt-0.5">Hourly</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[var(--mc-accent)] font-bold text-sm">{m.commissionRate != null ? `${m.commissionRate}%` : "—"}</p>
+                      <p className="text-[#444] text-[10px] uppercase tracking-wider mt-0.5">House %</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-green-400 font-bold text-sm">{m.commissionRate != null ? `${100 - m.commissionRate}%` : "—"}</p>
+                      <p className="text-[#444] text-[10px] uppercase tracking-wider mt-0.5">Stylist %</p>
+                    </div>
+                    <button onClick={() => {
+                      setEditingId(m.id);
+                      setEditHourly(m.hourlyRate != null ? String(m.hourlyRate) : "");
+                      setEditCommission(m.commissionRate != null ? String(m.commissionRate) : "");
+                    }} className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                      <Edit2 size={14} />
                     </button>
-                    <button onClick={() => setEditingId(null)}
-                      className="px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded text-xs">
-                      Cancel
-                    </button>
                   </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <div className="text-center">
-                    <p className="text-amber-400 font-bold text-sm">{m.hourlyRate != null ? `$${m.hourlyRate.toFixed(2)}/hr` : "—"}</p>
-                    <p className="text-zinc-500 text-[10px]">Hourly</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-amber-400 font-bold text-sm">{m.commissionRate != null ? `${m.commissionRate}%` : "—"}</p>
-                    <p className="text-zinc-500 text-[10px]">House %</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-green-400 font-bold text-sm">{m.commissionRate != null ? `${100 - m.commissionRate}%` : "—"}</p>
-                    <p className="text-zinc-500 text-[10px]">Stylist %</p>
-                  </div>
-                  <button onClick={() => {
-                    setEditingId(m.id);
-                    setEditHourly(m.hourlyRate != null ? String(m.hourlyRate) : "");
-                    setEditCommission(m.commissionRate != null ? String(m.commissionRate) : "");
-                  }} className="px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded text-xs">
-                    Edit
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* ── Time Clock sub-tab ───────────────────────────────────────────────── */}
+      {/* ── Time Clock ────────────────────────────────────────────────────────── */}
       {sub === "timeclock" && <TimeClockTab />}
 
-      {/* ── Payroll Report sub-tab ──────────────────────────────────────────── */}
+      {/* ── Payroll Report ────────────────────────────────────────────────────── */}
       {sub === "payroll" && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Period selector */}
           <div className="flex flex-wrap items-end gap-3">
-            <div className="flex bg-zinc-800 rounded-lg p-0.5 gap-0.5">
+            <div className="flex bg-[var(--mc-surface-dark)] p-0.5 gap-0.5 border border-[var(--mc-border)]">
               {PERIOD_OPTIONS.map(p => (
                 <button key={p.id} onClick={() => setPeriod(p.id)}
-                  className={`px-3 py-1.5 rounded text-xs font-medium transition ${period === p.id ? "bg-amber-500 text-black" : "text-zinc-400 hover:text-white"}`}>
+                  className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-widest transition-all cursor-pointer ${
+                    period === p.id ? "gold-gradient-bg text-black" : "text-[#555] hover:text-white"
+                  }`}>
                   {p.label}
                 </button>
               ))}
             </div>
             {period === "custom" && (
               <>
-                <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
-                  className="bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-amber-500" />
-                <span className="text-zinc-400 text-sm">to</span>
-                <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)}
-                  className="bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-amber-500" />
+                <div>
+                  <label className={labelCls}>From</label>
+                  <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
+                    className={inputCls} style={{ colorScheme: "dark", width: "140px" }} />
+                </div>
+                <div>
+                  <label className={labelCls}>To</label>
+                  <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)}
+                    className={inputCls} style={{ colorScheme: "dark", width: "140px" }} />
+                </div>
                 <button onClick={loadReport}
-                  className="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-black rounded text-xs font-bold">
+                  className="gold-gradient-bg text-black font-bold px-4 py-2 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer self-end">
                   Run
                 </button>
               </>
@@ -241,47 +253,47 @@ export default function PayrollTab() {
 
           {(() => {
             const { from, to } = getDateRange(period, customFrom, customTo);
-            return <p className="text-xs text-zinc-500">Period: {from} → {to}</p>;
+            return <p className="text-[#444] text-xs flex items-center gap-1.5"><Calendar size={11} /> Period: {from} → {to}</p>;
           })()}
 
           {reportLoading ? (
-            <div className="text-zinc-400 text-sm py-8 text-center">Calculating…</div>
+            <div className="text-center py-16 text-[#555] text-sm flex items-center justify-center gap-2">
+              <Loader size={14} className="animate-spin" /> Calculating…
+            </div>
           ) : (
             <>
-              {/* Per-staff cards */}
               <div className="space-y-3">
                 {staff.map(m => {
                   const { totalHours, hourlyPay, serviceTotal, commissionPay, totalPay, bookingCount } = calcPayroll(m);
                   const hasActivity = totalHours > 0 || bookingCount > 0;
                   return (
-                    <div key={m.id} className={`bg-zinc-800 rounded-lg p-4 ${!hasActivity ? "opacity-50" : ""}`}>
-                      <div className="flex items-center justify-between mb-3">
+                    <div key={m.id} className={`luxury-card p-5 ${!hasActivity ? "opacity-40" : ""}`}>
+                      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                         <div>
                           <p className="text-white font-semibold">{m.name}</p>
-                          <p className="text-zinc-400 text-xs">{m.role}</p>
+                          <p className="text-[#444] text-xs">{m.role}</p>
                         </div>
-                        <p className="text-green-400 font-bold text-xl">${totalPay.toFixed(2)}</p>
+                        <div className="text-right">
+                          <p className="font-serif text-2xl font-bold text-green-400">${totalPay.toFixed(2)}</p>
+                          <p className="text-[#444] text-[10px] uppercase tracking-wider">Total Pay</p>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        <div className="bg-zinc-700/50 rounded p-2 text-center">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-[var(--mc-border)] pt-4">
+                        <div className="text-center">
                           <p className="text-white font-semibold text-sm">{totalHours.toFixed(1)}h</p>
-                          <p className="text-zinc-400 text-[10px] mt-0.5">Hours</p>
+                          <p className="text-[#444] text-[10px] uppercase tracking-wider mt-0.5">Hours</p>
                         </div>
-                        <div className="bg-zinc-700/50 rounded p-2 text-center">
-                          <p className="text-amber-400 font-semibold text-sm">${hourlyPay.toFixed(2)}</p>
-                          <p className="text-zinc-400 text-[10px] mt-0.5">
-                            {m.hourlyRate != null ? `@ $${m.hourlyRate}/hr` : "No rate set"}
-                          </p>
+                        <div className="text-center">
+                          <p className="text-[var(--mc-accent)] font-semibold text-sm">${hourlyPay.toFixed(2)}</p>
+                          <p className="text-[#444] text-[10px] mt-0.5">{m.hourlyRate != null ? `@ $${m.hourlyRate}/hr` : "No rate"}</p>
                         </div>
-                        <div className="bg-zinc-700/50 rounded p-2 text-center">
+                        <div className="text-center">
                           <p className="text-white font-semibold text-sm">{bookingCount} bookings</p>
-                          <p className="text-zinc-400 text-[10px] mt-0.5">${serviceTotal.toFixed(2)} services</p>
+                          <p className="text-[#444] text-[10px] mt-0.5">${serviceTotal.toFixed(2)} services</p>
                         </div>
-                        <div className="bg-zinc-700/50 rounded p-2 text-center">
-                          <p className="text-amber-400 font-semibold text-sm">${commissionPay.toFixed(2)}</p>
-                          <p className="text-zinc-400 text-[10px] mt-0.5">
-                            {m.commissionRate != null ? `${100 - m.commissionRate}% of services` : "No split set"}
-                          </p>
+                        <div className="text-center">
+                          <p className="text-[var(--mc-accent)] font-semibold text-sm">${commissionPay.toFixed(2)}</p>
+                          <p className="text-[#444] text-[10px] mt-0.5">{m.commissionRate != null ? `${100 - m.commissionRate}% of services` : "No split"}</p>
                         </div>
                       </div>
                     </div>
@@ -291,25 +303,27 @@ export default function PayrollTab() {
 
               {/* Grand total */}
               {staff.length > 0 && (() => {
-                const grandTotal = staff.reduce((s, m) => s + calcPayroll(m).totalPay, 0);
+                const grandTotal          = staff.reduce((s, m) => s + calcPayroll(m).totalPay, 0);
                 const totalServiceRevenue = bookings.reduce((s, b) => s + (b.servicePrice ?? 0), 0);
                 const totalHouseRevenue   = bookings.reduce((s, b) => {
                   const stylist = staff.find(m => m.name.toLowerCase() === b.stylist?.toLowerCase());
                   return s + (b.servicePrice ?? 0) * ((stylist?.commissionRate ?? 0) / 100);
                 }, 0);
                 return (
-                  <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <p className="text-green-400 font-bold text-2xl">${grandTotal.toFixed(2)}</p>
-                      <p className="text-zinc-400 text-xs mt-1">Total Payroll</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-white font-bold text-2xl">${totalServiceRevenue.toFixed(2)}</p>
-                      <p className="text-zinc-400 text-xs mt-1">Total Service Revenue</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-amber-400 font-bold text-2xl">${totalHouseRevenue.toFixed(2)}</p>
-                      <p className="text-zinc-400 text-xs mt-1">House Commission</p>
+                  <div className="luxury-card p-6 border border-[var(--mc-accent)]/20">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                      <div>
+                        <p className="font-serif text-3xl font-bold text-green-400">${grandTotal.toFixed(2)}</p>
+                        <p className="text-[#555] text-xs uppercase tracking-widest mt-1">Total Payroll</p>
+                      </div>
+                      <div>
+                        <p className="font-serif text-3xl font-bold gold-gradient">${totalServiceRevenue.toFixed(2)}</p>
+                        <p className="text-[#555] text-xs uppercase tracking-widest mt-1">Service Revenue</p>
+                      </div>
+                      <div>
+                        <p className="font-serif text-3xl font-bold text-[var(--mc-accent)]">${totalHouseRevenue.toFixed(2)}</p>
+                        <p className="text-[#555] text-xs uppercase tracking-widest mt-1">House Commission</p>
+                      </div>
                     </div>
                   </div>
                 );

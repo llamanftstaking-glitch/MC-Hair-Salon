@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createGiftCard, getGiftCards, getGiftCardByCode, redeemGiftCard } from "@/lib/gift-cards";
 import { sendGiftCardEmail, sendNewGiftCardNotification } from "@/lib/email";
+import { requireAdmin } from "@/lib/auth";
 
-// GET — admin: list all, or ?code=XXXX to validate a single card
+// GET — ?code=XXXX is public (booking page validation); list-all requires admin
 export async function GET(req: NextRequest) {
   try {
     const code = new URL(req.url).searchParams.get("code");
@@ -11,6 +12,8 @@ export async function GET(req: NextRequest) {
       if (!card) return NextResponse.json({ error: "Gift card not found" }, { status: 404 });
       return NextResponse.json(card);
     }
+    const err = await requireAdmin();
+    if (err) return err;
     return NextResponse.json(await getGiftCards());
   } catch {
     return NextResponse.json({ error: "Failed to fetch gift cards" }, { status: 500 });

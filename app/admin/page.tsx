@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
-import TimeClockTab from "./TimeClockTab";
 import InventoryTab from "./InventoryTab";
 import PayrollTab from "./PayrollTab";
 import FinanceTab from "./FinanceTab";
@@ -142,6 +141,9 @@ export default function AdminPage() {
   const [adminGrantEmail,  setAdminGrantEmail]  = useState("");
   const [adminGrantLoading, setAdminGrantLoading] = useState(false);
   const [usersLoading,     setUsersLoading]     = useState(false);
+
+  // ── Clients search ──────────────────────────────────────────────────────────
+  const [clientSearch, setClientSearch] = useState("");
 
   // ── Reservations view/edit state ─────────────────────────────────────────────
   const [viewMode,       setViewMode]       = useState<"list" | "weekly" | "daily">("daily");
@@ -579,8 +581,8 @@ export default function AdminPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-5">
-        {/* Tabs — icon + short label, no scroll */}
-        <div className="flex mb-6 border-b border-[var(--mc-border)]">
+        {/* Tabs — scrollable on narrow screens */}
+        <div className="flex mb-6 border-b border-[var(--mc-border)] overflow-x-auto scrollbar-none">
           {tabs.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`relative flex items-center gap-1.5 px-3 py-2 text-[11px] uppercase tracking-wider font-semibold transition-all cursor-pointer border-b-2 -mb-px whitespace-nowrap ${
@@ -1311,12 +1313,34 @@ export default function AdminPage() {
         {/* ── CLIENTS ──────────────────────────────────────────────────────── */}
         {tab === "clients" && (
           <div>
-            <div className="mb-6"><p className="text-[#555] text-sm">{uniqueClients.length} unique client{uniqueClients.length !== 1 ? "s" : ""}</p></div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+              <p className="text-[#555] text-sm">{uniqueClients.length} unique client{uniqueClients.length !== 1 ? "s" : ""}</p>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={clientSearch}
+                  onChange={e => setClientSearch(e.target.value)}
+                  placeholder="Search by name or email…"
+                  className="bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white px-4 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444] w-72"
+                />
+              </div>
+            </div>
             {uniqueClients.length === 0 ? (
               <div className="text-center py-20 luxury-card"><Users size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No clients yet</p></div>
             ) : (
               <div className="space-y-4">
-                {uniqueClients.map(client => {
+                {uniqueClients
+                  .filter(client => {
+                    if (!clientSearch) return true;
+                    const q = clientSearch.toLowerCase();
+                    return client.name.toLowerCase().includes(q) || client.email.toLowerCase().includes(q);
+                  })
+                  .sort((a, b) => {
+                    const spendA = (clientMap[a.email] || []).filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
+                    const spendB = (clientMap[b.email] || []).filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
+                    return spendB - spendA;
+                  })
+                  .map(client => {
                   const visits   = clientMap[client.email] || [];
                   const lastVisit = visits.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
                   const totalSpend = visits.filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);

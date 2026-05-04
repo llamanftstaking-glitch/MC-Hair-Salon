@@ -26,10 +26,9 @@ async function uploadFile(
   try {
     const { Client } = await import("@replit/object-storage");
     const client = new Client();
-    const result = await client.uploadFromBytes(key, buffer);
-    // The replit-object-storage client returns a Result<void, Error>
-    // — surface the error instead of silently falling through.
-    if (result && typeof result === "object" && "ok" in result && result.ok === false) {
+    const result = await client.uploadFromBytes(key, buffer) as unknown;
+    // Surface upload errors from Replit Object Storage instead of silently falling through.
+    if (result && typeof result === "object" && "ok" in result && (result as { ok: boolean }).ok === false) {
       throw new Error(
         `Object storage upload failed: ${(result as { error?: { message?: string } }).error?.message ?? "unknown"}`,
       );

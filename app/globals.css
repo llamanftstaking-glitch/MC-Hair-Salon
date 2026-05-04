@@ -160,8 +160,9 @@ html[data-theme="light"] .mc-navbar {
   background-color: var(--mc-surface) !important;
   border-color: var(--mc-border) !important;
 }
-/* Undo the logo invert — white logo looks correct on dark navbar */
-html[data-theme="light"] .mc-navbar .logo-bw {
+/* Undo the logo invert — white logo looks correct on dark navbar and dark hero */
+html[data-theme="light"] .mc-navbar .logo-bw,
+html[data-theme="light"] .mc-hero .logo-bw {
   filter: none;
   mix-blend-mode: normal;
 }

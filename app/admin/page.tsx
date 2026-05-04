@@ -26,13 +26,12 @@ type Tab =
   | "reservations"
   | "clients"
   | "rewards"
+  | "staff"
   | "payroll"
-  | "schedule"
   | "finance"
   | "gift-cards"
-  | "promo-codes"
-  | "services"
   | "marketing"
+  | "services"
   | "reports"
   | "settings";
 
@@ -65,6 +64,7 @@ interface SiteSettings {
   business: { name: string; tagline: string; address: string; phone: string; email: string; instagram: string; facebook: string; };
   hours: { day: string; open: string; close: string; closed?: boolean; }[];
   hero: { headline: string; headlineAccent: string; subheadline: string; };
+  theme: { accent: string; accent2: string; bg: string; surface: string; border: string; text: string; muted: string; };
 }
 
 interface AdminUser {
@@ -119,9 +119,11 @@ export default function AdminPage() {
   const [settingsForm, setSettingsForm] = useState<SiteSettings | null>(null);
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<"business" | "hours" | "hero" | "staff" | "users">("business");
-  const [marketingTab, setMarketingTab] = useState<"newsletter" | "messages" | "automation">("newsletter");
-  const [reportsTab, setReportsTab] = useState<"analytics" | "inventory">("analytics");
+  const [staffTab,     setStaffTab]     = useState<"profiles" | "schedule">("profiles");
+  const [settingsTab,  setSettingsTab]  = useState<"business" | "hours" | "hero" | "theme" | "pages" | "users">("business");
+  const [marketingTab, setMarketingTab] = useState<"newsletter" | "messages" | "automation" | "promos">("newsletter");
+  const [servicesTab,  setServicesTab]  = useState<"catalog" | "inventory">("catalog");
+  const [reportsTab,   setReportsTab]   = useState<"analytics">("analytics");
   const [analyticsPeriod, setAnalyticsPeriod] = useState<"today" | "week" | "month" | "year">("month");
 
   // ── Automation toggle state ──────────────────────────────────────────────────
@@ -188,7 +190,9 @@ export default function AdminPage() {
   const fetchSettings = useCallback(async () => {
     const res = await fetch("/api/settings");
     const data = await res.json();
-    setSettings(data); setSettingsForm(data);
+    const DEFAULT_THEME = { accent: "#C9A84C", accent2: "#FFD700", bg: "#000000", surface: "#0f0f0f", border: "#2a2a2a", text: "#f5f0e8", muted: "#a89070" };
+    const merged = { ...data, theme: { ...DEFAULT_THEME, ...(data.theme ?? {}) } };
+    setSettings(merged); setSettingsForm(merged);
   }, []);
 
   const fetchRewards = useCallback(async () => {
@@ -533,18 +537,17 @@ export default function AdminPage() {
   };
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
-    { id: "reservations", label: "Reservations", icon: <Calendar size={15} /> },
-    { id: "clients",      label: "Clients",      icon: <Users size={15} /> },
-    { id: "rewards",      label: "Rewards",      icon: <Gift size={15} /> },
-    { id: "payroll",      label: "Payroll",      icon: <Clock size={15} /> },
-    { id: "schedule",     label: "Schedule",     icon: <CalendarClock size={15} /> },
-    { id: "finance",      label: "Finance",      icon: <DollarSign size={15} /> },
-    { id: "gift-cards",   label: "Gift Cards",   icon: <Gift size={15} /> },
-    { id: "promo-codes",  label: "Promos",       icon: <Ticket size={15} /> },
-    { id: "services",     label: "Services",     icon: <Wrench size={15} /> },
-    { id: "marketing",    label: "Marketing",    icon: <Mail size={15} />, badge: unreadMessages },
-    { id: "reports",      label: "Reports",      icon: <BarChart2 size={15} /> },
-    { id: "settings",     label: "Settings",     icon: <Settings size={15} /> },
+    { id: "reservations", label: "Reservations",      icon: <Calendar size={15} /> },
+    { id: "clients",      label: "Clients",           icon: <Users size={15} /> },
+    { id: "rewards",      label: "Rewards",           icon: <Gift size={15} /> },
+    { id: "staff",        label: "Staff",             icon: <UserCheck size={15} /> },
+    { id: "payroll",      label: "Payroll",           icon: <Clock size={15} /> },
+    { id: "finance",      label: "Finance",           icon: <DollarSign size={15} /> },
+    { id: "gift-cards",   label: "Gift Cards",        icon: <Gift size={15} /> },
+    { id: "marketing",    label: "Marketing",         icon: <Mail size={15} />, badge: unreadMessages },
+    { id: "services",     label: "Services & Products", icon: <Wrench size={15} /> },
+    { id: "reports",      label: "Reports",           icon: <BarChart2 size={15} /> },
+    { id: "settings",     label: "Settings",          icon: <Settings size={15} /> },
   ];
 
   // ── Shared booking form constants ────────────────────────────────────────────
@@ -1128,17 +1131,51 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── TIME CLOCK ───────────────────────────────────────────────────── */}
+        {/* ── PAYROLL ──────────────────────────────────────────────────────── */}
         {tab === "payroll" && <PayrollTab />}
 
-        {/* ── FINANCE / BILLS ──────────────────────────────────────────────── */}
+        {/* ── FINANCE ──────────────────────────────────────────────────────── */}
         {tab === "finance" && <FinanceTab />}
-        {tab === "schedule" && <ScheduleTab />}
-        {tab === "services" && <ServicesTab />}
-        {tab === "gift-cards" && <GiftCardsTab />}
-        {tab === "promo-codes" && <PromoCodesTab />}
 
-        {/* ── MARKETING (Newsletter + Messages + Automation) ───────────────── */}
+        {/* ── GIFT CARDS ───────────────────────────────────────────────────── */}
+        {tab === "gift-cards" && <GiftCardsTab />}
+
+        {/* ── STAFF ─────────────────────────────────────────────────────────── */}
+        {tab === "staff" && (
+          <div>
+            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)]">
+              {(["profiles", "schedule"] as const).map(s => (
+                <button key={s} onClick={() => setStaffTab(s)}
+                  className={`px-6 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all ${
+                    staffTab === s ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
+                  }`}>
+                  {s === "profiles" ? "Staff Profiles" : "Schedule"}
+                </button>
+              ))}
+            </div>
+            {staffTab === "schedule" && <ScheduleTab />}
+          </div>
+        )}
+
+        {/* ── SERVICES & PRODUCTS ───────────────────────────────────────────── */}
+        {tab === "services" && (
+          <div>
+            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)]">
+              {(["catalog", "inventory"] as const).map(s => (
+                <button key={s} onClick={() => setServicesTab(s)}
+                  className={`px-6 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all ${
+                    servicesTab === s ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
+                  }`}>
+                  {s === "catalog" ? "Services Catalog" : "Inventory & Products"}
+                </button>
+              ))}
+            </div>
+            {servicesTab === "catalog"   && <ServicesTab />}
+            {servicesTab === "inventory" && <InventoryTab />}
+          </div>
+        )}
+
+        {/* ── MARKETING (Newsletter + Messages + Automation + Promos) ─────── */}
         {tab === "marketing" && (
           <div className="space-y-4">
             {/* Sub-tab bar */}
@@ -1154,6 +1191,10 @@ export default function AdminPage() {
               <button onClick={() => setMarketingTab("automation")}
                 className={`px-4 py-1.5 rounded text-xs font-medium transition cursor-pointer ${marketingTab === "automation" ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
                 Automation
+              </button>
+              <button onClick={() => setMarketingTab("promos")}
+                className={`px-4 py-1.5 rounded text-xs font-medium transition cursor-pointer ${marketingTab === "promos" ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
+                Promo Codes
               </button>
             </div>
             {marketingTab === "messages" && (
@@ -1355,6 +1396,7 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+            {marketingTab === "promos" && <PromoCodesTab />}
           </div>
         )}
 
@@ -1436,20 +1478,9 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── REPORTS (Analytics + Inventory) ──────────────────────────────── */}
+        {/* ── REPORTS ───────────────────────────────────────────────────────── */}
         {tab === "reports" && (
-          <div className="space-y-4">
-            {/* Sub-tab bar */}
-            <div className="flex bg-[var(--mc-surface-dark)] rounded-lg p-0.5 gap-0.5 w-fit border border-[var(--mc-border)]">
-              {(["analytics", "inventory"] as const).map(s => (
-                <button key={s} onClick={() => setReportsTab(s)}
-                  className={`px-4 py-1.5 rounded text-xs font-medium capitalize transition ${reportsTab === s ? "gold-gradient-bg text-black" : "text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"}`}>
-                  {s === "analytics" ? "Analytics" : "Inventory"}
-                </button>
-              ))}
-            </div>
-            {reportsTab === "inventory" && <InventoryTab />}
-            {reportsTab === "analytics" && <div className="space-y-6">
+          <div className="space-y-6">
             {/* Period selector + Export */}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex bg-[var(--mc-surface-dark)] rounded-lg p-0.5 gap-0.5 border border-[var(--mc-border)]">
@@ -1524,13 +1555,12 @@ export default function AdminPage() {
                 )}
               </div>
             </div>
-          </div>}
           </div>
         )}
 
 
-        {/* ── STAFF (inside Settings > Staff) ──────────────────────────────── */}
-        {tab === "settings" && settingsTab === "staff" && (
+        {/* ── STAFF PROFILES ───────────────────────────────────────────────── */}
+        {tab === "staff" && staffTab === "profiles" && (
           <div>
             {/* Header */}
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
@@ -2041,19 +2071,24 @@ export default function AdminPage() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-white font-semibold text-lg flex items-center gap-2"><Settings size={18} className="text-[var(--mc-accent)]" /> Site Settings</p>
-                <p className="text-[#555] text-sm mt-1">Edit business info, hours, and homepage content</p>
+                <p className="text-[#555] text-sm mt-1">Full control over your site — content, colors, hours, and more</p>
               </div>
               {settingsSaved && <span className="text-green-400 text-sm flex items-center gap-1"><Check size={13} /> Saved!</span>}
             </div>
 
             {/* Sub-tabs */}
-            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)] overflow-x-auto">
-              {(["business", "hours", "hero", "staff", "users"] as const).map(s => (
+            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)] overflow-x-auto scrollbar-none">
+              {(["business", "hours", "hero", "theme", "pages", "users"] as const).map(s => (
                 <button key={s} onClick={() => setSettingsTab(s)}
-                  className={`px-6 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all ${
+                  className={`px-5 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all whitespace-nowrap ${
                     settingsTab === s ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
                   }`}>
-                  {s === "business" ? "Business Info" : s === "hours" ? "Hours" : "Homepage"}
+                  {s === "business" ? "Business Info"
+                    : s === "hours" ? "Hours"
+                    : s === "hero" ? "Homepage"
+                    : s === "theme" ? "Theme & Colors"
+                    : s === "pages" ? "Pages & Content"
+                    : "Users & Access"}
                 </button>
               ))}
             </div>
@@ -2166,6 +2201,101 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+
+            {/* ── THEME & COLORS ──────────────────────────────────────────── */}
+            {settingsTab === "theme" && settingsForm && (
+              <div className="max-w-2xl space-y-6">
+                <div className="luxury-card p-7">
+                  <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                    <Zap size={16} className="text-[var(--mc-accent)]" /> Theme & Brand Colors
+                  </h3>
+                  <p className="text-[#555] text-sm mb-6">Changes apply site-wide instantly. Default theme is gold on black.</p>
+                  <div className="space-y-5">
+                    {([
+                      { label: "Primary Accent Color",    key: "accent",  hint: "Main brand color — buttons, highlights, gold by default (#C9A84C)" },
+                      { label: "Secondary Accent Color",  key: "accent2", hint: "Shimmer / gradient end color (#FFD700)" },
+                      { label: "Page Background",         key: "bg",      hint: "Main background color (#000000)" },
+                      { label: "Card / Surface Color",    key: "surface", hint: "Background of cards and panels (#0f0f0f)" },
+                      { label: "Border Color",            key: "border",  hint: "Dividers and card borders (#2a2a2a)" },
+                      { label: "Primary Text Color",      key: "text",    hint: "Headings and primary copy (#f5f0e8)" },
+                      { label: "Muted Text Color",        key: "muted",   hint: "Subtext and secondary copy (#a89070)" },
+                    ] as { label: string; key: keyof SiteSettings["theme"]; hint: string }[]).map(f => (
+                      <div key={f.key}>
+                        <label className={labelCls}>{f.label}</label>
+                        <div className="flex items-center gap-3">
+                          <input type="color"
+                            value={settingsForm.theme?.[f.key] ?? "#000000"}
+                            onChange={e => setSettingsForm(p => p ? ({
+                              ...p,
+                              theme: { ...(p.theme ?? {}), [f.key]: e.target.value }
+                            } as SiteSettings) : p)}
+                            className="w-12 h-10 cursor-pointer border border-[var(--mc-border)] bg-transparent p-0.5 shrink-0"
+                          />
+                          <input type="text"
+                            value={settingsForm.theme?.[f.key] ?? ""}
+                            onChange={e => setSettingsForm(p => p ? ({
+                              ...p,
+                              theme: { ...(p.theme ?? {}), [f.key]: e.target.value }
+                            } as SiteSettings) : p)}
+                            className={`${inputCls} font-mono`}
+                            placeholder="#000000"
+                          />
+                        </div>
+                        <p className="text-[#444] text-xs mt-1">{f.hint}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 p-4 border border-[var(--mc-border)] bg-[var(--mc-surface-dark)] flex items-center gap-4 flex-wrap">
+                    <div className="text-xs text-[#555] uppercase tracking-widest">Preview</div>
+                    <div className="flex gap-2 items-center">
+                      <div className="w-8 h-8 rounded-full" style={{ background: settingsForm.theme?.accent ?? "#C9A84C" }} />
+                      <div className="w-8 h-8 border" style={{ background: settingsForm.theme?.surface ?? "#0f0f0f", borderColor: settingsForm.theme?.border ?? "#2a2a2a" }} />
+                      <span className="text-sm font-semibold" style={{ color: settingsForm.theme?.accent ?? "#C9A84C" }}>MC Hair Salon</span>
+                      <span className="text-sm" style={{ color: settingsForm.theme?.muted ?? "#a89070" }}>Upper East Side</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mt-6 flex-wrap">
+                    <button onClick={saveSettings} disabled={savingSettings}
+                      className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-8 py-3 text-sm uppercase tracking-widest hover:opacity-90 disabled:opacity-50 cursor-pointer transition-opacity">
+                      {savingSettings ? <><Loader size={14} className="animate-spin" /> Saving…</> : <><Save size={14} /> Save Colors</>}
+                    </button>
+                    <button onClick={() => setSettingsForm(p => p ? ({ ...p, theme: { accent: "#C9A84C", accent2: "#FFD700", bg: "#000000", surface: "#0f0f0f", border: "#2a2a2a", text: "#f5f0e8", muted: "#a89070" } }) : p)}
+                      className="px-6 py-3 border border-[var(--mc-border)] text-[#555] text-sm uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                      Reset to Gold Default
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── PAGES & CONTENT ─────────────────────────────────────────── */}
+            {settingsTab === "pages" && settingsForm && (
+              <div className="max-w-2xl space-y-4">
+                <div className="luxury-card p-5">
+                  <h3 className="text-white font-semibold mb-1 flex items-center gap-2"><Globe size={16} className="text-[var(--mc-accent)]" /> Pages & Content</h3>
+                  <p className="text-[#555] text-sm mb-6">Jump to the section that controls each page.</p>
+                  {[
+                    { label: "Homepage Hero Text",       sub: "Headline, accent line, and paragraph",          action: () => setSettingsTab("hero") },
+                    { label: "Business Info & Contact",  sub: "Salon name, phone, email, social links",        action: () => setSettingsTab("business") },
+                    { label: "Operating Hours",          sub: "Daily open/close times",                        action: () => setSettingsTab("hours") },
+                    { label: "Theme & Brand Colors",     sub: "Accent, background, text, border colors",       action: () => setSettingsTab("theme") },
+                    { label: "Staff Profiles & Bio",     sub: "Photos, bios, roles, portfolio — in Staff tab", action: () => setTab("staff" as Tab) },
+                    { label: "Services Catalog",         sub: "Pricing and service descriptions",              action: () => setTab("services" as Tab) },
+                    { label: "Users & Admin Access",     sub: "Grant or revoke admin permissions",             action: () => setSettingsTab("users") },
+                  ].map(item => (
+                    <button key={item.label} onClick={item.action}
+                      className="w-full flex items-center justify-between px-5 py-4 border border-[var(--mc-border)] hover:border-[var(--mc-accent)] transition-all group cursor-pointer mb-2">
+                      <div className="text-left">
+                        <p className="text-white text-sm font-semibold group-hover:text-[var(--mc-accent)] transition-colors">{item.label}</p>
+                        <p className="text-[#555] text-xs mt-0.5">{item.sub}</p>
+                      </div>
+                      <ChevronRight size={16} className="text-[#555] group-hover:text-[var(--mc-accent)] transition-colors shrink-0" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 

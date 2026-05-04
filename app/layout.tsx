@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import MobileBookBar from "@/components/MobileBookBar";
 import CurlyBot from "@/components/CurlyBot";
 import PromoPopup from "@/components/PromoPopup";
+import { getSettings } from "@/lib/settings";
 
 const SITE_URL = "https://mchairsalon.com";
 
@@ -84,11 +85,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getSettings().catch(() => null);
+  const t = settings?.theme;
+  const customCss = t ? `
+    html[data-theme="bw"], html:not([data-theme]) {
+      --mc-accent: ${t.accent};
+      --mc-accent-2: ${t.accent2};
+      --mc-bg: ${t.bg};
+      --mc-surface: ${t.surface};
+      --mc-card-bg: ${t.surface};
+      --mc-border: ${t.border};
+      --mc-card-border: ${t.border};
+      --mc-text: ${t.text};
+      --mc-muted: ${t.muted};
+    }
+  ` : "";
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <Script id="theme-init" strategy="beforeInteractive">{`try{var t=localStorage.getItem('mc-theme')||'bw';if(t!=='bw')document.documentElement.setAttribute('data-theme',t);}catch(e){}`}</Script>
+        {customCss && <style dangerouslySetInnerHTML={{ __html: customCss }} />}
       </head>
       <body>
         <JsonLd />

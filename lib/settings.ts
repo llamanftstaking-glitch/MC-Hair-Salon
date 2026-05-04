@@ -3,6 +3,16 @@ import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { siteSettings as siteSettingsTable } from "./schema";
 
+export interface ThemeColors {
+  accent:      string; // primary accent (gold by default)
+  accent2:     string; // secondary accent
+  bg:          string; // page background
+  surface:     string; // card/surface background
+  border:      string; // border color
+  text:        string; // primary text
+  muted:       string; // muted / subtext
+}
+
 export interface SiteSettings {
   business: {
     name: string;
@@ -24,9 +34,20 @@ export interface SiteSettings {
     headlineAccent: string;
     subheadline: string;
   };
+  theme: ThemeColors;
 }
 
 const SETTINGS_KEY = "settings";
+
+export const DEFAULT_THEME: ThemeColors = {
+  accent:  "#C9A84C",
+  accent2: "#FFD700",
+  bg:      "#000000",
+  surface: "#0f0f0f",
+  border:  "#2a2a2a",
+  text:    "#f5f0e8",
+  muted:   "#a89070",
+};
 
 const DEFAULTS: SiteSettings = {
   business: {
@@ -52,6 +73,7 @@ const DEFAULTS: SiteSettings = {
     headlineAccent: "Premier Hair Salon",
     subheadline:    "Luxury hair and spa services in the heart of New York City. Precision cuts, transformative color, and expert beauty treatments since 2011.",
   },
+  theme: DEFAULT_THEME,
 };
 
 export async function getSettings(): Promise<SiteSettings> {
@@ -62,10 +84,6 @@ export async function getSettings(): Promise<SiteSettings> {
       .from(siteSettingsTable)
       .where(eq(siteSettingsTable.key, SETTINGS_KEY));
   } catch (err) {
-    // The site_settings table may not exist yet during build-time
-    // prerendering (the production DB schema is applied after the build
-    // completes), or the DB may be transiently unreachable. Fall back to
-    // DEFAULTS so static generation and the public site keep working.
     console.warn(
       "[settings] DB read failed, returning DEFAULTS:",
       err instanceof Error ? err.message : err,
@@ -74,9 +92,6 @@ export async function getSettings(): Promise<SiteSettings> {
   }
 
   if (!rows.length) {
-    // First-run: seed defaults. Use ON CONFLICT DO NOTHING so concurrent
-    // requests racing the seed don't crash on the unique key. If the seed
-    // itself fails (e.g. read-only replica), still return DEFAULTS.
     try {
       await db
         .insert(siteSettingsTable)
@@ -94,12 +109,12 @@ export async function getSettings(): Promise<SiteSettings> {
   const stored = rows[0].value as Partial<SiteSettings>;
   return {
     business: { ...DEFAULTS.business, ...(stored.business ?? {}) },
-    hours:    stored.hours    ?? DEFAULTS.hours,
+    hours:    stored.hours ?? DEFAULTS.hours,
     hero:     { ...DEFAULTS.hero,     ...(stored.hero     ?? {}) },
+    theme:    { ...DEFAULT_THEME,     ...(stored.theme    ?? {}) },
   };
 }
 
-// Convenience helper for server components that need salon info
 export async function getSalonInfo() {
   const s = await getSettings();
   return {
@@ -119,8 +134,9 @@ export async function updateSettings(updates: Partial<SiteSettings>): Promise<Si
   const current = await getSettings();
   const updated: SiteSettings = {
     business: { ...current.business, ...(updates.business ?? {}) },
-    hours:    updates.hours    ?? current.hours,
+    hours:    updates.hours ?? current.hours,
     hero:     { ...current.hero,     ...(updates.hero     ?? {}) },
+    theme:    { ...current.theme,    ...(updates.theme    ?? {}) },
   };
   await db
     .insert(siteSettingsTable)

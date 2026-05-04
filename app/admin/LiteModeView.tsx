@@ -224,15 +224,16 @@ export default function LiteModeView({
           <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-4">Quick Settings</p>
           <div className="space-y-2">
             {[
-              { label: "Reservations", href: null, action: () => { onFullMode(); } },
-              { label: "Clients & Rewards", href: null, action: () => { onFullMode(); } },
-              { label: "Gift Cards & Promos", href: null, action: () => { onFullMode(); } },
-              { label: "Finance & Payroll", href: null, action: () => { onFullMode(); } },
-              { label: "Marketing", href: null, action: () => { onFullMode(); } },
-              { label: "Reports", href: null, action: () => { onFullMode(); } },
-              { label: "Site Settings & Staff", href: null, action: () => { onFullMode(); } },
+              { label: "Reservations" },
+              { label: "Clients & Rewards" },
+              { label: "Gift Cards & Promos" },
+              { label: "Payroll & Staff" },
+              { label: "Operations" },
+              { label: "Marketing" },
+              { label: "Reports" },
+              { label: "Site Settings" },
             ].map(item => (
-              <button key={item.label} onClick={item.action}
+              <button key={item.label} onClick={onFullMode}
                 className="luxury-card w-full flex items-center justify-between p-4 cursor-pointer hover:border-[var(--mc-accent)]/40 transition-colors min-h-[52px]">
                 <span className="text-white text-sm">{item.label}</span>
                 <ChevronRight size={16} className="text-[#555]" />

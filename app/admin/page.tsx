@@ -26,12 +26,10 @@ type Tab =
   | "reservations"
   | "clients"
   | "rewards"
-  | "staff"
   | "payroll"
-  | "finance"
+  | "operations"
   | "gift-cards"
   | "marketing"
-  | "services"
   | "reports"
   | "settings";
 
@@ -87,6 +85,205 @@ const statusColors: Record<string, string> = {
 const inputCls = "w-full bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444]";
 const labelCls = "block text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2";
 
+// ── Vendors Panel ──────────────────────────────────────────────────────────────
+function VendorsPanel() {
+  const [vendors, setVendors] = useState<{ id: string; name: string; category: string; contact: string; phone: string; email: string; notes: string }[]>(() => {
+    try { return JSON.parse(localStorage.getItem("mc-vendors") || "[]"); } catch { return []; }
+  });
+  const [form, setForm] = useState({ name: "", category: "", contact: "", phone: "", email: "", notes: "" });
+  const [adding, setAdding] = useState(false);
+
+  const save = (list: typeof vendors) => {
+    setVendors(list);
+    localStorage.setItem("mc-vendors", JSON.stringify(list));
+  };
+  const add = () => {
+    if (!form.name) return;
+    save([...vendors, { ...form, id: Date.now().toString() }]);
+    setForm({ name: "", category: "", contact: "", phone: "", email: "", notes: "" });
+    setAdding(false);
+  };
+  const remove = (id: string) => save(vendors.filter(v => v.id !== id));
+
+  const CATEGORIES = ["Products & Color", "Cleaning & Maintenance", "Equipment", "Software & Tech", "Furniture", "Other"];
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <p className="text-white font-semibold text-lg flex items-center gap-2"><Building2 size={18} className="text-[var(--mc-accent)]" /> Vendors & Suppliers</p>
+          <p className="text-[#555] text-sm mt-1">Contacts for products, maintenance, equipment, and services</p>
+        </div>
+        <button onClick={() => setAdding(!adding)}
+          className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer transition-opacity">
+          <Plus size={14} /> Add Vendor
+        </button>
+      </div>
+
+      {adding && (
+        <div className="luxury-card p-6 mb-6 border border-[var(--mc-accent)]/20">
+          <p className="text-white font-semibold mb-4">New Vendor</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {([
+              { key: "name", label: "Company Name", placeholder: "e.g. Wella Professional" },
+              { key: "contact", label: "Contact Person", placeholder: "e.g. Sarah Johnson" },
+              { key: "phone", label: "Phone", placeholder: "(212) 555-0000" },
+              { key: "email", label: "Email", placeholder: "sales@vendor.com" },
+            ] as const).map(f => (
+              <div key={f.key}>
+                <label className={labelCls}>{f.label}</label>
+                <input type="text" value={form[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))} className={inputCls} placeholder={f.placeholder} />
+              </div>
+            ))}
+            <div>
+              <label className={labelCls}>Category</label>
+              <select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))}
+                className={inputCls + " cursor-pointer"}>
+                <option value="">Select category…</option>
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>Notes</label>
+              <input type="text" value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} className={inputCls} placeholder="Account #, delivery schedule, etc." />
+            </div>
+          </div>
+          <div className="flex gap-3 mt-4">
+            <button onClick={add} className="gold-gradient-bg text-black font-bold px-6 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer">Save Vendor</button>
+            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {vendors.length === 0 && !adding ? (
+        <div className="text-center py-20 luxury-card"><Building2 size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No vendors added yet</p></div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {vendors.map(v => (
+            <div key={v.id} className="luxury-card p-5">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div>
+                  <p className="text-white font-semibold">{v.name}</p>
+                  {v.category && <span className="text-[10px] px-2 py-0.5 border border-[var(--mc-accent)]/30 text-[var(--mc-accent)] uppercase tracking-wider">{v.category}</span>}
+                </div>
+                <button onClick={() => remove(v.id)} className="text-[#555] hover:text-red-400 transition-colors cursor-pointer shrink-0"><Trash2 size={14} /></button>
+              </div>
+              {v.contact && <p className="text-[var(--mc-muted)] text-xs mt-2"><span className="text-[#555]">Contact:</span> {v.contact}</p>}
+              {v.phone   && <p className="text-[var(--mc-muted)] text-xs"><a href={`tel:${v.phone}`} className="hover:text-[var(--mc-accent)] transition-colors">{v.phone}</a></p>}
+              {v.email   && <p className="text-[var(--mc-muted)] text-xs"><a href={`mailto:${v.email}`} className="hover:text-[var(--mc-accent)] transition-colors">{v.email}</a></p>}
+              {v.notes   && <p className="text-[#555] text-xs mt-2 border-t border-[var(--mc-border)] pt-2">{v.notes}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Daily Tasks Panel ───────────────────────────────────────────────────────────
+function DailyTasksPanel() {
+  type Task = { id: string; text: string; category: "opening" | "closing" | "weekly" | "monthly"; done: boolean };
+  const DEFAULTS: Task[] = [
+    { id: "1",  text: "Wipe down all stations and mirrors",         category: "opening",  done: false },
+    { id: "2",  text: "Sanitize tools and combs",                   category: "opening",  done: false },
+    { id: "3",  text: "Check supply levels (color, shampoo, etc.)", category: "opening",  done: false },
+    { id: "4",  text: "Sweep and mop floors",                       category: "closing",  done: false },
+    { id: "5",  text: "Empty trash and clean sinks",                category: "closing",  done: false },
+    { id: "6",  text: "Turn off all electrical equipment",          category: "closing",  done: false },
+    { id: "7",  text: "Lock up retail display",                     category: "closing",  done: false },
+    { id: "8",  text: "Deep clean shampoo bowls",                   category: "weekly",   done: false },
+    { id: "9",  text: "Restock retail shelves",                     category: "weekly",   done: false },
+    { id: "10", text: "Review upcoming appointments",               category: "weekly",   done: false },
+    { id: "11", text: "Place product orders",                       category: "monthly",  done: false },
+    { id: "12", text: "Review payroll and hours",                   category: "monthly",  done: false },
+  ];
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    try { const s = localStorage.getItem("mc-tasks"); return s ? JSON.parse(s) : DEFAULTS; } catch { return DEFAULTS; }
+  });
+  const [newTask, setNewTask] = useState("");
+  const [newCat, setNewCat] = useState<Task["category"]>("opening");
+
+  const save = (list: Task[]) => { setTasks(list); localStorage.setItem("mc-tasks", JSON.stringify(list)); };
+  const toggle = (id: string) => save(tasks.map(t => t.id === id ? { ...t, done: !t.done } : t));
+  const addTask = () => {
+    if (!newTask.trim()) return;
+    save([...tasks, { id: Date.now().toString(), text: newTask.trim(), category: newCat, done: false }]);
+    setNewTask("");
+  };
+  const removeTask = (id: string) => save(tasks.filter(t => t.id !== id));
+  const resetAll = () => save(tasks.map(t => ({ ...t, done: false })));
+
+  const CATS: { id: Task["category"]; label: string; color: string }[] = [
+    { id: "opening",  label: "Opening",  color: "text-blue-400 border-blue-400/30 bg-blue-400/10" },
+    { id: "closing",  label: "Closing",  color: "text-purple-400 border-purple-400/30 bg-purple-400/10" },
+    { id: "weekly",   label: "Weekly",   color: "text-yellow-400 border-yellow-400/30 bg-yellow-400/10" },
+    { id: "monthly",  label: "Monthly",  color: "text-green-400 border-green-400/30 bg-green-400/10" },
+  ];
+
+  const done = tasks.filter(t => t.done).length;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <p className="text-white font-semibold text-lg flex items-center gap-2"><Check size={18} className="text-[var(--mc-accent)]" /> Daily Tasks & Checklists</p>
+          <p className="text-[#555] text-sm mt-1">{done} / {tasks.length} completed today</p>
+        </div>
+        <button onClick={resetAll} className="px-4 py-2 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+          Reset All
+        </button>
+      </div>
+
+      {/* Add task */}
+      <div className="luxury-card p-4 mb-6 flex flex-wrap gap-3 items-end">
+        <div className="flex-1 min-w-48">
+          <label className={labelCls}>New Task</label>
+          <input type="text" value={newTask} onChange={e => setNewTask(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && addTask()}
+            className={inputCls} placeholder="Add a task…" />
+        </div>
+        <div>
+          <label className={labelCls}>Category</label>
+          <select value={newCat} onChange={e => setNewCat(e.target.value as Task["category"])} className={inputCls + " cursor-pointer w-36"}>
+            {CATS.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+          </select>
+        </div>
+        <button onClick={addTask} className="gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer h-[42px]">
+          Add
+        </button>
+      </div>
+
+      {/* Tasks by category */}
+      {CATS.map(cat => {
+        const catTasks = tasks.filter(t => t.category === cat.id);
+        if (!catTasks.length) return null;
+        return (
+          <div key={cat.id} className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className={`text-[10px] px-2 py-0.5 border uppercase tracking-wider font-semibold ${cat.color}`}>{cat.label}</span>
+              <span className="text-[#444] text-xs">{catTasks.filter(t=>t.done).length}/{catTasks.length}</span>
+            </div>
+            <div className="space-y-2">
+              {catTasks.map(task => (
+                <div key={task.id} className="luxury-card px-4 py-3 flex items-center gap-3">
+                  <button onClick={() => toggle(task.id)}
+                    className={`w-5 h-5 border flex items-center justify-center shrink-0 cursor-pointer transition-all ${
+                      task.done ? "bg-[var(--mc-accent)] border-[var(--mc-accent)]" : "border-[var(--mc-border)] hover:border-[var(--mc-accent)]"
+                    }`}>
+                    {task.done && <Check size={11} className="text-black" />}
+                  </button>
+                  <span className={`flex-1 text-sm transition-all ${task.done ? "line-through text-[#444]" : "text-[var(--mc-muted)]"}`}>{task.text}</span>
+                  <button onClick={() => removeTask(task.id)} className="text-[#333] hover:text-red-400 transition-colors cursor-pointer shrink-0"><X size={13} /></button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   // ── Existing state ──────────────────────────────────────────────────────────
@@ -119,10 +316,10 @@ export default function AdminPage() {
   const [settingsForm, setSettingsForm] = useState<SiteSettings | null>(null);
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
-  const [staffTab,     setStaffTab]     = useState<"profiles" | "schedule">("profiles");
+  const [payrollTab,   setPayrollTab]   = useState<"staff" | "schedule" | "payroll">("staff");
+  const [opsTab,       setOpsTab]       = useState<"bills" | "services" | "inventory" | "vendors" | "tasks">("bills");
   const [settingsTab,  setSettingsTab]  = useState<"business" | "hours" | "hero" | "theme" | "pages" | "users">("business");
   const [marketingTab, setMarketingTab] = useState<"newsletter" | "messages" | "automation" | "promos">("newsletter");
-  const [servicesTab,  setServicesTab]  = useState<"catalog" | "inventory">("catalog");
   const [reportsTab,   setReportsTab]   = useState<"analytics">("analytics");
   const [analyticsPeriod, setAnalyticsPeriod] = useState<"today" | "week" | "month" | "year">("month");
 
@@ -149,7 +346,7 @@ export default function AdminPage() {
   const [liteMode, setLiteMode] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     const saved = localStorage.getItem("mc-admin-lite");
-    return saved === null ? true : saved === "true";
+    return saved === "false" ? false : true; // default always true unless explicitly set false
   });
   const toggleLiteMode = (val: boolean) => {
     setLiteMode(val);
@@ -537,17 +734,15 @@ export default function AdminPage() {
   };
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
-    { id: "reservations", label: "Reservations",      icon: <Calendar size={15} /> },
-    { id: "clients",      label: "Clients",           icon: <Users size={15} /> },
-    { id: "rewards",      label: "Rewards",           icon: <Gift size={15} /> },
-    { id: "staff",        label: "Staff",             icon: <UserCheck size={15} /> },
-    { id: "payroll",      label: "Payroll",           icon: <Clock size={15} /> },
-    { id: "finance",      label: "Finance",           icon: <DollarSign size={15} /> },
-    { id: "gift-cards",   label: "Gift Cards",        icon: <Gift size={15} /> },
-    { id: "marketing",    label: "Marketing",         icon: <Mail size={15} />, badge: unreadMessages },
-    { id: "services",     label: "Services & Products", icon: <Wrench size={15} /> },
-    { id: "reports",      label: "Reports",           icon: <BarChart2 size={15} /> },
-    { id: "settings",     label: "Settings",          icon: <Settings size={15} /> },
+    { id: "reservations", label: "Reservations", icon: <Calendar size={15} /> },
+    { id: "clients",      label: "Clients",      icon: <Users size={15} /> },
+    { id: "rewards",      label: "Rewards",      icon: <Gift size={15} /> },
+    { id: "payroll",      label: "Payroll & Staff", icon: <UserCheck size={15} /> },
+    { id: "operations",   label: "Operations",   icon: <Wrench size={15} /> },
+    { id: "gift-cards",   label: "Gift Cards",   icon: <Gift size={15} /> },
+    { id: "marketing",    label: "Marketing",    icon: <Mail size={15} />, badge: unreadMessages },
+    { id: "reports",      label: "Reports",      icon: <BarChart2 size={15} /> },
+    { id: "settings",     label: "Settings",     icon: <Settings size={15} /> },
   ];
 
   // ── Shared booking form constants ────────────────────────────────────────────
@@ -1131,47 +1326,56 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── PAYROLL ──────────────────────────────────────────────────────── */}
-        {tab === "payroll" && <PayrollTab />}
-
-        {/* ── FINANCE ──────────────────────────────────────────────────────── */}
-        {tab === "finance" && <FinanceTab />}
-
         {/* ── GIFT CARDS ───────────────────────────────────────────────────── */}
         {tab === "gift-cards" && <GiftCardsTab />}
 
-        {/* ── STAFF ─────────────────────────────────────────────────────────── */}
-        {tab === "staff" && (
+        {/* ── PAYROLL & STAFF ──────────────────────────────────────────────── */}
+        {tab === "payroll" && (
           <div>
-            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)]">
-              {(["profiles", "schedule"] as const).map(s => (
-                <button key={s} onClick={() => setStaffTab(s)}
-                  className={`px-6 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all ${
-                    staffTab === s ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
+            {/* Sub-tab nav */}
+            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)] overflow-x-auto scrollbar-none">
+              {([
+                { id: "staff",    label: "Staff Profiles" },
+                { id: "schedule", label: "Schedule" },
+                { id: "payroll",  label: "Payroll & Rates" },
+              ] as const).map(s => (
+                <button key={s.id} onClick={() => setPayrollTab(s.id)}
+                  className={`px-6 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all whitespace-nowrap ${
+                    payrollTab === s.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
                   }`}>
-                  {s === "profiles" ? "Staff Profiles" : "Schedule"}
+                  {s.label}
                 </button>
               ))}
             </div>
-            {staffTab === "schedule" && <ScheduleTab />}
+            {payrollTab === "schedule" && <ScheduleTab />}
+            {payrollTab === "payroll"  && <PayrollTab />}
           </div>
         )}
 
-        {/* ── SERVICES & PRODUCTS ───────────────────────────────────────────── */}
-        {tab === "services" && (
+        {/* ── OPERATIONS ───────────────────────────────────────────────────── */}
+        {tab === "operations" && (
           <div>
-            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)]">
-              {(["catalog", "inventory"] as const).map(s => (
-                <button key={s} onClick={() => setServicesTab(s)}
-                  className={`px-6 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all ${
-                    servicesTab === s ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
+            <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)] overflow-x-auto scrollbar-none">
+              {([
+                { id: "bills",     label: "Bills & Expenses" },
+                { id: "services",  label: "Services Catalog" },
+                { id: "inventory", label: "Inventory" },
+                { id: "vendors",   label: "Vendors" },
+                { id: "tasks",     label: "Daily Tasks" },
+              ] as const).map(s => (
+                <button key={s.id} onClick={() => setOpsTab(s.id)}
+                  className={`px-5 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all whitespace-nowrap ${
+                    opsTab === s.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
                   }`}>
-                  {s === "catalog" ? "Services Catalog" : "Inventory & Products"}
+                  {s.label}
                 </button>
               ))}
             </div>
-            {servicesTab === "catalog"   && <ServicesTab />}
-            {servicesTab === "inventory" && <InventoryTab />}
+            {opsTab === "bills"     && <FinanceTab />}
+            {opsTab === "services"  && <ServicesTab />}
+            {opsTab === "inventory" && <InventoryTab />}
+            {opsTab === "vendors"   && <VendorsPanel />}
+            {opsTab === "tasks"     && <DailyTasksPanel />}
           </div>
         )}
 
@@ -1559,8 +1763,8 @@ export default function AdminPage() {
         )}
 
 
-        {/* ── STAFF PROFILES ───────────────────────────────────────────────── */}
-        {tab === "staff" && staffTab === "profiles" && (
+        {/* ── STAFF PROFILES (under Payroll tab) ───────────────────────────── */}
+        {tab === "payroll" && payrollTab === "staff" && (
           <div>
             {/* Header */}
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
@@ -2279,8 +2483,8 @@ export default function AdminPage() {
                     { label: "Business Info & Contact",  sub: "Salon name, phone, email, social links",        action: () => setSettingsTab("business") },
                     { label: "Operating Hours",          sub: "Daily open/close times",                        action: () => setSettingsTab("hours") },
                     { label: "Theme & Brand Colors",     sub: "Accent, background, text, border colors",       action: () => setSettingsTab("theme") },
-                    { label: "Staff Profiles & Bio",     sub: "Photos, bios, roles, portfolio — in Staff tab", action: () => setTab("staff" as Tab) },
-                    { label: "Services Catalog",         sub: "Pricing and service descriptions",              action: () => setTab("services" as Tab) },
+                    { label: "Staff Profiles & Bio",     sub: "Photos, bios, roles, portfolio — in Payroll tab", action: () => { setTab("payroll"); setPayrollTab("staff"); } },
+                    { label: "Services Catalog",         sub: "Pricing and service descriptions",               action: () => { setTab("operations"); setOpsTab("services"); } },
                     { label: "Users & Admin Access",     sub: "Grant or revoke admin permissions",             action: () => setSettingsTab("users") },
                   ].map(item => (
                     <button key={item.label} onClick={item.action}

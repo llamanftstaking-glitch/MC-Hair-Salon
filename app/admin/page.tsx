@@ -7,7 +7,7 @@ import {
   Building2, Globe, Phone, ChevronRight, ChevronLeft, Image as ImageIcon, Save,
   CreditCard, AlertTriangle, ShieldCheck,
   Gift, Star, Crown, Zap, Minus, Scissors, QrCode, Edit2,
-  Download, ToggleLeft, ToggleRight, DollarSign,
+  Download, ToggleLeft, ToggleRight, DollarSign, LayoutGrid,
   CalendarClock, Wrench, Tag, Ticket,
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
@@ -19,6 +19,7 @@ import ScheduleTab from "./ScheduleTab";
 import ServicesTab from "./ServicesTab";
 import GiftCardsTab from "./GiftCardsTab";
 import PromoCodesTab from "./PromoCodesTab";
+import LiteModeView from "./LiteModeView";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Tab =
@@ -141,6 +142,17 @@ export default function AdminPage() {
   const [adminGrantEmail,  setAdminGrantEmail]  = useState("");
   const [adminGrantLoading, setAdminGrantLoading] = useState(false);
   const [usersLoading,     setUsersLoading]     = useState(false);
+
+  // ── Lite mode ────────────────────────────────────────────────────────────────
+  const [liteMode, setLiteMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const saved = localStorage.getItem("mc-admin-lite");
+    return saved === null ? true : saved === "true";
+  });
+  const toggleLiteMode = (val: boolean) => {
+    setLiteMode(val);
+    localStorage.setItem("mc-admin-lite", String(val));
+  };
 
   // ── Clients search ──────────────────────────────────────────────────────────
   const [clientSearch, setClientSearch] = useState("");
@@ -573,6 +585,11 @@ export default function AdminPage() {
               </div>
             ))}
           </div>
+          <button onClick={() => toggleLiteMode(!liteMode)}
+            title={liteMode ? "Switch to Full Admin" : "Switch to Lite Mode"}
+            className="shrink-0 px-2 h-8 flex items-center gap-1 border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-[10px] uppercase tracking-wider whitespace-nowrap">
+            {liteMode ? <><LayoutGrid size={12} /> Full</> : <><ToggleLeft size={12} /> Lite</>}
+          </button>
           <button onClick={() => { fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); fetchAutomation(); }}
             className="shrink-0 w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer"
             title="Refresh">
@@ -581,7 +598,29 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-5">
+      {/* ── LITE MODE ─────────────────────────────────────────────────────── */}
+      {liteMode && (
+        <LiteModeView
+          bookings={bookings}
+          loading={loading}
+          pending={pending}
+          updateStatus={updateStatus}
+          resendEmail={resendConfirmationEmail}
+          chargeNoShow={chargeNoShow}
+          startEdit={startEditBooking}
+          deleteBooking={deleteBooking}
+          noshowLoading={noshowLoading}
+          noshowResult={noshowResult}
+          emailStatus={emailStatus}
+          openCreate={() => setCreateBookingOpen(true)}
+          uniqueClients={uniqueClients}
+          clientMap={clientMap}
+          onFullMode={() => toggleLiteMode(false)}
+        />
+      )}
+
+      {/* ── FULL ADMIN ────────────────────────────────────────────────────── */}
+      {!liteMode && <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-5">
         {/* Tabs — scrollable on narrow screens */}
         <div className="flex mb-6 border-b border-[var(--mc-border)] overflow-x-auto scrollbar-none">
           {tabs.map((t) => (
@@ -2221,7 +2260,8 @@ export default function AdminPage() {
           </div>
         )}
 
-      </div>
+      </div>}
+
     </div>
   );
 }

@@ -555,32 +555,33 @@ export default function AdminPage() {
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-black">
-      {/* Compact top bar: title + stats + refresh all in one line */}
+      {/* Top bar — single non-wrapping row on all screen sizes */}
       <div className="border-b border-[var(--mc-border)] bg-[var(--mc-surface-dark)]">
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center gap-4 flex-wrap">
-          <h1 className="font-serif text-base font-bold gold-gradient shrink-0">MC Admin</h1>
-          <div className="flex items-center gap-3 flex-1 flex-wrap">
+        <div className="max-w-7xl mx-auto px-3 py-2 flex items-center gap-2 min-w-0">
+          <h1 className="font-serif text-sm font-bold gold-gradient shrink-0">MC Admin</h1>
+          <div className="flex items-center gap-1.5 flex-1 overflow-x-auto scrollbar-none min-w-0">
             {[
-              { icon: <Calendar size={13} />, label: "Bookings", value: bookings.length },
-              { icon: <Clock size={13} />,    label: "Pending",  value: pending },
-              { icon: <MessageSquare size={13} />, label: "Msgs", value: unreadMessages },
-              { icon: <Bell size={13} />,     label: "Subs",     value: activeSubscribers },
+              { icon: <Calendar size={12} />, label: "Bookings", value: bookings.length },
+              { icon: <Clock size={12} />,    label: "Pending",  value: pending },
+              { icon: <MessageSquare size={12} />, label: "Msgs", value: unreadMessages },
+              { icon: <Bell size={12} />,     label: "Subs",     value: activeSubscribers },
             ].map((s) => (
-              <div key={s.label} className="flex items-center gap-1.5 border border-[var(--mc-border)] px-2.5 py-1">
+              <div key={s.label} className="flex items-center gap-1 border border-[var(--mc-border)] px-2 py-1 shrink-0">
                 <span className="text-[var(--mc-accent)]">{s.icon}</span>
                 <span className="text-white text-xs font-bold">{s.value}</span>
-                <span className="text-[#444] text-[10px] uppercase tracking-wider">{s.label}</span>
+                <span className="text-[#444] text-[10px] uppercase tracking-wider hidden sm:inline">{s.label}</span>
               </div>
             ))}
           </div>
-          <button onClick={() => { fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); }}
-            className="flex items-center gap-1.5 border border-[var(--mc-border)] text-[#555] px-3 py-1 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
-            <RefreshCw size={12} /> Refresh
+          <button onClick={() => { fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); fetchAutomation(); }}
+            className="shrink-0 w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer"
+            title="Refresh">
+            <RefreshCw size={13} />
           </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-5">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-5">
         {/* Tabs — scrollable on narrow screens */}
         <div className="flex mb-6 border-b border-[var(--mc-border)] overflow-x-auto scrollbar-none">
           {tabs.map((t) => (
@@ -599,36 +600,38 @@ export default function AdminPage() {
         {/* ── RESERVATIONS ─────────────────────────────────────────────────── */}
         {tab === "reservations" && (
           <div>
-            {/* Toolbar: filters + view toggle */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-              <div className="flex gap-2 flex-wrap">
+            {/* Toolbar: filters (scrollable) + view toggle */}
+            <div className="flex items-center gap-2 mb-4 min-w-0">
+              {/* Status filters — horizontal scroll on mobile */}
+              <div className="flex gap-1.5 overflow-x-auto scrollbar-none flex-1 min-w-0">
                 {(["all", "pending", "confirmed", "cancelled", "no_show"] as const).map(f => (
                   <button key={f} onClick={() => setFilter(f)}
-                    className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all ${
+                    className={`shrink-0 px-3 py-1.5 text-[10px] uppercase tracking-widest cursor-pointer transition-all whitespace-nowrap ${
                       filter === f ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
                     }`}>
                     {f} ({f === "all" ? bookings.length : bookings.filter(b => b.status === f).length})
                   </button>
                 ))}
               </div>
-              <div className="flex gap-2 shrink-0 flex-wrap">
-                <button onClick={() => setViewMode("daily")}
-                  className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all flex items-center gap-1.5 ${
-                    viewMode === "daily" ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
+              {/* View toggle — icon-only on mobile */}
+              <div className="flex gap-1 shrink-0">
+                <button onClick={() => setViewMode("daily")} title="Daily"
+                  className={`w-8 h-8 flex items-center justify-center cursor-pointer transition-all ${
+                    viewMode === "daily" ? "gold-gradient-bg text-black" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
                   }`}>
-                  <Clock size={12} /> Daily
+                  <Clock size={13} />
                 </button>
-                <button onClick={() => setViewMode("weekly")}
-                  className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all flex items-center gap-1.5 ${
-                    viewMode === "weekly" ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
+                <button onClick={() => setViewMode("weekly")} title="Weekly"
+                  className={`w-8 h-8 flex items-center justify-center cursor-pointer transition-all ${
+                    viewMode === "weekly" ? "gold-gradient-bg text-black" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
                   }`}>
-                  <Calendar size={12} /> Weekly
+                  <Calendar size={13} />
                 </button>
-                <button onClick={() => setViewMode("list")}
-                  className={`px-4 py-1.5 text-xs uppercase tracking-widest cursor-pointer transition-all flex items-center gap-1.5 ${
-                    viewMode === "list" ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--mc-text-dim)] hover:border-[var(--mc-accent)]"
+                <button onClick={() => setViewMode("list")} title="List"
+                  className={`w-8 h-8 flex items-center justify-center cursor-pointer transition-all ${
+                    viewMode === "list" ? "gold-gradient-bg text-black" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
                   }`}>
-                  <BarChart2 size={12} /> List
+                  <BarChart2 size={13} />
                 </button>
               </div>
             </div>
@@ -719,23 +722,29 @@ export default function AdminPage() {
               };
               return (
                 <div>
-                  {/* Day nav + New Booking */}
-                  <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-                    <button onClick={prevDay} className="flex items-center gap-1 border border-[var(--mc-border)] text-[#555] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
-                      <ChevronLeft size={12} /> Prev
+                  {/* Day nav — single compact row on all screen sizes */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <button onClick={prevDay}
+                      className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
+                      <ChevronLeft size={14} />
                     </button>
-                    <div className="flex items-center gap-3 flex-wrap justify-center">
-                      <p className={`text-sm font-semibold ${isToday ? "text-[var(--mc-accent)]" : "text-white"}`}>{dateLabel}</p>
-                      <button onClick={() => setDailyDate(new Date().toISOString().split("T")[0])} className="text-[#444] text-xs hover:text-[var(--mc-accent)] transition-colors cursor-pointer">Today</button>
-                      <input type="date" value={dailyDate} onChange={e => setDailyDate(e.target.value)}
-                        className="bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white text-xs px-2 py-1 focus:outline-none focus:border-[var(--mc-accent)] cursor-pointer" style={{ colorScheme: "dark" }} />
-                      <button onClick={() => { setCreateForm(f => ({ ...f, date: dailyDate, time: "", stylist: "" })); setCreateBookingOpen(true); }}
-                        className="flex items-center gap-1.5 gold-gradient-bg text-black text-xs font-bold px-3 py-1.5 uppercase tracking-wider cursor-pointer hover:opacity-90 transition-opacity">
-                        <Plus size={12} /> New Booking
+                    <div className="flex-1 flex items-center gap-2 min-w-0 overflow-hidden">
+                      <p className={`text-xs font-semibold truncate ${isToday ? "text-[var(--mc-accent)]" : "text-white"}`}>{dateLabel}</p>
+                      <button onClick={() => setDailyDate(new Date().toISOString().split("T")[0])}
+                        className="shrink-0 text-[#444] text-[10px] uppercase tracking-wider hover:text-[var(--mc-accent)] transition-colors cursor-pointer hidden sm:block">
+                        Today
                       </button>
+                      <input type="date" value={dailyDate} onChange={e => setDailyDate(e.target.value)}
+                        className="shrink-0 bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white text-[10px] px-1.5 py-1 focus:outline-none focus:border-[var(--mc-accent)] cursor-pointer w-[110px]"
+                        style={{ colorScheme: "dark" }} />
                     </div>
-                    <button onClick={nextDay} className="flex items-center gap-1 border border-[var(--mc-border)] text-[#555] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
-                      Next <ChevronRight size={12} />
+                    <button onClick={nextDay}
+                      className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
+                      <ChevronRight size={14} />
+                    </button>
+                    <button onClick={() => { setCreateForm(f => ({ ...f, date: dailyDate, time: "", stylist: "" })); setCreateBookingOpen(true); }}
+                      className="shrink-0 flex items-center gap-1 gold-gradient-bg text-black text-[10px] font-bold px-2.5 py-1.5 uppercase tracking-wider cursor-pointer hover:opacity-90 transition-opacity">
+                      <Plus size={11} /> <span className="hidden sm:inline">New </span>Booking
                     </button>
                   </div>
 

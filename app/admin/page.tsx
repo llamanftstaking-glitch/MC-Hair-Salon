@@ -761,17 +761,33 @@ export default function AdminPage() {
   // ── Fetch functions ─────────────────────────────────────────────────────────
   const fetchBookings = useCallback(async () => {
     setLoading(true);
-    try { const res = await fetch("/api/bookings"); setBookings(await res.json()); }
+    try {
+      const res = await fetch("/api/bookings");
+      const data = await res.json();
+      setBookings(Array.isArray(data) ? data : []);
+    } catch { /* non-fatal */ }
     finally { setLoading(false); }
   }, []);
   const fetchSubscribers = useCallback(async () => {
-    const res = await fetch("/api/newsletter"); setSubscribers(await res.json());
+    try {
+      const res = await fetch("/api/newsletter");
+      const data = await res.json();
+      setSubscribers(Array.isArray(data) ? data : []);
+    } catch { /* non-fatal */ }
   }, []);
   const fetchMessages = useCallback(async () => {
-    const res = await fetch("/api/contact"); setMessages(await res.json());
+    try {
+      const res = await fetch("/api/contact");
+      const data = await res.json();
+      setMessages(Array.isArray(data) ? data : []);
+    } catch { /* non-fatal */ }
   }, []);
   const fetchStaff = useCallback(async () => {
-    const res = await fetch("/api/staff"); setStaff(await res.json());
+    try {
+      const res = await fetch("/api/staff");
+      const data = await res.json();
+      setStaff(Array.isArray(data) ? data : []);
+    } catch { /* non-fatal */ }
   }, []);
   const fetchSettings = useCallback(async () => {
     const res = await fetch("/api/settings");

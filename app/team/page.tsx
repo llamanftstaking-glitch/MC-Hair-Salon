@@ -23,7 +23,8 @@ export const metadata: Metadata = {
 };
 
 export default async function TeamPage() {
-  const team = await getAllStaff();
+  let team: Awaited<ReturnType<typeof getAllStaff>> = [];
+  try { team = await getAllStaff(); } catch { /* DB unavailable — show empty state */ }
 
   return (
     <>

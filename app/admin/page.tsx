@@ -284,6 +284,395 @@ function DailyTasksPanel() {
   );
 }
 
+// ── Expense Reports Panel ───────────────────────────────────────────────────────
+function ExpenseReportsPanel() {
+  type Expense = { id: string; date: string; amount: number; category: string; description: string; vendor: string; };
+  const EXP_CATS = ["Supplies & Color", "Equipment", "Utilities", "Rent & Lease", "Marketing", "Payroll", "Repairs", "Insurance", "Software & Tech", "Other"];
+  const [expenses, setExpenses] = useState<Expense[]>(() => {
+    try { return JSON.parse(localStorage.getItem("mc-expenses") || "[]"); } catch { return []; }
+  });
+  const [form, setForm] = useState<Omit<Expense,"id">>({ date: new Date().toISOString().split("T")[0], amount: 0, category: "Supplies & Color", description: "", vendor: "" });
+  const [adding, setAdding] = useState(false);
+  const [rangeStart, setRangeStart] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().split("T")[0]; });
+  const [rangeEnd,   setRangeEnd]   = useState(() => new Date().toISOString().split("T")[0]);
+
+  const save = (list: Expense[]) => { setExpenses(list); localStorage.setItem("mc-expenses", JSON.stringify(list)); };
+  const add = () => {
+    if (!form.description || form.amount <= 0) return;
+    save([...expenses, { ...form, id: Date.now().toString() }]);
+    setForm({ date: new Date().toISOString().split("T")[0], amount: 0, category: "Supplies & Color", description: "", vendor: "" });
+    setAdding(false);
+  };
+  const remove = (id: string) => { if (confirm("Delete this expense?")) save(expenses.filter(e => e.id !== id)); };
+
+  const inRange = expenses.filter(e => e.date >= rangeStart && e.date <= rangeEnd).sort((a,b) => b.date.localeCompare(a.date));
+  const total = inRange.reduce((s, e) => s + e.amount, 0);
+  const byCategory: Record<string, number> = {};
+  inRange.forEach(e => { byCategory[e.category] = (byCategory[e.category] || 0) + e.amount; });
+  const topCats = Object.entries(byCategory).sort((a,b) => b[1]-a[1]);
+
+  const exportCSV = () => {
+    const rows = [["Date","Category","Description","Vendor","Amount"], ...inRange.map(e => [e.date,e.category,e.description,e.vendor,`$${e.amount.toFixed(2)}`])];
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n");
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download = "expenses.csv"; a.click();
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <p className="text-white font-semibold text-lg flex items-center gap-2"><DollarSign size={18} className="text-[var(--mc-accent)]" /> Expense Reports</p>
+          <p className="text-[#555] text-sm mt-1">Track and categorize all salon expenses</p>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <button onClick={exportCSV} className="flex items-center gap-1.5 border border-[var(--mc-border)] text-[#555] px-4 py-2 text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+            <Download size={13} /> Export CSV
+          </button>
+          <button onClick={() => setAdding(!adding)} className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer transition-opacity">
+            <Plus size={14} /> Add Expense
+          </button>
+        </div>
+      </div>
+
+      {/* Date range filter */}
+      <div className="luxury-card p-4 mb-6 flex flex-wrap items-end gap-4">
+        <div>
+          <label className={labelCls}>From</label>
+          <input type="date" value={rangeStart} onChange={e => setRangeStart(e.target.value)} className={`${inputCls} w-44 cursor-pointer`} />
+        </div>
+        <div>
+          <label className={labelCls}>To</label>
+          <input type="date" value={rangeEnd} onChange={e => setRangeEnd(e.target.value)} className={`${inputCls} w-44 cursor-pointer`} />
+        </div>
+        <div className="border border-[var(--mc-accent)]/30 px-5 py-2 bg-[var(--mc-accent)]/5">
+          <p className="text-[10px] text-[#555] uppercase tracking-widest">Total in Range</p>
+          <p className="text-[var(--mc-accent)] font-bold text-xl">${total.toLocaleString("en-US",{minimumFractionDigits:2})}</p>
+        </div>
+      </div>
+
+      {adding && (
+        <div className="luxury-card p-6 mb-6 border border-[var(--mc-accent)]/20">
+          <p className="text-white font-semibold mb-4">New Expense</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div><label className={labelCls}>Date</label><input type="date" value={form.date} onChange={e => setForm(p=>({...p,date:e.target.value}))} className={`${inputCls} cursor-pointer`} /></div>
+            <div><label className={labelCls}>Amount ($)</label><input type="number" min="0" step="0.01" value={form.amount || ""} onChange={e => setForm(p=>({...p,amount:parseFloat(e.target.value)||0}))} className={inputCls} placeholder="0.00" /></div>
+            <div><label className={labelCls}>Category</label><select value={form.category} onChange={e => setForm(p=>({...p,category:e.target.value}))} className={`${inputCls} cursor-pointer`}>{EXP_CATS.map(c=><option key={c} value={c}>{c}</option>)}</select></div>
+            <div><label className={labelCls}>Description</label><input type="text" value={form.description} onChange={e => setForm(p=>({...p,description:e.target.value}))} className={inputCls} placeholder="What was purchased" /></div>
+            <div><label className={labelCls}>Vendor</label><input type="text" value={form.vendor} onChange={e => setForm(p=>({...p,vendor:e.target.value}))} className={inputCls} placeholder="Who was paid" /></div>
+          </div>
+          <div className="flex gap-3 mt-4">
+            <button onClick={add} className="gold-gradient-bg text-black font-bold px-6 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer">Save Expense</button>
+            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Category breakdown */}
+      {topCats.length > 0 && (
+        <div className="luxury-card p-5 mb-6">
+          <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-4">Breakdown by Category</p>
+          <div className="space-y-2">
+            {topCats.map(([cat, amt]) => (
+              <div key={cat} className="flex items-center gap-3">
+                <span className="text-[var(--mc-muted)] text-sm w-44 shrink-0 truncate">{cat}</span>
+                <div className="flex-1 bg-[var(--mc-surface-dark)] h-2 relative">
+                  <div className="absolute inset-y-0 left-0 gold-gradient-bg" style={{ width: `${Math.round((amt/total)*100)}%` }} />
+                </div>
+                <span className="text-white text-sm font-semibold w-20 text-right shrink-0">${amt.toFixed(2)}</span>
+                <span className="text-[#555] text-xs w-10 text-right shrink-0">{Math.round((amt/total)*100)}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {inRange.length === 0 ? (
+        <div className="text-center py-16 luxury-card"><DollarSign size={40} className="text-[#333] mx-auto mb-3" /><p className="text-[#555] text-sm">No expenses in this date range</p></div>
+      ) : (
+        <div className="space-y-2">
+          {inRange.map(e => (
+            <div key={e.id} className="luxury-card px-5 py-3 flex items-center gap-4 flex-wrap">
+              <span className="text-[#555] text-xs w-24 shrink-0">{new Date(e.date+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</span>
+              <span className="text-[var(--mc-accent)] font-bold text-sm w-20 shrink-0">${e.amount.toFixed(2)}</span>
+              <span className="text-[10px] border border-[var(--mc-border)] text-[#555] px-2 py-0.5 uppercase tracking-wider shrink-0">{e.category}</span>
+              <span className="text-[var(--mc-muted)] text-sm flex-1 min-w-0 truncate">{e.description}</span>
+              {e.vendor && <span className="text-[#555] text-xs shrink-0">{e.vendor}</span>}
+              <button onClick={() => remove(e.id)} className="text-[#333] hover:text-red-400 transition-colors cursor-pointer shrink-0"><Trash2 size={13} /></button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Maintenance Log Panel ───────────────────────────────────────────────────────
+function MaintenanceLogPanel() {
+  type MEntry = { id: string; equipment: string; issue: string; reportedDate: string; resolvedDate: string; cost: number; technician: string; status: "pending" | "in-progress" | "resolved"; notes: string; };
+  const EQUIPMENT = ["Salon Chair #1","Salon Chair #2","Salon Chair #3","Salon Chair #4","Shampoo Bowl #1","Shampoo Bowl #2","Hair Dryer #1","Hair Dryer #2","Steamer","Color Processor","Flat Iron Station","Reception Desk","HVAC / AC","Plumbing","Electrical","Other"];
+  const [entries, setEntries] = useState<MEntry[]>(() => {
+    try { return JSON.parse(localStorage.getItem("mc-maintenance") || "[]"); } catch { return []; }
+  });
+  const [form, setForm] = useState<Omit<MEntry,"id">>({ equipment: "Salon Chair #1", issue: "", reportedDate: new Date().toISOString().split("T")[0], resolvedDate: "", cost: 0, technician: "", status: "pending", notes: "" });
+  const [adding, setAdding] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<"all"|"pending"|"in-progress"|"resolved">("all");
+
+  const save = (list: MEntry[]) => { setEntries(list); localStorage.setItem("mc-maintenance", JSON.stringify(list)); };
+  const add = () => {
+    if (!form.issue) return;
+    save([{ ...form, id: Date.now().toString() }, ...entries]);
+    setForm({ equipment: "Salon Chair #1", issue: "", reportedDate: new Date().toISOString().split("T")[0], resolvedDate: "", cost: 0, technician: "", status: "pending", notes: "" });
+    setAdding(false);
+  };
+  const updateStatus = (id: string, status: MEntry["status"]) => save(entries.map(e => e.id === id ? { ...e, status, resolvedDate: status === "resolved" ? new Date().toISOString().split("T")[0] : e.resolvedDate } : e));
+  const remove = (id: string) => { if (confirm("Delete this log entry?")) save(entries.filter(e => e.id !== id)); };
+
+  const STATUS_STYLE: Record<string, string> = {
+    pending:      "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",
+    "in-progress":"text-blue-400 border-blue-400/30 bg-blue-400/10",
+    resolved:     "text-green-400 border-green-400/30 bg-green-400/10",
+  };
+  const STATUS_BORDER: Record<string, string> = {
+    pending: "border-l-yellow-400", "in-progress": "border-l-blue-400", resolved: "border-l-green-400",
+  };
+
+  const filtered = statusFilter === "all" ? entries : entries.filter(e => e.status === statusFilter);
+  const openCount = entries.filter(e => e.status !== "resolved").length;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <p className="text-white font-semibold text-lg flex items-center gap-2"><Wrench size={18} className="text-[var(--mc-accent)]" /> Maintenance Log</p>
+          <p className="text-[#555] text-sm mt-1">{openCount} open issue{openCount !== 1 ? "s" : ""} · {entries.filter(e=>e.status==="resolved").length} resolved</p>
+        </div>
+        <button onClick={() => setAdding(!adding)} className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer transition-opacity">
+          <Plus size={14} /> Log Issue
+        </button>
+      </div>
+
+      {/* Status filter */}
+      <div className="flex gap-1.5 mb-6 overflow-x-auto scrollbar-none">
+        {(["all","pending","in-progress","resolved"] as const).map(s => (
+          <button key={s} onClick={() => setStatusFilter(s)}
+            className={`shrink-0 px-3 py-1.5 text-[10px] uppercase tracking-widest cursor-pointer transition-all whitespace-nowrap ${
+              statusFilter === s ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
+            }`}>
+            {s} {s === "all" ? `(${entries.length})` : `(${entries.filter(e=>e.status===s).length})`}
+          </button>
+        ))}
+      </div>
+
+      {adding && (
+        <div className="luxury-card p-6 mb-6 border border-[var(--mc-accent)]/20">
+          <p className="text-white font-semibold mb-4">New Maintenance Entry</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div><label className={labelCls}>Equipment</label><select value={form.equipment} onChange={e=>setForm(p=>({...p,equipment:e.target.value}))} className={`${inputCls} cursor-pointer`}>{EQUIPMENT.map(eq=><option key={eq} value={eq}>{eq}</option>)}</select></div>
+            <div className="sm:col-span-2"><label className={labelCls}>Issue / Task</label><input type="text" value={form.issue} onChange={e=>setForm(p=>({...p,issue:e.target.value}))} className={inputCls} placeholder="Describe the problem or maintenance task" /></div>
+            <div><label className={labelCls}>Reported Date</label><input type="date" value={form.reportedDate} onChange={e=>setForm(p=>({...p,reportedDate:e.target.value}))} className={`${inputCls} cursor-pointer`} /></div>
+            <div><label className={labelCls}>Status</label><select value={form.status} onChange={e=>setForm(p=>({...p,status:e.target.value as MEntry["status"]}))} className={`${inputCls} cursor-pointer`}><option value="pending">Pending</option><option value="in-progress">In Progress</option><option value="resolved">Resolved</option></select></div>
+            <div><label className={labelCls}>Technician / Vendor</label><input type="text" value={form.technician} onChange={e=>setForm(p=>({...p,technician:e.target.value}))} className={inputCls} placeholder="Who is handling it" /></div>
+            <div><label className={labelCls}>Repair Cost ($)</label><input type="number" min="0" step="0.01" value={form.cost||""} onChange={e=>setForm(p=>({...p,cost:parseFloat(e.target.value)||0}))} className={inputCls} placeholder="0.00" /></div>
+            <div className="sm:col-span-2"><label className={labelCls}>Notes</label><input type="text" value={form.notes} onChange={e=>setForm(p=>({...p,notes:e.target.value}))} className={inputCls} placeholder="Parts needed, follow-up actions, warranty info…" /></div>
+          </div>
+          <div className="flex gap-3 mt-4">
+            <button onClick={add} className="gold-gradient-bg text-black font-bold px-6 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer">Save Entry</button>
+            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 luxury-card"><Wrench size={40} className="text-[#333] mx-auto mb-3" /><p className="text-[#555] text-sm">No entries</p></div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(e => (
+            <div key={e.id} className={`luxury-card border-l-4 ${STATUS_BORDER[e.status] ?? "border-l-[var(--mc-border)]"} p-5`}>
+              <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <p className="text-white font-semibold text-sm">{e.equipment}</p>
+                    <span className={`text-[10px] px-2 py-0.5 border uppercase tracking-wider font-semibold ${STATUS_STYLE[e.status]}`}>{e.status}</span>
+                    {e.cost > 0 && <span className="text-[var(--mc-accent)] text-xs font-semibold">${e.cost.toFixed(2)}</span>}
+                  </div>
+                  <p className="text-[var(--mc-muted)] text-sm">{e.issue}</p>
+                  {e.technician && <p className="text-[#555] text-xs mt-1">Technician: {e.technician}</p>}
+                  {e.notes && <p className="text-[#444] text-xs mt-1">{e.notes}</p>}
+                  <p className="text-[#444] text-xs mt-2">Reported: {e.reportedDate}{e.resolvedDate ? ` · Resolved: ${e.resolvedDate}` : ""}</p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {e.status !== "resolved" && (
+                    <button onClick={() => updateStatus(e.id, e.status === "pending" ? "in-progress" : "resolved")}
+                      className="px-3 py-1.5 border border-[var(--mc-accent)]/30 text-[var(--mc-accent)] text-xs uppercase tracking-wider hover:bg-[var(--mc-accent)]/10 transition-colors cursor-pointer whitespace-nowrap">
+                      {e.status === "pending" ? "→ In Progress" : "→ Resolved"}
+                    </button>
+                  )}
+                  <button onClick={() => remove(e.id)} className="text-[#555] hover:text-red-400 transition-colors cursor-pointer"><Trash2 size={14} /></button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Supply Orders Panel ─────────────────────────────────────────────────────────
+function SupplyOrdersPanel() {
+  type SupplyItem = { id: string; name: string; category: string; unit: string; currentStock: number; reorderThreshold: number; vendor: string; lastOrdered: string; status: "ok" | "low" | "ordered" | "received"; notes: string; };
+  const SUPPLY_CATS = ["Hair Color", "Shampoo & Conditioner", "Styling Products", "Tools & Equipment", "Disposables", "Retail Products", "Cleaning Supplies", "Office Supplies", "Other"];
+  const [items, setItems] = useState<SupplyItem[]>(() => {
+    try { return JSON.parse(localStorage.getItem("mc-supplies") || "[]"); } catch { return []; }
+  });
+  const [form, setForm] = useState<Omit<SupplyItem,"id"|"status">>({ name: "", category: "Hair Color", unit: "units", currentStock: 0, reorderThreshold: 5, vendor: "", lastOrdered: "", notes: "" });
+  const [adding, setAdding] = useState(false);
+  const [filter, setFilter] = useState<"all"|"low"|"ordered">("all");
+
+  const save = (list: SupplyItem[]) => { setItems(list); localStorage.setItem("mc-supplies", JSON.stringify(list)); };
+  const computeStatus = (item: Omit<SupplyItem,"status">): SupplyItem["status"] => {
+    if (item.currentStock <= 0) return "low";
+    if (item.currentStock <= item.reorderThreshold) return "low";
+    return "ok";
+  };
+  const add = () => {
+    if (!form.name) return;
+    const newItem: SupplyItem = { ...form, id: Date.now().toString(), status: computeStatus({ ...form, id: "" }) };
+    save([...items, newItem]);
+    setForm({ name: "", category: "Hair Color", unit: "units", currentStock: 0, reorderThreshold: 5, vendor: "", lastOrdered: "", notes: "" });
+    setAdding(false);
+  };
+  const updateStock = (id: string, delta: number) => save(items.map(i => {
+    if (i.id !== id) return i;
+    const updated = { ...i, currentStock: Math.max(0, i.currentStock + delta) };
+    return { ...updated, status: computeStatus(updated) };
+  }));
+  const markOrdered = (id: string) => save(items.map(i => i.id === id ? { ...i, status: "ordered", lastOrdered: new Date().toISOString().split("T")[0] } : i));
+  const markReceived = (id: string, qty: number) => save(items.map(i => {
+    if (i.id !== id) return i;
+    const updated = { ...i, currentStock: i.currentStock + qty, status: computeStatus({...i, currentStock: i.currentStock + qty}) as SupplyItem["status"] };
+    return updated;
+  }));
+  const remove = (id: string) => { if (confirm("Remove this item?")) save(items.filter(i => i.id !== id)); };
+
+  const STATUS_STYLE: Record<string, string> = {
+    ok:       "text-green-400 border-green-400/30 bg-green-400/10",
+    low:      "text-red-400 border-red-400/30 bg-red-400/10",
+    ordered:  "text-blue-400 border-blue-400/30 bg-blue-400/10",
+    received: "text-green-400 border-green-400/30 bg-green-400/10",
+  };
+  const STATUS_BORDER: Record<string, string> = {
+    ok: "border-l-green-400", low: "border-l-red-400", ordered: "border-l-blue-400", received: "border-l-green-400",
+  };
+
+  const lowCount = items.filter(i => i.status === "low").length;
+  const orderedCount = items.filter(i => i.status === "ordered").length;
+  const filtered = filter === "all" ? items : items.filter(i => i.status === filter);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <p className="text-white font-semibold text-lg flex items-center gap-2"><Tag size={18} className="text-[var(--mc-accent)]" /> Supply Orders</p>
+          <div className="flex items-center gap-3 mt-1 flex-wrap">
+            {lowCount > 0 && <span className="text-red-400 text-xs font-semibold flex items-center gap-1"><AlertTriangle size={11} /> {lowCount} item{lowCount!==1?"s":""} low/out</span>}
+            {orderedCount > 0 && <span className="text-blue-400 text-xs">{orderedCount} order{orderedCount!==1?"s":""} pending</span>}
+            {lowCount === 0 && orderedCount === 0 && <span className="text-[#555] text-xs">{items.length} items tracked</span>}
+          </div>
+        </div>
+        <button onClick={() => setAdding(!adding)} className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer transition-opacity">
+          <Plus size={14} /> Add Item
+        </button>
+      </div>
+
+      {/* Low stock alert banner */}
+      {lowCount > 0 && (
+        <div className="mb-5 p-4 border border-red-400/30 bg-red-400/5 flex items-center gap-3">
+          <AlertTriangle size={16} className="text-red-400 shrink-0" />
+          <p className="text-red-400 text-sm font-semibold">{lowCount} item{lowCount!==1?"s":""} at or below reorder threshold — place orders soon</p>
+        </div>
+      )}
+
+      {/* Filter tabs */}
+      <div className="flex gap-1.5 mb-6">
+        {(["all","low","ordered"] as const).map(f => (
+          <button key={f} onClick={() => setFilter(f)}
+            className={`px-3 py-1.5 text-[10px] uppercase tracking-widest cursor-pointer transition-all ${
+              filter === f ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
+            }`}>
+            {f === "all" ? `All (${items.length})` : f === "low" ? `Low Stock (${lowCount})` : `Ordered (${orderedCount})`}
+          </button>
+        ))}
+      </div>
+
+      {adding && (
+        <div className="luxury-card p-6 mb-6 border border-[var(--mc-accent)]/20">
+          <p className="text-white font-semibold mb-4">Add Supply Item</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div><label className={labelCls}>Item Name</label><input type="text" value={form.name} onChange={e=>setForm(p=>({...p,name:e.target.value}))} className={inputCls} placeholder="e.g. Wella Koleston 7/0" /></div>
+            <div><label className={labelCls}>Category</label><select value={form.category} onChange={e=>setForm(p=>({...p,category:e.target.value}))} className={`${inputCls} cursor-pointer`}>{SUPPLY_CATS.map(c=><option key={c} value={c}>{c}</option>)}</select></div>
+            <div><label className={labelCls}>Unit</label><input type="text" value={form.unit} onChange={e=>setForm(p=>({...p,unit:e.target.value}))} className={inputCls} placeholder="bottles, boxes, tubes…" /></div>
+            <div><label className={labelCls}>Current Stock</label><input type="number" min="0" value={form.currentStock} onChange={e=>setForm(p=>({...p,currentStock:parseInt(e.target.value)||0}))} className={inputCls} /></div>
+            <div><label className={labelCls}>Reorder When Below</label><input type="number" min="0" value={form.reorderThreshold} onChange={e=>setForm(p=>({...p,reorderThreshold:parseInt(e.target.value)||0}))} className={inputCls} /></div>
+            <div><label className={labelCls}>Vendor</label><input type="text" value={form.vendor} onChange={e=>setForm(p=>({...p,vendor:e.target.value}))} className={inputCls} placeholder="Supplier name" /></div>
+            <div className="sm:col-span-2"><label className={labelCls}>Notes</label><input type="text" value={form.notes} onChange={e=>setForm(p=>({...p,notes:e.target.value}))} className={inputCls} placeholder="SKU, size, color formula notes…" /></div>
+          </div>
+          <div className="flex gap-3 mt-4">
+            <button onClick={add} className="gold-gradient-bg text-black font-bold px-6 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer">Add Item</button>
+            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 luxury-card"><Tag size={40} className="text-[#333] mx-auto mb-3" /><p className="text-[#555] text-sm">{filter === "low" ? "No low-stock items" : filter === "ordered" ? "No pending orders" : "No supply items added yet"}</p></div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(item => (
+            <div key={item.id} className={`luxury-card border-l-4 ${STATUS_BORDER[item.status]} p-5`}>
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <p className="text-white font-semibold text-sm">{item.name}</p>
+                    <span className={`text-[10px] px-2 py-0.5 border uppercase tracking-wider font-semibold ${STATUS_STYLE[item.status]}`}>{item.status.toUpperCase()}</span>
+                    <span className="text-[10px] border border-[var(--mc-border)] text-[#555] px-2 py-0.5">{item.category}</span>
+                  </div>
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => updateStock(item.id, -1)} className="w-7 h-7 border border-[var(--mc-border)] text-[#555] flex items-center justify-center hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] cursor-pointer transition-all"><Minus size={11} /></button>
+                      <span className={`text-lg font-bold w-12 text-center ${item.currentStock <= item.reorderThreshold ? "text-red-400" : "text-white"}`}>{item.currentStock}</span>
+                      <button onClick={() => updateStock(item.id, 1)} className="w-7 h-7 border border-[var(--mc-border)] text-[#555] flex items-center justify-center hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] cursor-pointer transition-all"><Plus size={11} /></button>
+                      <span className="text-[#555] text-xs">{item.unit}</span>
+                    </div>
+                    <span className="text-[#555] text-xs">Reorder at: {item.reorderThreshold}</span>
+                    {item.vendor && <span className="text-[#555] text-xs">Vendor: {item.vendor}</span>}
+                    {item.lastOrdered && <span className="text-[#555] text-xs">Last ordered: {item.lastOrdered}</span>}
+                  </div>
+                  {item.notes && <p className="text-[#444] text-xs mt-1">{item.notes}</p>}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {item.status === "low" && (
+                    <button onClick={() => markOrdered(item.id)} className="px-3 py-1.5 border border-blue-400/30 text-blue-400 text-xs uppercase tracking-wider hover:bg-blue-400/10 transition-colors cursor-pointer whitespace-nowrap">
+                      Mark Ordered
+                    </button>
+                  )}
+                  {item.status === "ordered" && (
+                    <button onClick={() => { const qty = parseInt(prompt("How many units received?") || "0"); if (qty > 0) markReceived(item.id, qty); }}
+                      className="px-3 py-1.5 border border-green-400/30 text-green-400 text-xs uppercase tracking-wider hover:bg-green-400/10 transition-colors cursor-pointer whitespace-nowrap">
+                      Mark Received
+                    </button>
+                  )}
+                  <button onClick={() => remove(item.id)} className="text-[#555] hover:text-red-400 transition-colors cursor-pointer"><Trash2 size={14} /></button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   // ── Existing state ──────────────────────────────────────────────────────────
@@ -317,7 +706,7 @@ export default function AdminPage() {
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [payrollTab,   setPayrollTab]   = useState<"staff" | "schedule" | "payroll">("staff");
-  const [opsTab,       setOpsTab]       = useState<"bills" | "services" | "inventory" | "vendors" | "tasks">("bills");
+  const [opsTab,       setOpsTab]       = useState<"bills" | "services" | "inventory" | "vendors" | "tasks" | "expenses" | "maintenance" | "orders">("bills");
   const [settingsTab,  setSettingsTab]  = useState<"business" | "hours" | "hero" | "theme" | "pages" | "users">("business");
   const [marketingTab, setMarketingTab] = useState<"newsletter" | "messages" | "automation" | "promos">("newsletter");
   const [reportsTab,   setReportsTab]   = useState<"analytics">("analytics");
@@ -1357,11 +1746,14 @@ export default function AdminPage() {
           <div>
             <div className="flex gap-0 mb-8 border-b border-[var(--mc-border)] overflow-x-auto scrollbar-none">
               {([
-                { id: "bills",     label: "Bills & Expenses" },
-                { id: "services",  label: "Services Catalog" },
-                { id: "inventory", label: "Inventory" },
-                { id: "vendors",   label: "Vendors" },
-                { id: "tasks",     label: "Daily Tasks" },
+                { id: "bills",       label: "Bills" },
+                { id: "expenses",    label: "Expense Reports" },
+                { id: "services",    label: "Services" },
+                { id: "inventory",   label: "Inventory" },
+                { id: "orders",      label: "Supply Orders" },
+                { id: "vendors",     label: "Vendors" },
+                { id: "maintenance", label: "Maintenance" },
+                { id: "tasks",       label: "Daily Tasks" },
               ] as const).map(s => (
                 <button key={s.id} onClick={() => setOpsTab(s.id)}
                   className={`px-5 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all whitespace-nowrap ${
@@ -1371,11 +1763,14 @@ export default function AdminPage() {
                 </button>
               ))}
             </div>
-            {opsTab === "bills"     && <FinanceTab />}
-            {opsTab === "services"  && <ServicesTab />}
-            {opsTab === "inventory" && <InventoryTab />}
-            {opsTab === "vendors"   && <VendorsPanel />}
-            {opsTab === "tasks"     && <DailyTasksPanel />}
+            {opsTab === "bills"       && <FinanceTab />}
+            {opsTab === "expenses"    && <ExpenseReportsPanel />}
+            {opsTab === "services"    && <ServicesTab />}
+            {opsTab === "inventory"   && <InventoryTab />}
+            {opsTab === "orders"      && <SupplyOrdersPanel />}
+            {opsTab === "vendors"     && <VendorsPanel />}
+            {opsTab === "maintenance" && <MaintenanceLogPanel />}
+            {opsTab === "tasks"       && <DailyTasksPanel />}
           </div>
         )}
 

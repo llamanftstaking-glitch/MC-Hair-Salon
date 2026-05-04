@@ -81,8 +81,8 @@ export default function Navbar() {
         <div className="flex items-center justify-center py-2 px-4 sm:px-10 relative">
           {/* Mobile: phone only */}
           <a href="tel:+12129885252"
-            className="sm:hidden flex items-center gap-1.5 text-[11px] tracking-[0.15em] text-[var(--mc-text)] uppercase">
-            <Phone size={10} className="text-[var(--mc-accent)]" />
+            className="sm:hidden flex items-center gap-1.5 text-xs tracking-[0.15em] text-[var(--mc-text)] uppercase">
+            <Phone size={12} className="text-[var(--mc-accent)]" />
             (212) 988-5252
           </a>
           {/* Desktop: full tagline */}

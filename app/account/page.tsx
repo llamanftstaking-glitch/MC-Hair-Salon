@@ -100,11 +100,13 @@ export default function AccountPage() {
     <div className="min-h-screen bg-[var(--mc-bg)] pt-24 pb-16">
 
       {/* ── Tab bar ─────────────────────────────────────────────────────────── */}
-      <div className="border-b border-[var(--mc-border)] px-6">
-        <div className="max-w-5xl mx-auto flex gap-0 overflow-x-auto">
+      <div className="border-b border-[var(--mc-border)] px-6 relative">
+        {/* Fade hint on right edge for mobile scroll */}
+        <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--mc-bg)] to-transparent pointer-events-none sm:hidden z-10" />
+        <div className="max-w-5xl mx-auto flex gap-0 overflow-x-auto scrollbar-none">
           {TABS.map(t => {
             const isActive = t.id === "overview";
-            const cls = `px-4 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors cursor-pointer ${
+            const cls = `px-4 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors cursor-pointer shrink-0 ${
               isActive
                 ? "border-[var(--mc-accent)] text-[var(--mc-accent)]"
                 : "border-transparent text-[var(--mc-text-dim)] hover:text-[var(--mc-text)]"

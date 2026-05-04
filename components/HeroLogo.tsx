@@ -158,7 +158,7 @@ export default function HeroLogo() {
       </div>
 
       {/* ══════════════ MOBILE: 2-column video zone (top) ══════════════ */}
-      <div className="md:hidden relative w-full flex shrink-0" style={{ height: "46vh" }}>
+      <div className="md:hidden relative w-full flex shrink-0" style={{ height: "min(46vh, 280px)" }}>
         <div className="flex-1 relative">
           <VideoColumn startIdx={0} swapEvery={10000} />
         </div>

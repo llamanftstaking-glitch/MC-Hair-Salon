@@ -304,11 +304,11 @@ function ServiceStep({ selected, onSelect }: { selected: string; onSelect: (serv
       <h2 className="font-serif text-2xl font-bold text-white mb-1">Choose a Service</h2>
       <p className="text-[var(--mc-muted)] text-sm mb-6">What brings you in today?</p>
 
-      {/* Category pills */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      {/* Category pills — horizontal scroll on mobile */}
+      <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-none pb-1">
         {SERVICE_CATEGORIES.map(cat => (
           <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-            className={`px-4 py-2 text-xs uppercase tracking-widest font-semibold transition-all cursor-pointer ${
+            className={`shrink-0 px-4 py-2.5 text-xs uppercase tracking-widest font-semibold transition-all cursor-pointer ${
               activeCategory === cat.id
                 ? "gold-gradient-bg text-black"
                 : "border border-[#2a2a2a] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)]"
@@ -411,7 +411,7 @@ function DateTimeStep({ date, time, onSelect, onBack }: { date: string; time: st
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {TIME_SLOTS.map(slot => (
             <button key={slot} onClick={() => setSelectedTime(slot)}
-              className={`py-2.5 text-xs font-semibold transition-all cursor-pointer ${
+              className={`py-3 text-xs font-semibold transition-all cursor-pointer min-h-[44px] ${
                 selectedTime === slot
                   ? "gold-gradient-bg text-black"
                   : "border border-[#1a1a1a] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)]"

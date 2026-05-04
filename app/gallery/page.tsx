@@ -53,9 +53,9 @@ export default function GalleryPage() {
               <div
                 key={img.src}
                 className={`relative overflow-hidden cursor-pointer group border border-[var(--mc-border)] hover:border-[var(--mc-accent)]/40 transition-all duration-300 ${
-                  i % 7 === 0 ? "col-span-2 row-span-2" : ""
+                  i % 7 === 0 ? "sm:col-span-2 sm:row-span-2" : ""
                 }`}
-                style={{ aspectRatio: i % 7 === 0 ? "1/1" : "3/4" }}
+                style={{ aspectRatio: "3/4" }}
                 onClick={() => setSelected({ src: img.src, alt: img.alt })}
               >
                   <Image

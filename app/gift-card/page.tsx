@@ -98,7 +98,7 @@ export default function GiftCardPage() {
                   <span className="w-7 h-7 rounded-full gold-gradient-bg text-black text-xs font-bold flex items-center justify-center shrink-0">1</span>
                   Choose Amount
                 </h2>
-                <div className="grid grid-cols-4 gap-3 mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                   {AMOUNTS.map(a => (
                     <button key={a} onClick={() => setForm(f => ({ ...f, amount: a, customAmount: "" }))}
                       className={`py-4 font-serif text-xl font-bold cursor-pointer transition-all duration-200 border ${

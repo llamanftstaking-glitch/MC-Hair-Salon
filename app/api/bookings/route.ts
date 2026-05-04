@@ -26,16 +26,19 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      name, email, phone, service, stylist, date, time, notes,
+      name, email, phone, service, services, stylist, date, time, notes,
       servicePrice, stripeCustomerId, stripePaymentMethodId,
     } = body;
 
-    if (!name || !email || !phone || !service || !date || !time) {
+    // Derive primary service from multi-service array if provided
+    const primaryService = service || (Array.isArray(services) && services.length > 0 ? services[0].name : "");
+
+    if (!name || !email || !phone || !primaryService || !date || !time) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     // Basic length guards
-    if (name.length > 120 || email.length > 254 || phone.length > 30 || service.length > 200) {
+    if (name.length > 120 || email.length > 254 || phone.length > 30 || primaryService.length > 200) {
       return NextResponse.json({ error: "Input too long" }, { status: 400 });
     }
 
@@ -56,7 +59,8 @@ export async function POST(req: NextRequest) {
       name: name.trim(),
       email: email.trim().toLowerCase(),
       phone: phone.trim(),
-      service: service.trim(),
+      service: primaryService.trim(),
+      services: Array.isArray(services) ? services : (primaryService ? [{ name: primaryService.trim() }] : []),
       stylist: stylist?.trim() ?? "",
       date,
       time,

@@ -83,6 +83,7 @@ export const bookings = pgTable("bookings", {
   email:                text("email").notNull(),
   phone:                text("phone").notNull(),
   service:              text("service").notNull(),
+  services:             jsonb("services").$type<{ name: string; price?: string }[]>().default([]),
   stylist:              text("stylist").notNull(),
   date:                 text("date").notNull(),
   time:                 text("time").notNull(),

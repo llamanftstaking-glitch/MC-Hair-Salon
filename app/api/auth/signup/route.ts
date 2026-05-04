@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getCustomerByEmail, createCustomer } from "@/lib/customers";
 import { signToken } from "@/lib/auth";
+import { addSubscriber } from "@/lib/newsletter";
 
 export async function POST(req: NextRequest) {
-  const { name, email, password, phone } = await req.json();
+  const { name, email, password, phone, subscribeToNewsletter } = await req.json();
 
   if (!name || !email || !password)
     return NextResponse.json({ error: "Name, email, and password are required" }, { status: 400 });
@@ -18,6 +19,10 @@ export async function POST(req: NextRequest) {
 
   const passwordHash = await bcrypt.hash(password, 10);
   const customer = await createCustomer({ name, email, phone: phone || "", passwordHash });
+
+  if (subscribeToNewsletter) {
+    addSubscriber(email, name).catch(() => {});
+  }
 
   const token = await signToken({
     id: customer.id,

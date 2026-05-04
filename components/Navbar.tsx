@@ -81,43 +81,33 @@ export default function Navbar() {
         <div className="flex items-center justify-center py-2 px-4 sm:px-10 relative">
           {/* Mobile: phone only */}
           <a href="tel:+12129885252"
-            className="sm:hidden flex items-center gap-1.5 text-xs tracking-[0.15em] text-[var(--mc-text)] uppercase">
+            className="lg:hidden flex items-center gap-1.5 text-xs tracking-[0.15em] text-[var(--mc-text)] uppercase">
             <Phone size={12} className="text-[var(--mc-accent)]" />
             (212) 988-5252
           </a>
           {/* Desktop: full tagline */}
-          <p className="hidden sm:block text-[11px] tracking-[0.2em] text-[var(--mc-text)] uppercase">
+          <p className="hidden lg:block text-[11px] tracking-[0.2em] text-[var(--mc-text)] uppercase">
             Upper East Side · New York City ·{" "}
             <a href="tel:+12129885252" className="hover:text-[var(--mc-accent)] transition-colors">
               (212) 988-5252
             </a>
           </p>
-          <Link href="/book"
-            className="absolute right-4 sm:right-5 text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors text-[11px] tracking-widest uppercase cursor-pointer hidden sm:block">
-            Book →
-          </Link>
         </div>
 
-        {/* ── Main bar ── */}
-        <div className="grid grid-cols-3 items-center h-[56px] sm:h-[60px] px-4 sm:px-10 border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/95">
-
-          {/* Left — Book + Services shortcuts */}
-          <div className="flex items-center gap-3 sm:gap-4">
+        {/* ── MOBILE main bar (< lg) ── */}
+        <div className="lg:hidden grid grid-cols-3 items-center h-[56px] px-4 border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/95">
+          {/* Left */}
+          <div className="flex items-center gap-3">
             <Link href="/book"
-              className="text-[10px] sm:text-[11px] uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer whitespace-nowrap">
+              className="text-[10px] uppercase tracking-[0.15em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer whitespace-nowrap">
               + Book
-            </Link>
-            <span className="text-[var(--mc-border)] text-xs hidden sm:block">·</span>
-            <Link href="/services"
-              className="hidden sm:block text-[10px] sm:text-[11px] uppercase tracking-[0.15em] sm:tracking-[0.18em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer whitespace-nowrap">
-              Services
             </Link>
           </div>
 
           {/* Center — logo */}
           <Link href="/" className="flex justify-center cursor-pointer" onClick={() => setMenuOpen(false)}>
             <div
-              className="relative w-9 h-9 sm:w-12 sm:h-12"
+              className="relative w-9 h-9"
               style={{
                 opacity: isHome && !scrolled ? 0 : 1,
                 transition: "opacity 0.4s ease",
@@ -129,26 +119,20 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Right — user + menu */}
-          <div className="flex items-center gap-2 sm:gap-5 justify-end" suppressHydrationWarning>
+          {/* Right — user + hamburger */}
+          <div className="flex items-center gap-2 justify-end" suppressHydrationWarning>
             {user ? (
-              <Link href="/account"
-                className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer p-1"
-                title={user.name}>
+              <Link href="/account" className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer p-1" title={user.name}>
                 <User size={17} />
               </Link>
             ) : (
-              <Link href="/login"
-                className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer p-1"
-                title="Sign In">
+              <Link href="/login" className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer p-1" title="Sign In">
                 <User size={17} />
               </Link>
             )}
-
-            {/* Hamburger */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex items-center gap-2 px-3 py-2 sm:px-3.5 sm:py-1.5 border border-[var(--mc-border)] hover:border-[var(--mc-accent)] transition-colors cursor-pointer group min-h-0"
+              className="flex items-center gap-2 px-3 py-2 border border-[var(--mc-border)] hover:border-[var(--mc-accent)] transition-colors cursor-pointer group min-h-0"
               aria-label="Toggle menu"
               aria-expanded={menuOpen}
             >
@@ -157,17 +141,81 @@ export default function Navbar() {
                 <span className="block h-px w-full bg-[var(--mc-text)] group-hover:bg-[var(--mc-accent)] transition-colors" />
                 <span className="block h-px w-2/3 bg-[var(--mc-text)] group-hover:bg-[var(--mc-accent)] transition-colors" />
               </span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--mc-text)] group-hover:text-[var(--mc-accent)] transition-colors hidden sm:block">
-                Menu
-              </span>
             </button>
+          </div>
+        </div>
+
+        {/* ── DESKTOP main bar (lg+) ── */}
+        <div className="hidden lg:flex items-center h-[60px] px-10 border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/95 gap-6">
+
+          {/* Logo */}
+          <Link href="/" className="flex items-center shrink-0 cursor-pointer mr-2">
+            <div
+              className="relative w-11 h-11"
+              style={{
+                opacity: isHome && !scrolled ? 0 : 1,
+                transition: "opacity 0.4s ease",
+                pointerEvents: isHome && !scrolled ? "none" : "auto",
+              }}
+            >
+              <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" priority />
+              <Image src="/mc-logo-black.png" alt="MC Hair Salon" fill className="logo-light object-contain" priority />
+            </div>
+          </Link>
+
+          {/* Inline nav links */}
+          <nav className="flex items-center gap-1 flex-1" aria-label="Main navigation">
+            {navLinks.map(l => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                  pathname === l.href
+                    ? "text-[var(--mc-accent)]"
+                    : "text-[var(--mc-muted)] hover:text-[var(--mc-accent)]"
+                }`}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right — Book CTA + user */}
+          <div className="flex items-center gap-4 shrink-0" suppressHydrationWarning>
+            {user ? (
+              <>
+                <Link href="/account"
+                  className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer flex items-center gap-1.5 text-[11px] uppercase tracking-widest"
+                  title={user.name}>
+                  <User size={14} />
+                  <span className="hidden xl:block max-w-[100px] truncate">{user.name.split(" ")[0]}</span>
+                </Link>
+                <button onClick={handleLogout}
+                  className="text-[var(--mc-muted)] hover:text-red-400 transition-colors cursor-pointer"
+                  title="Sign Out">
+                  <LogOut size={14} />
+                </button>
+              </>
+            ) : (
+              <Link href="/login"
+                className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer text-[11px] uppercase tracking-widest"
+                title="Sign In">
+                <User size={16} />
+              </Link>
+            )}
+
+            <Link href="/book"
+              className="px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-black cursor-pointer hover:opacity-90 transition-opacity whitespace-nowrap"
+              style={{ background: "linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #C9A84C 100%)" }}>
+              Book Now
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* ── Backdrop ── */}
+      {/* ── Backdrop (mobile only) ── */}
       <div
-        className="fixed inset-0 z-[60]"
+        className="lg:hidden fixed inset-0 z-[60]"
         style={{
           background: "rgba(0,0,0,0.55)",
           backdropFilter: "blur(4px)",
@@ -181,17 +229,17 @@ export default function Navbar() {
         onClick={() => setMenuOpen(false)}
       />
 
-      {/* ── Slide-in drawer ── */}
+      {/* ── Slide-in drawer (mobile only) ── */}
       <div
-        className="fixed top-0 right-0 bottom-0 z-[61] bg-white flex flex-col"
+        className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] bg-white flex flex-col"
         style={{
           width: "min(400px, 100vw)",
           transform: menuOpen ? "translateX(0)" : "translateX(100%)",
           transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
-        {/* Close row — always visible at top */}
-        <div className="flex items-center justify-between px-6 sm:px-10 pt-5 pb-4 border-b border-gray-100 shrink-0">
+        {/* Close row */}
+        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-100 shrink-0">
           <span className="font-serif text-sm text-gray-400 tracking-widest uppercase">Menu</span>
           <button
             onClick={() => setMenuOpen(false)}
@@ -203,10 +251,10 @@ export default function Navbar() {
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-6 sm:px-10 py-6"
+        <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-6"
           style={{ paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}>
 
-          {/* Book Now — prominent mobile CTA */}
+          {/* Book Now CTA */}
           <Link
             href="/book"
             onClick={() => setMenuOpen(false)}
@@ -301,7 +349,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Bottom salon info — helpful on mobile */}
+          {/* Salon info */}
           <div className="mt-8 pt-6 border-t border-gray-100 space-y-2">
             <p className="text-[10px] uppercase tracking-widest text-gray-400">Visit Us</p>
             <p className="text-xs text-gray-500">336 East 78th St · Upper East Side</p>

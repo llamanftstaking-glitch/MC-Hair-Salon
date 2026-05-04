@@ -130,6 +130,20 @@ export async function getSalonInfo() {
   };
 }
 
+export async function upsertKey(key: string, value: unknown): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const v = value as any;
+  await db
+    .insert(siteSettingsTable)
+    .values({ key, value: v })
+    .onConflictDoUpdate({ target: siteSettingsTable.key, set: { value: v } });
+}
+
+export async function getKey(key: string): Promise<unknown | null> {
+  const rows = await db.select().from(siteSettingsTable).where(eq(siteSettingsTable.key, key));
+  return rows.length ? rows[0].value : null;
+}
+
 export async function updateSettings(updates: Partial<SiteSettings>): Promise<SiteSettings> {
   const current = await getSettings();
   const updated: SiteSettings = {

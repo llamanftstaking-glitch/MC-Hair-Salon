@@ -9,6 +9,7 @@ export interface Booking {
   email: string;
   phone: string;
   service: string;
+  services?: { name: string; price?: string }[];
   stylist: string;
   date: string;
   time: string;
@@ -34,6 +35,7 @@ function rowToBooking(row: typeof bookingsTable.$inferSelect): Booking {
     email:                 row.email,
     phone:                 row.phone,
     service:               row.service,
+    services:              (row.services as { name: string; price?: string }[] | null) ?? undefined,
     stylist:               row.stylist,
     date:                  row.date,
     time:                  row.time,
@@ -73,6 +75,7 @@ export async function addBooking(
     email:                 newBooking.email,
     phone:                 newBooking.phone,
     service:               newBooking.service,
+    services:              newBooking.services ?? [],
     stylist:               newBooking.stylist,
     date:                  newBooking.date,
     time:                  newBooking.time,
@@ -99,6 +102,7 @@ export async function updateBooking(
   if (updates.email !== undefined)                 dbUpdates.email = updates.email;
   if (updates.phone !== undefined)                 dbUpdates.phone = updates.phone;
   if (updates.service !== undefined)               dbUpdates.service = updates.service;
+  if ("services" in updates)                       dbUpdates.services = updates.services ?? [];
   if (updates.stylist !== undefined)               dbUpdates.stylist = updates.stylist;
   if (updates.date !== undefined)                  dbUpdates.date = updates.date;
   if (updates.time !== undefined)                  dbUpdates.time = updates.time;

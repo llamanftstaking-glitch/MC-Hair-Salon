@@ -14,7 +14,7 @@ function AuthForm() {
   const [error, setError]   = useState("");
 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [regForm,   setRegForm]   = useState({ name: "", email: "", phone: "", password: "" });
+  const [regForm,   setRegForm]   = useState({ name: "", email: "", phone: "", password: "", subscribe: true });
 
   useEffect(() => {
     if (params.get("tab") === "register") setView("register");
@@ -50,7 +50,7 @@ function AuthForm() {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(regForm),
+        body: JSON.stringify({ ...regForm, subscribeToNewsletter: regForm.subscribe }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -218,6 +218,19 @@ function AuthForm() {
                   </button>
                 </div>
               </div>
+
+              {/* Subscribe checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={regForm.subscribe}
+                  onChange={e => setRegForm({ ...regForm, subscribe: e.target.checked })}
+                  className="mt-0.5 w-4 h-4 accent-[#B8860B] cursor-pointer shrink-0"
+                />
+                <span className="text-[var(--mc-text-dim)] text-sm leading-snug">
+                  Subscribe me to exclusive offers, style tips & updates from MC Hair Salon
+                </span>
+              </label>
 
               {error && (
                 <div className="border border-red-800/50 bg-red-950/20 px-4 py-3 text-red-300 text-sm">

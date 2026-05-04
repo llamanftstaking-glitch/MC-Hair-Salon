@@ -58,6 +58,8 @@ export default function InventoryTab() {
   const [transactions, setTransactions] = useState<InventoryTransaction[]>([]);
   const [lowStock, setLowStock] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reminderSending, setReminderSending] = useState(false);
+  const [reminderMsg, setReminderMsg] = useState("");
   const [view, setView] = useState<"products" | "transactions" | "order">("products");
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState<Category | "all">("all");
@@ -284,7 +286,34 @@ export default function InventoryTab() {
             </button>
           ))}
         </div>
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex gap-2 flex-wrap">
+          {/* Monthly reminder button — always visible */}
+          <div className="flex items-center gap-2">
+            {reminderMsg && <span className="text-xs text-green-400">{reminderMsg}</span>}
+            <button
+              onClick={async () => {
+                setReminderSending(true);
+                setReminderMsg("");
+                try {
+                  const res = await fetch("/api/admin/inventory-reminder", { method: "POST" });
+                  const data = await res.json();
+                  if (data.emailSent) {
+                    setReminderMsg(`✓ Email sent — ${data.lowStockCount} items flagged`);
+                  } else {
+                    setReminderMsg(`✓ ${data.lowStockCount} items below min (email not configured)`);
+                  }
+                  setTimeout(() => setReminderMsg(""), 6000);
+                } catch {
+                  setReminderMsg("Error sending reminder");
+                } finally {
+                  setReminderSending(false);
+                }
+              }}
+              disabled={reminderSending}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded text-xs font-medium disabled:opacity-50">
+              {reminderSending ? "Sending…" : "📧 Monthly Reminder"}
+            </button>
+          </div>
           {view === "products" && (
             <>
               <button onClick={startScan}

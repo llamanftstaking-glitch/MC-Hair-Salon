@@ -8,7 +8,7 @@ import {
   CreditCard, AlertTriangle, ShieldCheck,
   Gift, Star, Crown, Zap, Minus, Scissors, QrCode, Edit2,
   Download, ToggleLeft, ToggleRight, DollarSign, LayoutGrid,
-  CalendarClock, Wrench, Tag, Ticket,
+  CalendarClock, Wrench, Tag, Ticket, Sun, Moon, ChevronDown,
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
@@ -20,6 +20,7 @@ import ServicesTab from "./ServicesTab";
 import GiftCardsTab from "./GiftCardsTab";
 import PromoCodesTab from "./PromoCodesTab";
 import LiteModeView from "./LiteModeView";
+import VibeTab from "./VibeTab";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Tab =
@@ -31,7 +32,8 @@ type Tab =
   | "gift-cards"
   | "marketing"
   | "reports"
-  | "settings";
+  | "settings"
+  | "vibe";
 
 interface RewardCustomer {
   id: string;
@@ -744,9 +746,20 @@ export default function AdminPage() {
 
   // ── Clients search ──────────────────────────────────────────────────────────
   const [clientSearch, setClientSearch] = useState("");
+  const [selectedClientEmail, setSelectedClientEmail] = useState<string | null>(null);
+
+  // ── Admin theme ──────────────────────────────────────────────────────────────
+  const [adminDark, setAdminDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("mc-admin-dark") === "true";
+  });
+  const toggleAdminDark = (val: boolean) => {
+    setAdminDark(val);
+    localStorage.setItem("mc-admin-dark", String(val));
+  };
 
   // ── Reservations view/edit state ─────────────────────────────────────────────
-  const [viewMode,       setViewMode]       = useState<"list" | "weekly" | "daily">("daily");
+  const [viewMode,       setViewMode]       = useState<"list" | "weekly" | "daily" | "monthly">("daily");
   const [weekOffset,     setWeekOffset]     = useState(0);
   const [dailyDate,      setDailyDate]      = useState<string>(new Date().toISOString().split("T")[0]);
   const [editBookingId,  setEditBookingId]  = useState<string | null>(null);
@@ -1146,6 +1159,7 @@ export default function AdminPage() {
     { id: "operations",   label: "Operations",   icon: <Wrench size={15} /> },
     { id: "gift-cards",   label: "Gift Cards",   icon: <Gift size={15} /> },
     { id: "marketing",    label: "Marketing",    icon: <Mail size={15} />, badge: unreadMessages },
+    { id: "vibe",         label: "Vibe",         icon: <Zap size={15} /> },
     { id: "reports",      label: "Reports",      icon: <BarChart2 size={15} /> },
     { id: "settings",     label: "Settings",     icon: <Settings size={15} /> },
   ];
@@ -1169,9 +1183,9 @@ export default function AdminPage() {
 
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-black">
+    <div className={`min-h-screen ${adminDark ? "admin-dark" : "admin-light"}`}>
       {/* Top bar — single non-wrapping row on all screen sizes */}
-      <div className="border-b border-[var(--mc-border)] bg-[var(--mc-surface-dark)]">
+      <div className="border-b border-[var(--admin-border)] bg-[var(--admin-surface)]">
         <div className="max-w-7xl mx-auto px-3 py-2 flex items-center gap-2 min-w-0">
           <h1 className="font-serif text-sm font-bold gold-gradient shrink-0">MC Admin</h1>
           <div className="flex items-center gap-1.5 flex-1 overflow-x-auto scrollbar-none min-w-0">
@@ -1181,20 +1195,26 @@ export default function AdminPage() {
               { icon: <MessageSquare size={12} />, label: "Msgs", value: unreadMessages },
               { icon: <Bell size={12} />,     label: "Subs",     value: activeSubscribers },
             ].map((s) => (
-              <div key={s.label} className="flex items-center gap-1 border border-[var(--mc-border)] px-2 py-1 shrink-0">
+              <div key={s.label} className="flex items-center gap-1 border border-[var(--admin-border)] px-2 py-1 shrink-0">
                 <span className="text-[var(--mc-accent)]">{s.icon}</span>
-                <span className="text-white text-xs font-bold">{s.value}</span>
-                <span className="text-[#444] text-[10px] uppercase tracking-wider hidden sm:inline">{s.label}</span>
+                <span className="text-[var(--admin-text)] text-xs font-bold">{s.value}</span>
+                <span className="text-[var(--admin-muted)] text-[10px] uppercase tracking-wider hidden sm:inline">{s.label}</span>
               </div>
             ))}
           </div>
+          {/* Light/Dark toggle */}
+          <button onClick={() => toggleAdminDark(!adminDark)}
+            title={adminDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            className="shrink-0 w-8 h-8 flex items-center justify-center border border-[var(--admin-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+            {adminDark ? <Sun size={13} /> : <Moon size={13} />}
+          </button>
           <button onClick={() => toggleLiteMode(!liteMode)}
             title={liteMode ? "Switch to Full Admin" : "Switch to Lite Mode"}
-            className="shrink-0 px-2 h-8 flex items-center gap-1 border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-[10px] uppercase tracking-wider whitespace-nowrap">
+            className="shrink-0 px-2 h-8 flex items-center gap-1 border border-[var(--admin-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-[10px] uppercase tracking-wider whitespace-nowrap">
             {liteMode ? <><LayoutGrid size={12} /> Full</> : <><ToggleLeft size={12} /> Lite</>}
           </button>
           <button onClick={() => { fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); fetchAutomation(); }}
-            className="shrink-0 w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer"
+            className="shrink-0 w-8 h-8 flex items-center justify-center border border-[var(--admin-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer"
             title="Refresh">
             <RefreshCw size={13} />
           </button>
@@ -1255,26 +1275,21 @@ export default function AdminPage() {
                   </button>
                 ))}
               </div>
-              {/* View toggle — icon-only on mobile */}
+              {/* View toggle — labeled buttons */}
               <div className="flex gap-1 shrink-0">
-                <button onClick={() => setViewMode("daily")} title="Daily"
-                  className={`w-8 h-8 flex items-center justify-center cursor-pointer transition-all ${
-                    viewMode === "daily" ? "gold-gradient-bg text-black" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
-                  }`}>
-                  <Clock size={13} />
-                </button>
-                <button onClick={() => setViewMode("weekly")} title="Weekly"
-                  className={`w-8 h-8 flex items-center justify-center cursor-pointer transition-all ${
-                    viewMode === "weekly" ? "gold-gradient-bg text-black" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
-                  }`}>
-                  <Calendar size={13} />
-                </button>
-                <button onClick={() => setViewMode("list")} title="List"
-                  className={`w-8 h-8 flex items-center justify-center cursor-pointer transition-all ${
-                    viewMode === "list" ? "gold-gradient-bg text-black" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
-                  }`}>
-                  <BarChart2 size={13} />
-                </button>
+                {([
+                  { id: "daily",   label: "Daily" },
+                  { id: "weekly",  label: "Weekly" },
+                  { id: "monthly", label: "Monthly" },
+                  { id: "list",    label: "List" },
+                ] as const).map(v => (
+                  <button key={v.id} onClick={() => setViewMode(v.id)}
+                    className={`px-3 h-8 text-[10px] uppercase tracking-widest font-semibold cursor-pointer transition-all whitespace-nowrap ${
+                      viewMode === v.id ? "gold-gradient-bg text-black" : "border border-[var(--admin-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)]"
+                    }`}>
+                    {v.label}
+                  </button>
+                ))}
               </div>
             </div>
             {loading ? (
@@ -1465,7 +1480,11 @@ export default function AdminPage() {
                           <span className="text-[var(--mc-accent)] font-medium">{booking.date} · {booking.time}</span>
                           <span className="text-[var(--mc-muted)]">{booking.stylist || "No preference"}</span>
                         </div>
-                        <p className="text-[#555] text-sm">{booking.service}</p>
+                        <p className="text-[#555] text-sm">
+                          {booking.services && booking.services.length > 1
+                            ? booking.services.map(s => s.name).join(" · ")
+                            : booking.service}
+                        </p>
                         {booking.notes && <p className="text-[var(--mc-text-dim)] text-xs mt-1 italic">"{booking.notes}"</p>}
                         {/* Card on file */}
                         {booking.stripePaymentMethodId && (
@@ -1733,6 +1752,9 @@ export default function AdminPage() {
 
         {/* ── GIFT CARDS ───────────────────────────────────────────────────── */}
         {tab === "gift-cards" && <GiftCardsTab />}
+
+        {/* ── VIBE ─────────────────────────────────────────────────────────── */}
+        {tab === "vibe" && <VibeTab />}
 
         {/* ── PAYROLL & STAFF ──────────────────────────────────────────────── */}
         {tab === "payroll" && (

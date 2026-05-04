@@ -108,13 +108,16 @@ const TIME_SLOTS = [
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Step = 0 | 1 | 2 | 3 | 4;
 
+interface SelectedService { name: string; price?: string }
+
 interface Selection {
-  service:       string;
-  servicePrice?: string;
-  stylist:       string;
-  date:          string;
-  time:          string;
-  notes:         string;
+  service:          string;
+  servicePrice?:    string;
+  selectedServices: SelectedService[];
+  stylist:          string;
+  date:             string;
+  time:             string;
+  notes:            string;
 }
 
 interface CardData {
@@ -181,8 +184,17 @@ function SummaryPanel({ selection, user, cardData }: { selection: Selection; use
       {/* Selections */}
       <div className="space-y-3 text-sm mb-4">
         <div className="flex justify-between items-start gap-2">
-          <span className="text-[#444] text-xs uppercase tracking-widest shrink-0">Service</span>
-          <span className="text-white font-medium text-right">{selection.service || "—"}</span>
+          <span className="text-[#444] text-xs uppercase tracking-widest shrink-0">
+            {selection.selectedServices.length > 1 ? "Services" : "Service"}
+          </span>
+          <div className="text-right">
+            {selection.selectedServices.length > 0
+              ? selection.selectedServices.map((s, i) => (
+                  <p key={i} className="text-white font-medium leading-snug">{s.name}</p>
+                ))
+              : <span className="text-[#333]">—</span>
+            }
+          </div>
         </div>
         <div className="flex justify-between items-start gap-2">
           <span className="text-[#444] text-xs uppercase tracking-widest shrink-0">Stylist</span>
@@ -286,25 +298,35 @@ function SignInGate({ onSignIn }: { onSignIn: (user: AuthCustomer) => void }) {
   );
 }
 
-// ── Step 1 — Service ──────────────────────────────────────────────────────────
-function ServiceStep({ selected, onSelect }: { selected: string; onSelect: (service: string, price?: string) => void }) {
-  const [activeCategory, setActiveCategory] = useState(SERVICE_CATEGORIES[0].id);
-
-  useEffect(() => {
-    if (selected) {
-      const cat = SERVICE_CATEGORIES.find(c => c.services.some(s => s.name === selected));
-      if (cat) setActiveCategory(cat.id);
-    }
-  }, [selected]);
+// ── Step 1 — Service (multi-select) ──────────────────────────────────────────
+function ServiceStep({
+  selectedServices,
+  onSelect,
+}: {
+  selectedServices: SelectedService[];
+  onSelect: (services: SelectedService[]) => void;
+}) {
+  const [activeCategory, setActiveCategory]   = useState(SERVICE_CATEGORIES[0].id);
+  const [localSelected,  setLocalSelected]    = useState<SelectedService[]>(selectedServices);
 
   const currentCategory = SERVICE_CATEGORIES.find(c => c.id === activeCategory)!;
 
+  function toggle(name: string, price?: string) {
+    setLocalSelected(prev => {
+      const exists = prev.find(s => s.name === name);
+      if (exists) return prev.filter(s => s.name !== name);
+      return [...prev, { name, price }];
+    });
+  }
+
+  const isSelected = (name: string) => localSelected.some(s => s.name === name);
+
   return (
     <div className="luxury-card p-6 md:p-8">
-      <h2 className="font-serif text-2xl font-bold text-white mb-1">Choose a Service</h2>
-      <p className="text-[var(--mc-muted)] text-sm mb-6">What brings you in today?</p>
+      <h2 className="font-serif text-2xl font-bold text-white mb-1">Choose Your Services</h2>
+      <p className="text-[var(--mc-muted)] text-sm mb-6">Select one or more services for your visit.</p>
 
-      {/* Category pills — horizontal scroll on mobile */}
+      {/* Category pills */}
       <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-none pb-1">
         {SERVICE_CATEGORIES.map(cat => (
           <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
@@ -321,30 +343,57 @@ function ServiceStep({ selected, onSelect }: { selected: string; onSelect: (serv
       {/* Services grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {currentCategory.services.map(svc => {
-          const isSelected = selected === svc.name;
+          const sel = isSelected(svc.name);
           return (
-            <button key={svc.name} onClick={() => onSelect(svc.name, svc.price)}
+            <button key={svc.name} onClick={() => toggle(svc.name, svc.price)}
               className={`flex items-center justify-between p-4 border text-left transition-all cursor-pointer ${
-                isSelected ? "border-[var(--mc-accent)] bg-[#0a0800]" : "border-[#1a1a1a] hover:border-[var(--mc-accent)]/50 bg-[#080808]"
+                sel ? "border-[var(--mc-accent)] bg-[#0a0800]" : "border-[#1a1a1a] hover:border-[var(--mc-accent)]/50 bg-[#080808]"
               }`}>
               <div>
-                <p className={`text-sm font-semibold ${isSelected ? "text-white" : "text-[var(--mc-muted)]"}`}>{svc.name}</p>
-                <p className={`text-xs mt-0.5 ${isSelected ? "text-[var(--mc-accent)]" : "text-[#444]"}`}>{svc.price}</p>
+                <p className={`text-sm font-semibold ${sel ? "text-white" : "text-[var(--mc-muted)]"}`}>{svc.name}</p>
+                <p className={`text-xs mt-0.5 ${sel ? "text-[var(--mc-accent)]" : "text-[#444]"}`}>{svc.price}</p>
               </div>
-              {isSelected && <Check size={16} className="text-[var(--mc-accent)] shrink-0 ml-2" />}
+              <div className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center shrink-0 ml-2 transition-all ${
+                sel ? "bg-[var(--mc-accent)] border-[var(--mc-accent)]" : "border-[#333]"
+              }`}>
+                {sel && <Check size={11} strokeWidth={3} className="text-black" />}
+              </div>
             </button>
           );
         })}
       </div>
 
       {/* Other */}
-      <button onClick={() => onSelect("Other (specify in notes)")}
+      <button onClick={() => toggle("Other (specify in notes)")}
         className={`w-full mt-2.5 flex items-center justify-between p-4 border text-left transition-all cursor-pointer ${
-          selected === "Other (specify in notes)" ? "border-[var(--mc-accent)] bg-[#0a0800]" : "border-[#1a1a1a] hover:border-[var(--mc-accent)]/50 bg-[#080808]"
+          isSelected("Other (specify in notes)") ? "border-[var(--mc-accent)] bg-[#0a0800]" : "border-[#1a1a1a] hover:border-[var(--mc-accent)]/50 bg-[#080808]"
         }`}>
-        <p className={`text-sm ${selected === "Other (specify in notes)" ? "text-white font-semibold" : "text-[#444]"}`}>Other (specify in notes)</p>
-        {selected === "Other (specify in notes)" && <Check size={16} className="text-[var(--mc-accent)]" />}
+        <p className={`text-sm ${isSelected("Other (specify in notes)") ? "text-white font-semibold" : "text-[#444]"}`}>Other (specify in notes)</p>
+        <div className={`w-5 h-5 rounded-sm border-2 flex items-center justify-center shrink-0 transition-all ${
+          isSelected("Other (specify in notes)") ? "bg-[var(--mc-accent)] border-[var(--mc-accent)]" : "border-[#333]"
+        }`}>
+          {isSelected("Other (specify in notes)") && <Check size={11} strokeWidth={3} className="text-black" />}
+        </div>
       </button>
+
+      {/* Selected count + Continue */}
+      {localSelected.length > 0 && (
+        <div className="mt-6 flex items-center justify-between gap-4">
+          <div className="flex flex-wrap gap-1.5">
+            {localSelected.map(s => (
+              <span key={s.name} className="text-[10px] px-2.5 py-1 bg-[#0a0800] border border-[var(--mc-accent)]/40 text-[var(--mc-accent)] tracking-wide">
+                {s.name}
+              </span>
+            ))}
+          </div>
+          <button
+            onClick={() => onSelect(localSelected)}
+            className="shrink-0 gold-gradient-bg text-black font-bold px-6 py-3 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap"
+          >
+            Continue →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -635,6 +684,7 @@ function ConfirmStep({
     setSubmitting(true);
     setError("");
     try {
+      const primaryService = selection.selectedServices[0]?.name ?? selection.service;
       const res = await fetch("/api/bookings", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
@@ -642,7 +692,8 @@ function ConfirmStep({
           name:                  cardData.name,
           email:                 cardData.email,
           phone:                 cardData.phone,
-          service:               selection.service,
+          service:               primaryService,
+          services:              selection.selectedServices.length > 0 ? selection.selectedServices : [{ name: primaryService }],
           stylist:               selection.stylist === "No preference" ? "" : selection.stylist,
           date:                  selection.date,
           time:                  selection.time,
@@ -671,7 +722,12 @@ function ConfirmStep({
       <div className="luxury-card p-5 lg:hidden">
         <p className="text-[#555] text-xs uppercase tracking-widest mb-3">Your Booking</p>
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between gap-2"><span className="text-[#444]">Service</span><span className="text-white font-medium text-right">{selection.service}</span></div>
+          <div className="flex justify-between gap-2">
+            <span className="text-[#444] shrink-0">{selection.selectedServices.length > 1 ? "Services" : "Service"}</span>
+            <div className="text-right">
+              {selection.selectedServices.map((s, i) => <p key={i} className="text-white font-medium">{s.name}</p>)}
+            </div>
+          </div>
           <div className="flex justify-between gap-2"><span className="text-[#444]">Stylist</span><span className="text-[var(--mc-muted)] text-right">{selection.stylist}</span></div>
           <div className="flex justify-between gap-2"><span className="text-[#444]">Date</span><span className="text-[var(--mc-accent)] text-right">{formattedDate}</span></div>
           <div className="flex justify-between gap-2"><span className="text-[#444]">Time</span><span className="text-[var(--mc-accent)] text-right">{selection.time}</span></div>
@@ -705,7 +761,10 @@ function ConfirmStep({
 
           {/* Booking summary */}
           <div className="border border-[#1a1a1a] bg-[#080808] p-5 mb-6 space-y-2 text-sm">
-            <div className="flex justify-between gap-2"><span className="text-[#555]">Service</span><span className="text-white font-medium text-right">{selection.service}</span></div>
+            <div className="flex justify-between gap-2">
+              <span className="text-[#555] shrink-0">{selection.selectedServices.length > 1 ? "Services" : "Service"}</span>
+              <div className="text-right">{selection.selectedServices.map((s, i) => <p key={i} className="text-white font-medium">{s.name}</p>)}</div>
+            </div>
             <div className="flex justify-between gap-2"><span className="text-[#555]">Stylist</span><span className="text-[var(--mc-muted)] text-right">{selection.stylist}</span></div>
             <div className="flex justify-between gap-2"><span className="text-[#555]">Date</span><span className="text-[var(--mc-accent)] font-medium text-right">{formattedDate}</span></div>
             <div className="flex justify-between gap-2"><span className="text-[#555]">Time</span><span className="text-[var(--mc-accent)] font-medium text-right">{selection.time}</span></div>
@@ -786,7 +845,7 @@ function BookingFlow() {
   const [user,        setUser]        = useState<AuthCustomer | null>(null);
   const [cardData,    setCardData]    = useState<CardData | null>(null);
   const [selection,   setSelection]   = useState<Selection>({
-    service: "", servicePrice: undefined, stylist: "No preference", date: "", time: "", notes: "",
+    service: "", servicePrice: undefined, selectedServices: [], stylist: "No preference", date: "", time: "", notes: "",
   });
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -814,7 +873,7 @@ function BookingFlow() {
   const reset = () => {
     setStep(1);
     setDone(false);
-    setSelection({ service: "", servicePrice: undefined, stylist: "No preference", date: "", time: "", notes: "" });
+    setSelection({ service: "", servicePrice: undefined, selectedServices: [], stylist: "No preference", date: "", time: "", notes: "" });
   };
 
   if (!authChecked) {
@@ -864,9 +923,15 @@ function BookingFlow() {
               <div>
                 {step === 1 && (
                   <ServiceStep
-                    selected={selection.service}
-                    onSelect={(service, price) => {
-                      setSelection(s => ({ ...s, service, servicePrice: price }));
+                    selectedServices={selection.selectedServices}
+                    onSelect={services => {
+                      const first = services[0];
+                      setSelection(s => ({
+                        ...s,
+                        selectedServices: services,
+                        service:      first?.name ?? "",
+                        servicePrice: first?.price,
+                      }));
                       setStep(2);
                     }}
                   />

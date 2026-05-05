@@ -87,7 +87,7 @@ const SERVICES = ["Hair", "Color", "Balayage", "Blowouts", "Lash Extensions", "F
 
 export default function HeroLogo() {
   return (
-    <section className="mc-hero relative flex flex-col items-center md:justify-center overflow-hidden bg-black mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)] max-w-[100vw]">
+    <section className="mc-hero relative flex flex-col items-center md:justify-center overflow-hidden bg-[var(--mc-bg)] mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)] max-w-[100vw]">
 
       {/* ══════════════ DESKTOP: 3-column full-height bg ══════════════ */}
       <div className="absolute inset-0 hidden md:flex">

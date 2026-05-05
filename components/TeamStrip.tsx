@@ -4,7 +4,7 @@ import { TEAM } from "@/lib/data";
 
 export default function TeamStrip() {
   return (
-    <section className="py-16 sm:py-20 bg-black overflow-hidden">
+    <section className="py-16 sm:py-20 bg-[var(--mc-bg)] overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-10 sm:mb-14">
           <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">The Team</p>

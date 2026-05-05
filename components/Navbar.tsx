@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { User, LogOut, X, Phone } from "lucide-react";
+import { User, LogOut, X, Phone, Gift, Sparkles } from "lucide-react";
 import { setTheme, getTheme, type Theme } from "@/lib/theme";
 
 const navLinks = [
@@ -17,11 +17,14 @@ const navLinks = [
   { href: "/contact",  label: "Contact"     },
 ];
 
+const featuredLinks = [
+  { href: "/packages",  label: "Packages",   icon: Sparkles, desc: "Curated service bundles" },
+  { href: "/gift-card", label: "Gift Cards", icon: Gift,     desc: "Give the gift of beauty" },
+];
+
 const secondaryLinks = [
   { href: "/about",     label: "About Us"         },
   { href: "/blog",      label: "Journal"          },
-  { href: "/packages",  label: "Packages"         },
-  { href: "/gift-card", label: "Gift Cards"       },
   { href: "/visit",     label: "How to Get Here"  },
   { href: "/account",   label: "My Account"       },
 ];
@@ -177,6 +180,21 @@ export default function Navbar() {
                 {l.label}
               </Link>
             ))}
+            <div className="h-4 w-px bg-[var(--mc-border)] mx-1" />
+            {featuredLinks.map(l => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                  pathname === l.href
+                    ? "text-[var(--mc-accent)]"
+                    : "text-[#C9A84C] hover:text-[var(--mc-accent)]"
+                }`}
+              >
+                <l.icon size={11} />
+                {l.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Right — Book CTA + user */}
@@ -262,6 +280,26 @@ export default function Navbar() {
           >
             Book Appointment
           </Link>
+
+          {/* Featured: Packages + Gift Cards */}
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            {featuredLinks.map(l => (
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className={`flex flex-col items-center justify-center gap-1.5 py-4 px-3 border transition-colors cursor-pointer group ${
+                  pathname === l.href
+                    ? "border-[#C9A84C] bg-[#C9A84C]/10"
+                    : "border-[#C9A84C]/40 hover:border-[#C9A84C] hover:bg-[#C9A84C]/5"
+                }`}
+              >
+                <l.icon size={18} className="text-[#C9A84C]" />
+                <span className="text-[11px] uppercase tracking-[0.15em] font-semibold text-gray-800 group-hover:text-[#B8860B]">{l.label}</span>
+                <span className="text-[10px] text-gray-400 text-center leading-tight">{l.desc}</span>
+              </Link>
+            ))}
+          </div>
 
           {/* Primary nav */}
           <nav aria-label="Main navigation">

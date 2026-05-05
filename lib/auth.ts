@@ -74,6 +74,11 @@ export async function getSession(): Promise<CustomerPayload | null> {
 }
 
 export async function requireAdmin(): Promise<NextResponse | null> {
+  // TEMPORARY: open admin for testing. Set ADMIN_OPEN_ACCESS=false (or
+  // delete the secret) to re-enable auth before public launch.
+  if (process.env.ADMIN_OPEN_ACCESS === "true") {
+    return null;
+  }
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });

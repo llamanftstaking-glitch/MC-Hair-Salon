@@ -50,3 +50,4 @@ build = ["npm", "run", "build"]
 
 [userenv.shared]
 SALON_INBOX_EMAIL = "hello@mchairsalon.com"
+ADMIN_OPEN_ACCESS = "true"

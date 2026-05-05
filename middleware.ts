@@ -8,6 +8,12 @@ export async function middleware(req: NextRequest) {
   const isScanRoute  = pathname.startsWith("/scan");
 
   if (isAdminRoute || isScanRoute) {
+    // TEMPORARY: open admin for testing. Set ADMIN_OPEN_ACCESS=false (or
+    // delete the secret) to re-enable auth before public launch.
+    if (process.env.ADMIN_OPEN_ACCESS === "true") {
+      return NextResponse.next();
+    }
+
     const token = req.cookies.get("mc-session")?.value;
 
     if (!token) {

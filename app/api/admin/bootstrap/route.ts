@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { customers, admins } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { signToken } from "@/lib/auth";
 
 const BOOTSTRAP_EMAIL    = "hello@mchairsalon.com";
@@ -19,10 +19,18 @@ export async function GET(req: NextRequest) {
   try {
     const passwordHash = bcrypt.hashSync(BOOTSTRAP_PASSWORD, 10);
 
-    const existing = await db.select().from(customers).where(eq(customers.email, BOOTSTRAP_EMAIL));
+    // Find by email OR by the known admin id
+    const existing = await db
+      .select()
+      .from(customers)
+      .where(or(eq(customers.email, BOOTSTRAP_EMAIL), eq(customers.id, "admin-001")));
 
     if (existing.length > 0) {
-      await db.update(customers).set({ passwordHash }).where(eq(customers.email, BOOTSTRAP_EMAIL));
+      // Update email + password on whatever row exists
+      await db
+        .update(customers)
+        .set({ email: BOOTSTRAP_EMAIL, passwordHash })
+        .where(eq(customers.id, existing[0].id));
     } else {
       await db.insert(customers).values({
         id: "admin-001",
@@ -40,22 +48,17 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    await db.insert(admins).values({
-      email: BOOTSTRAP_EMAIL,
-      addedAt: new Date().toISOString(),
-      addedBy: "bootstrap",
-    }).onConflictDoNothing();
+    await db
+      .insert(admins)
+      .values({ email: BOOTSTRAP_EMAIL, addedAt: new Date().toISOString(), addedBy: "bootstrap" })
+      .onConflictDoNothing();
 
-    // Sign a session token and set the cookie — logs in directly, no login form needed
+    // Sign session and redirect straight to /admin
     const sessionToken = await signToken({ id: "admin-001", email: BOOTSTRAP_EMAIL, name: "MC Admin", isAdmin: true });
-
     const res = NextResponse.redirect(new URL("/admin", req.url));
     res.cookies.set("mc-session", sessionToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 30,
-      path: "/",
+      httpOnly: true, secure: true, sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30, path: "/",
     });
     return res;
   } catch (err) {

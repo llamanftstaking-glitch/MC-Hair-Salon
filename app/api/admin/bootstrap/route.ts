@@ -18,10 +18,13 @@ export async function GET(req: NextRequest) {
   try {
     const passwordHash = bcrypt.hashSync(BOOTSTRAP_PASSWORD, 10);
 
-    // Always upsert — resets password if account existed with wrong hash
-    await db
-      .insert(customers)
-      .values({
+    const existing = await db.select().from(customers).where(eq(customers.email, BOOTSTRAP_EMAIL));
+
+    if (existing.length > 0) {
+      // Update password hash on existing row
+      await db.update(customers).set({ passwordHash }).where(eq(customers.email, BOOTSTRAP_EMAIL));
+    } else {
+      await db.insert(customers).values({
         id: "admin-001",
         name: "MC Admin",
         email: BOOTSTRAP_EMAIL,
@@ -34,21 +37,14 @@ export async function GET(req: NextRequest) {
         tier: "Bronze",
         visitStreak: 0,
         blowoutsEarned: 0,
-      })
-      .onConflictDoUpdate({
-        target: customers.email,
-        set: { passwordHash },
       });
+    }
 
-    // Ensure admin row exists
-    await db
-      .insert(admins)
-      .values({
-        email: BOOTSTRAP_EMAIL,
-        addedAt: new Date().toISOString(),
-        addedBy: "bootstrap",
-      })
-      .onConflictDoNothing();
+    await db.insert(admins).values({
+      email: BOOTSTRAP_EMAIL,
+      addedAt: new Date().toISOString(),
+      addedBy: "bootstrap",
+    }).onConflictDoNothing();
 
     return NextResponse.json({
       success: true,

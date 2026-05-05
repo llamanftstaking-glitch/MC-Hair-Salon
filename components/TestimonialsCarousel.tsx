@@ -2,6 +2,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import { TESTIMONIALS } from "@/lib/data";
+import FadeIn from "@/components/FadeIn";
 
 export default function TestimonialsCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -25,9 +26,10 @@ export default function TestimonialsCarousel() {
   return (
     <>
       {/* Mobile: snap carousel */}
+      <FadeIn className="md:hidden">
       <div
         ref={scrollRef}
-        className="md:hidden flex overflow-x-auto snap-x snap-mandatory gap-0"
+        className="flex overflow-x-auto snap-x snap-mandatory gap-0"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {TESTIMONIALS.map((t, i) => (
@@ -55,6 +57,7 @@ export default function TestimonialsCarousel() {
           </div>
         ))}
       </div>
+      </FadeIn>
 
       {/* Mobile dot indicators */}
       <div className="md:hidden flex justify-center gap-2 mt-5">
@@ -73,7 +76,8 @@ export default function TestimonialsCarousel() {
       {/* Desktop: 3-col grid */}
       <div className="hidden md:grid md:grid-cols-3 gap-6 md:gap-8">
         {TESTIMONIALS.map((t, i) => (
-          <div key={i} className="luxury-card p-6 sm:p-8 h-full flex flex-col">
+          <FadeIn key={i} delay={i * 100}>
+          <div className="luxury-card p-6 sm:p-8 h-full flex flex-col">
             <div className="flex gap-1 mb-4">
               {Array.from({ length: t.rating }).map((_, j) => (
                 <Star key={j} size={14} className="fill-[var(--mc-accent)] text-[var(--mc-accent)]" />
@@ -93,6 +97,7 @@ export default function TestimonialsCarousel() {
               </div>
             </div>
           </div>
+          </FadeIn>
         ))}
       </div>
     </>

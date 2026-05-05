@@ -1,5 +1,7 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import FadeIn from "@/components/FadeIn";
 
 // Row layout (3-col grid):
 // Row 1: [IMG_5036 r2] [IMG_5888 ] [IMG_4603]
@@ -22,17 +24,18 @@ export default function ResultsGallery() {
   return (
     <section className="py-16 sm:py-24 px-6 bg-[var(--mc-surface-dark)]">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-10 sm:mb-16">
+        <FadeIn className="text-center mb-10 sm:mb-16">
           <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Client Transformations</p>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--mc-text)]">The Work</h2>
           <p className="text-[var(--mc-muted)] text-sm mt-4 max-w-lg mx-auto">Every look is personal. Every result is intentional.</p>
-        </div>
+        </FadeIn>
 
         {/* Asymmetric grid — shorter rows on mobile, taller on desktop */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3 [grid-template-rows:200px_200px_170px_150px] sm:[grid-template-rows:280px_280px_240px_210px]">
           {GALLERY.map((item, i) => (
-            <Link key={i} href="/book"
-              className={`relative overflow-hidden group cursor-pointer ${item.span}`}>
+            <FadeIn key={i} delay={i * 60} className={`${item.span}`}>
+            <Link href="/book"
+              className="relative overflow-hidden group cursor-pointer w-full h-full block">
               <Image
                 src={item.src}
                 alt={`${item.label} at MC Hair Salon Upper East Side NYC`}
@@ -48,6 +51,7 @@ export default function ResultsGallery() {
                 </p>
               </div>
             </Link>
+            </FadeIn>
           ))}
         </div>
 

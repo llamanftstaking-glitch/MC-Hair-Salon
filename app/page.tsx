@@ -60,11 +60,13 @@ export default async function Home() {
             { label: "Color",       price: "$85" },
             { label: "Balayage",    price: "$120" },
           ].map((item, i, arr) => (
-            <div key={i} className="flex flex-col sm:flex-row items-center sm:items-center gap-0.5 sm:gap-3 text-center sm:text-left">
-              <span className="font-serif text-2xl sm:text-xl gold-gradient font-bold">{item.price}</span>
-              <span className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-wider leading-tight">{item.label}</span>
-              {i < arr.length - 1 && <span className="text-[var(--mc-border)] text-sm hidden sm:block">·</span>}
-            </div>
+            <FadeIn key={i} delay={i * 70}>
+              <div className="flex flex-col sm:flex-row items-center sm:items-center gap-0.5 sm:gap-3 text-center sm:text-left">
+                <span className="font-serif text-2xl sm:text-xl gold-gradient font-bold">{item.price}</span>
+                <span className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-wider leading-tight">{item.label}</span>
+                {i < arr.length - 1 && <span className="text-[var(--mc-border)] text-sm hidden sm:block">·</span>}
+              </div>
+            </FadeIn>
           ))}
           <Link href="/services" className="text-[var(--mc-accent)] text-xs uppercase tracking-widest hover:underline col-span-3 text-center mt-1 sm:mt-0 sm:col-span-1 cursor-pointer">
             Full Menu →

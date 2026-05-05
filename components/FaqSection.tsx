@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import FadeIn from "@/components/FadeIn";
 
 export interface FaqItem {
   q: string;
@@ -45,8 +46,8 @@ export default function FaqSection({
 
       <div className="space-y-2 max-w-3xl mx-auto">
         {faqs.map((item, i) => (
+          <FadeIn key={i} delay={i * 45}>
           <div
-            key={i}
             className="border border-[#1a1a1a] bg-[#080808] overflow-hidden"
           >
             <button
@@ -68,6 +69,7 @@ export default function FaqSection({
               </div>
             )}
           </div>
+          </FadeIn>
         ))}
       </div>
     </section>

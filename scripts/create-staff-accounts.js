@@ -1,12 +1,19 @@
+#!/usr/bin/env node
 /**
- * Creates staff login accounts in the customers table.
- * Run once: node scripts/create-staff-accounts.js
+ * Idempotent staff account seeder.
+ * Runs automatically on every `npm start` (after seed-admin.js).
+ * Safe to run multiple times — uses ON CONFLICT DO NOTHING.
  *
- * Default password: MCStaff2026!
- * Staff can change their password via the account settings page.
+ * Staff can log in at /login and access their schedule at /staff.
+ * Default password: MCStaff2026!  (change via account settings after first login)
  */
-const bcrypt = require("bcryptjs");
-const { Pool } = require("pg");
+const bcrypt   = require("bcryptjs");
+const postgres = require("postgres");
+
+if (!process.env.DATABASE_URL) {
+  console.error("ERROR: DATABASE_URL is not set.");
+  process.exit(1);
+}
 
 const STAFF = [
   { name: "Juany",    email: "juany@mchairsalon.com" },
@@ -20,43 +27,35 @@ const STAFF = [
 
 const DEFAULT_PASSWORD = "MCStaff2026!";
 
-async function main() {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const sql = postgres(process.env.DATABASE_URL, { max: 1 });
 
-  console.log("Creating staff accounts...\n");
-  const hash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
+async function main() {
+  const hash = bcrypt.hashSync(DEFAULT_PASSWORD, 10);
+  let created = 0;
 
   for (const { name, email } of STAFF) {
-    try {
-      // Check if already exists
-      const existing = await pool.query(
-        "SELECT id FROM customers WHERE email = $1",
-        [email]
-      );
-
-      if (existing.rows.length > 0) {
-        console.log(`  ✓ ${name} (${email}) — already exists`);
-        continue;
-      }
-
-      const id = `STAFF-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-      await pool.query(
-        `INSERT INTO customers (id, name, email, phone, password_hash, created_at, points, visits, total_spent, tier, visit_streak, blowouts_earned)
-         VALUES ($1, $2, $3, $4, $5, $6, 0, 0, 0, 'Bronze', 0, 0)`,
-        [id, name, email, "", hash, new Date().toISOString()]
-      );
-      console.log(`  ✓ ${name} (${email}) — created`);
-    } catch (err) {
-      console.error(`  ✗ ${name} (${email}) — error:`, err.message);
+    const existing = await sql`SELECT id FROM customers WHERE email = ${email} LIMIT 1`;
+    if (existing.length > 0) {
+      continue; // already exists, skip silently
     }
+    const id  = `STAFF-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const now = new Date().toISOString();
+    await sql`
+      INSERT INTO customers (id, name, email, phone, password_hash, created_at, points, visits, total_spent, tier, visit_streak, blowouts_earned)
+      VALUES (${id}, ${name}, ${email}, '', ${hash}, ${now}, 0, 0, 0, 'Bronze', 0, 0)
+      ON CONFLICT (email) DO NOTHING
+    `;
+    created++;
+    console.log(`  Created staff account: ${name} <${email}>`);
   }
 
-  console.log(`\nDone! Default password: ${DEFAULT_PASSWORD}`);
-  console.log("Each staff member can log in at /login and access their portal at /staff");
-  await pool.end();
+  if (created === 0) {
+    console.log("Staff accounts: all 7 already exist.");
+  } else {
+    console.log(`Staff accounts: created ${created} new account(s). Default password: ${DEFAULT_PASSWORD}`);
+  }
 }
 
-main().catch(err => {
-  console.error("Fatal error:", err);
-  process.exit(1);
-});
+main()
+  .catch(err => { console.error("Staff seed error:", err.message); })
+  .finally(() => sql.end());

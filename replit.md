@@ -20,7 +20,9 @@ Luxury hair salon website for MC Hair Salon & Spa, Upper East Side, New York.
 1. Add `DATABASE_URL` as a Replit secret (PostgreSQL connection string from Replit Postgres or Neon).
 2. Run `npm run db:push` once to create all tables.
 3. Run `node scripts/import-data.js` once to migrate any existing `data/*.json` files into Postgres.
-4. The `scripts/seed-admin.js` runs automatically on start to ensure the admin account exists.
+4. On every `npm start`, the following run automatically:
+   - `scripts/seed-admin.js` — ensures the admin customer + admins row exists
+   - `scripts/create-staff-accounts.js` — ensures all 7 staff accounts exist (idempotent)
 
 The schema is defined in `lib/schema.ts`. All lib modules are now async and DB-backed. Rate limiting, webhook idempotency, analytics, and settings all use Postgres.
 
@@ -98,9 +100,68 @@ Front-end button is `components/GoogleSignInButton.tsx` (loads `https://accounts
 3. Authorized JavaScript origins: the current Replit dev URL (`https://<repl>.replit.dev`), the deployed `.replit.app` URL, and `https://mchairsalon.com`. No redirect URIs are required (Google Identity Services uses one-tap / popup, not a redirect flow).
 4. Save the Client ID into the `NEXT_PUBLIC_GOOGLE_CLIENT_ID` secret.
 
+**⚠️ Pre-launch Google OAuth checklist (must do before Wednesday):**
+- [ ] Open [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials
+- [ ] Click the MC Hair Salon OAuth Web Client ID
+- [ ] Under "Authorized JavaScript origins", verify these URLs are listed:
+  - `https://<your-repl-name>.replit.app` (the live deployed URL)
+  - `https://mchairsalon.com` (if custom domain is active)
+- [ ] If either is missing, click "+ Add URI", paste it, and Save
+- [ ] Confirm `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is set as a Replit secret
+- [ ] Test: open the live URL in an incognito window → /login → "Sign in with Google" — should open Google picker without "origin not allowed" error
+
 ## GitHub Sync Workflow
 The site is pushed from GitHub repo `llamanftstaking-glitch/MC-Hair-Salon`.
 On `push from github`, files are downloaded via `https://raw.githubusercontent.com/...` since direct git operations are blocked in this environment. Replit-only files (`lib/staff-data.ts`, `lib/settings.ts`, `replit.md`) are not on GitHub and must be preserved across pulls.
 
 ## Deployment
 Published via Replit Deployments (autoscale).
+
+---
+
+## Wednesday Go-Live Checklist
+
+### Pre-deploy (do in order)
+- [ ] Set all required Replit secrets: `DATABASE_URL`, `JWT_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
+- [ ] Run `npm run db:push` on Replit (adds `services` jsonb column to bookings table)
+- [ ] Deploy the app — startup script auto-seeds admin + 7 staff accounts
+- [ ] Confirm in Replit console that startup logs show "Staff accounts: all 7 already exist" (or "created N new accounts")
+- [ ] Complete Google OAuth origin checklist above
+
+### Smoke tests (run on the live .replit.app URL)
+
+**1. Contact form**
+- [ ] Go to /contact, submit a test message with your email
+- [ ] Confirm client auto-reply arrives at your inbox
+- [ ] Confirm salon notification arrives at hello@mchairsalon.com
+- [ ] Log: timestamp, message text → `verification-evidence/smoke-test-launch.json`
+
+**2. Booking with Stripe card capture**
+- [ ] Create a test account at /login → select a service, stylist, date, time
+- [ ] Complete card capture with Stripe test card `4242 4242 4242 4242`
+- [ ] Confirm booking appears in admin panel as "pending"
+- [ ] Confirm client receives "Request Received" email
+- [ ] Confirm salon receives new booking notification
+- [ ] Admin: change status to "confirmed" → confirm client receives "Confirmed" email
+- [ ] Log: booking ID, timestamps → `verification-evidence/smoke-test-launch.json`
+
+**3. Gift card purchase**
+- [ ] Go to /gift-card, purchase with Stripe test card
+- [ ] Confirm recipient receives gift card email with code
+- [ ] Confirm salon receives new gift card notification
+- [ ] Log: gift card code, timestamps → `verification-evidence/smoke-test-launch.json`
+
+**4. Staff portal**
+- [ ] Log in as maria@mchairsalon.com (password: MCStaff2026!)
+- [ ] Go to /staff — confirm schedule and analytics load
+- [ ] Log: ✓ or any errors
+
+**5. Google Sign-In**
+- [ ] Open live URL in incognito → /login → click "Sign in with Google"
+- [ ] Confirm no "origin not allowed" error
+- [ ] Complete Google sign-in, confirm redirects to /account
+- [ ] Log: ✓ or error message
+
+### Post-smoke-test
+- [ ] Update `verification-evidence/smoke-test-launch.json` with results
+- [ ] Announce live to client

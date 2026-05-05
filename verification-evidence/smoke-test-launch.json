@@ -1,0 +1,46 @@
+{
+  "_note": "Fill this in after running the Wednesday go-live smoke tests on the live .replit.app URL.",
+  "testedAt": null,
+  "testedBy": null,
+  "liveUrl": null,
+  "results": {
+    "contactForm": {
+      "status": "pending",
+      "submittedAt": null,
+      "clientReplyReceived": null,
+      "salonNotificationReceived": null,
+      "notes": ""
+    },
+    "booking": {
+      "status": "pending",
+      "bookingId": null,
+      "submittedAt": null,
+      "stripeCardCapture": null,
+      "pendingEmailReceived": null,
+      "confirmedEmailReceived": null,
+      "salonNotificationReceived": null,
+      "notes": ""
+    },
+    "giftCard": {
+      "status": "pending",
+      "giftCardCode": null,
+      "purchasedAt": null,
+      "recipientEmailReceived": null,
+      "salonNotificationReceived": null,
+      "notes": ""
+    },
+    "staffPortal": {
+      "status": "pending",
+      "loginEmail": "maria@mchairsalon.com",
+      "scheduleLoaded": null,
+      "analyticsLoaded": null,
+      "notes": ""
+    },
+    "googleSignIn": {
+      "status": "pending",
+      "originError": null,
+      "loginCompleted": null,
+      "notes": ""
+    }
+  }
+}

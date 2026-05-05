@@ -333,15 +333,18 @@ function NewcomersTab() {
         <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-4">Salon Hours</p>
         <div className="space-y-2">
           {[
-            ["Monday",             "10:00 AM – 5:00 PM"],
-            ["Tuesday – Thursday", "10:30 AM – 7:30 PM"],
-            ["Friday",             "10:00 AM – 7:00 PM"],
-            ["Saturday",           "10:00 AM – 7:00 PM"],
-            ["Sunday",             "11:00 AM – 6:00 PM"],
-          ].map(([day, hours]) => (
-            <div key={day} className="flex justify-between text-sm">
-              <span className="text-[#555]">{day}</span>
-              <span className="text-white">{hours}</span>
+            ["Monday",             "9:30 AM – 4:00 PM",  "By Appointment Only"],
+            ["Tuesday – Thursday", "10:30 AM – 7:30 PM", ""],
+            ["Friday",             "10:00 AM – 7:00 PM", ""],
+            ["Saturday",           "10:00 AM – 7:00 PM", ""],
+            ["Sunday",             "11:00 AM – 6:00 PM", ""],
+          ].map(([day, hours, note]) => (
+            <div key={day} className="flex justify-between text-sm gap-4">
+              <span className="text-[#555] shrink-0">{day}</span>
+              <span className="text-right">
+                <span className="text-white">{hours}</span>
+                {note && <span className="block text-[var(--mc-accent)] text-[10px] uppercase tracking-widest mt-0.5">{note}</span>}
+              </span>
             </div>
           ))}
         </div>

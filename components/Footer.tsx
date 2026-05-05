@@ -53,9 +53,14 @@ export default async function Footer() {
             <h4 className="text-[var(--mc-accent)] uppercase tracking-widest text-xs font-semibold mb-6">Hours</h4>
             <ul className="space-y-2">
               {SALON_INFO.hours.map((h) => (
-                <li key={h.day} className="flex justify-between text-sm">
-                  <span className="text-[var(--mc-text-dim)]">{h.day}</span>
-                  <span className="text-[var(--mc-muted)]">{h.open} – {h.close}</span>
+                <li key={h.day} className="flex justify-between text-sm gap-4">
+                  <span className="text-[var(--mc-text-dim)] shrink-0">{h.day}</span>
+                  <span className="text-[var(--mc-muted)] text-right">
+                    {h.open} – {h.close}
+                    {"note" in h && h.note && (
+                      <span className="block text-[var(--mc-accent)] text-[10px] uppercase tracking-widest mt-0.5">{h.note}</span>
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>

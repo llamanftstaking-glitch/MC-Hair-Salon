@@ -8,7 +8,7 @@ export const SALON_INFO = {
   facebook: "https://www.facebook.com/mchairsalonandspa/",
   established: 2011,
   hours: [
-    { day: "Monday", open: "9:30 AM", close: "4:00 PM" },
+    { day: "Monday", open: "9:30 AM", close: "4:00 PM", note: "By Appointment Only" },
     { day: "Tuesday", open: "10:30 AM", close: "7:30 PM" },
     { day: "Wednesday", open: "10:30 AM", close: "7:30 PM" },
     { day: "Thursday", open: "10:30 AM", close: "7:30 PM" },

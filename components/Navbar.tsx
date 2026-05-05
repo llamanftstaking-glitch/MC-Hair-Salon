@@ -77,7 +77,7 @@ export default function Navbar() {
   return (
     <>
       {/* ── Top bar ── */}
-      <div className="mc-navbar fixed top-0 left-0 right-0 z-50 bg-[var(--mc-surface)] border-b border-[var(--mc-border)]">
+      <div className="mc-navbar fixed top-0 left-0 right-0 z-50 bg-[var(--mc-surface)] border-b border-[var(--mc-border)] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-gradient-to-r after:from-transparent after:via-[#C9A84C]/40 after:to-transparent relative">
 
         {/* Announcement strip */}
         <div className="flex items-center justify-center py-2 px-4 sm:px-10 relative">
@@ -156,13 +156,16 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`px-3 py-3 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                className={`relative px-3 py-3 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer group ${
                   pathname === l.href
                     ? "text-[var(--mc-accent)]"
-                    : "text-[var(--mc-muted)] hover:text-[var(--mc-accent)]"
+                    : "text-[var(--mc-muted)] hover:text-[var(--mc-text)]"
                 }`}
               >
                 {l.label}
+                <span className={`absolute bottom-0 left-3 right-3 h-px bg-[var(--mc-accent)] transition-transform duration-300 origin-left ${
+                  pathname === l.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                }`} />
               </Link>
             ))}
           </nav>
@@ -189,27 +192,30 @@ export default function Navbar() {
                 <Link
                   key={l.href}
                   href={l.href}
-                  className={`px-3 py-3 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                  className={`relative px-3 py-3 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer group ${
                     pathname === l.href
                       ? "text-[var(--mc-accent)]"
-                      : "text-[var(--mc-muted)] hover:text-[var(--mc-accent)]"
+                      : "text-[var(--mc-muted)] hover:text-[var(--mc-text)]"
                   }`}
                 >
                   {l.label}
+                  <span className={`absolute bottom-0 left-3 right-3 h-px bg-[var(--mc-accent)] transition-transform duration-300 origin-left ${
+                    pathname === l.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                  }`} />
                 </Link>
               ))}
-              <div className="h-4 w-px bg-[var(--mc-border)] mx-1" />
+              <div className="h-4 w-px bg-[var(--mc-border)] mx-2" />
               {featuredLinks.map(l => (
                 <Link
                   key={l.href}
                   href={l.href}
-                  className={`px-3 py-3 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                  className={`mx-0.5 px-2.5 py-1.5 text-[10px] uppercase tracking-[0.15em] font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1 border ${
                     pathname === l.href
-                      ? "text-[var(--mc-accent)]"
-                      : "text-[#C9A84C] hover:text-[var(--mc-accent)]"
+                      ? "border-[#C9A84C] bg-[#C9A84C]/15 text-[#C9A84C]"
+                      : "border-[#C9A84C]/30 text-[#C9A84C] hover:border-[#C9A84C] hover:bg-[#C9A84C]/10"
                   }`}
                 >
-                  <l.icon size={11} />
+                  <l.icon size={10} />
                   {l.label}
                 </Link>
               ))}
@@ -239,9 +245,10 @@ export default function Navbar() {
               )}
 
               <Link href="/book"
-                className="px-5 py-3 text-[11px] font-bold uppercase tracking-widest text-black cursor-pointer hover:opacity-90 transition-opacity whitespace-nowrap"
+                className="ml-1 px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest text-black cursor-pointer hover:brightness-110 transition-all whitespace-nowrap relative overflow-hidden group"
                 style={{ background: "linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #C9A84C 100%)" }}>
-                Book Now
+                <span className="relative z-10">Book Now</span>
+                <span className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200" />
               </Link>
             </div>
           </div>

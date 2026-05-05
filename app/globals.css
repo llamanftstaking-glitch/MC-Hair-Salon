@@ -313,4 +313,40 @@ html[data-theme="light"] .luxury-card {
 img, video, iframe { max-width: 100%; }
 table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
+/* ── ADMIN PANEL THEMES ─────────────────────────────────────────────────────── */
+.admin-light {
+  --admin-bg:           #ffffff;
+  --admin-surface:      #f5f5f5;
+  --admin-surface-dark: #ebebeb;
+  --admin-border:       #e0e0e0;
+  --admin-text:         #111111;
+  --admin-muted:        #666666;
+  /* override site-wide dark vars so all admin content goes light */
+  --mc-bg:              #ffffff;
+  --mc-surface:         #f5f5f5;
+  --mc-surface-2:       #efefef;
+  --mc-surface-dark:    #ebebeb;
+  --mc-border:          #e0e0e0;
+  --mc-text:            #111111;
+  --mc-text-body:       #333333;
+  --mc-muted:           #666666;
+  --mc-text-dim:        #999999;
+  --mc-accent:          #111111;
+  --mc-accent-2:        #444444;
+  --mc-card-bg:         #f5f5f5;
+  --mc-card-border:     #e0e0e0;
+  background-color:     #ffffff;
+  color:                #111111;
+}
+.admin-dark {
+  --admin-bg:           #000000;
+  --admin-surface:      #0f0f0f;
+  --admin-surface-dark: #050505;
+  --admin-border:       #2a2a2a;
+  --admin-text:         #ffffff;
+  --admin-muted:        #888888;
+  background-color:     #000000;
+  color:                #ffffff;
+}
+
 * { -webkit-tap-highlight-color: transparent; }

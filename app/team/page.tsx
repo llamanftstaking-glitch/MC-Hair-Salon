@@ -41,18 +41,11 @@ export default async function TeamPage() {
           {team.map((member) => (
             <div key={member.id} className="luxury-card overflow-hidden group">
               <div className="relative h-48 sm:h-64 md:h-80 overflow-hidden bg-[var(--mc-surface-dark)]">
-                {member.image ? (
-                  <Image
-                    src={member.image} alt={member.name} fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-6xl text-[var(--mc-accent)] font-serif font-bold">
-                      {member.name.charAt(0)}
-                    </span>
-                  </div>
-                )}
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-7xl text-[var(--mc-accent)] font-serif font-bold select-none">
+                    {member.name.charAt(0)}
+                  </span>
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                 <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6">
                   <p className="font-serif text-base sm:text-2xl font-bold text-white">{member.name}</p>

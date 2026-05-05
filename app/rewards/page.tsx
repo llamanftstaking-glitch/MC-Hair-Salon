@@ -122,7 +122,7 @@ export default function RewardsPage() {
   return (
     <>
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="relative pt-28 sm:pt-40 pb-20 px-6 bg-[var(--mc-bg)] text-center overflow-hidden">
+      <section className="relative pt-20 sm:pt-28 pb-10 px-6 bg-[var(--mc-bg)] text-center overflow-hidden">
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-10"

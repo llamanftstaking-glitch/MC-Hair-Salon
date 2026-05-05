@@ -19,11 +19,11 @@ export default function GalleryPage() {
 
   return (
     <>
-      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-[var(--mc-bg)] text-center">
-        <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Our Work</p>
-        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4">Gallery</h1>
-        <div className="mx-auto h-px w-20 bg-gradient-to-r from-transparent via-[var(--mc-accent)] to-transparent mb-6" />
-        <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">
+      <section className="pt-20 sm:pt-26 pb-4 sm:pb-6 px-6 bg-[var(--mc-bg)] text-center">
+        <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-3">Our Work</p>
+        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">Gallery</h1>
+        <div className="mx-auto h-px w-20 bg-gradient-to-r from-transparent via-[var(--mc-accent)] to-transparent mb-4" />
+        <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed text-sm">
           Transformations, artistry, and the luxury experience at MC Hair Salon & Spa.
         </p>
       </section>

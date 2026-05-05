@@ -15,10 +15,10 @@ export default function ServicesPage() {
   return (
     <>
       {/* Header */}
-      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-[var(--mc-bg)] text-center">
-        <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">What We Offer</p>
-        <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Services & Pricing</h1>
-        <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed text-sm sm:text-base">
+      <section className="pt-20 sm:pt-26 pb-4 sm:pb-6 px-6 bg-[var(--mc-bg)] text-center">
+        <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-3">What We Offer</p>
+        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">Services & Pricing</h1>
+        <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed text-sm">
           All prices listed are starting rates. Final pricing may vary based on hair length, density, and complexity.
         </p>
       </section>
@@ -27,8 +27,8 @@ export default function ServicesPage() {
       <div className="h-px gold-gradient-bg mx-auto w-24 mb-0" />
 
       {/* Services */}
-      <section className="py-14 sm:py-20 px-4 sm:px-6 bg-[var(--mc-bg)]">
-        <div className="max-w-5xl mx-auto space-y-16 sm:space-y-24">
+      <section className="py-8 sm:py-12 px-4 sm:px-6 bg-[var(--mc-bg)]">
+        <div className="max-w-5xl mx-auto space-y-10 sm:space-y-14">
           {SERVICES.map((category, ci) => (
             <div key={category.category}>
               {/* Ornamental divider (skip first) */}
@@ -59,10 +59,10 @@ export default function ServicesPage() {
               </div>
 
               {/* Items */}
-              <div className="space-y-2 sm:space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {category.items.map((item) => (
                   <div key={item.name}
-                    className="flex items-center justify-between p-4 sm:p-5 bg-[#080808] border border-[#141414] border-l-2 border-l-transparent group gap-3 transition-all duration-200 hover:border-[var(--mc-accent)]/25 hover:bg-[#0c0c0c] hover:border-l-[var(--mc-accent)]">
+                    className="flex items-center justify-between p-3 sm:p-4 bg-[#080808] border border-[#141414] border-l-2 border-l-transparent group gap-3 transition-all duration-200 hover:border-[var(--mc-accent)]/25 hover:bg-[#0c0c0c] hover:border-l-[var(--mc-accent)]">
                     <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
                       <div className="w-4 h-4 border border-[#2a2a2a] flex items-center justify-center shrink-0 mt-1 group-hover:border-[var(--mc-accent)] transition-colors">
                         <Check size={9} className="text-[#3a3a3a] group-hover:text-[var(--mc-accent)] transition-colors" />

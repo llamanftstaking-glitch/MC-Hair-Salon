@@ -69,6 +69,13 @@ async function main() {
     if (existing.length > 0) {
       console.log(`Admin account already exists: ${ADMIN_EMAIL}`);
     } else {
+      // Make sure we don't collide with an already-taken id (e.g. another
+      // admin row created by the bootstrap endpoint for a different email).
+      const idTaken = await sql`SELECT 1 FROM customers WHERE id = 'admin-001' LIMIT 1`;
+      const adminId = idTaken.length > 0
+        ? `admin-${ADMIN_EMAIL.replace(/[^a-z0-9]/gi, "-").toLowerCase()}`
+        : "admin-001";
+
       const passwordHash = bcrypt.hashSync(ADMIN_PASSWORD, 10);
       const now = new Date().toISOString();
       await sql`
@@ -76,12 +83,12 @@ async function main() {
           id, name, email, phone, password_hash, created_at,
           points, visits, total_spent, tier, visit_streak, blowouts_earned
         ) VALUES (
-          'admin-001', 'MC Admin', ${ADMIN_EMAIL}, '', ${passwordHash}, ${now},
+          ${adminId}, 'MC Admin', ${ADMIN_EMAIL}, '', ${passwordHash}, ${now},
           0, 0, 0, 'Bronze', 0, 0
         )
         ON CONFLICT (email) DO NOTHING
       `;
-      console.log(`Created customer account: ${ADMIN_EMAIL}`);
+      console.log(`Created customer account: ${ADMIN_EMAIL} (id=${adminId})`);
     }
 
     // Check if admin entry already exists
@@ -105,8 +112,10 @@ async function main() {
     console.log(`  Email:    ${ADMIN_EMAIL}`);
     console.log(`  Password: ${ADMIN_PASSWORD}`);
   } catch (err) {
-    console.error("Seed error:", err.message);
-    process.exit(1);
+    // Do NOT crash the deploy if seeding fails. The admin account can be
+    // (re)created at any time via the /api/admin/bootstrap endpoint, and
+    // crashing here would prevent the web server from ever starting.
+    console.error("Seed error (non-fatal, continuing boot):", err.message);
   } finally {
     await sql.end();
   }

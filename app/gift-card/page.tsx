@@ -3,7 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Gift, Mail, MessageSquare, Check, Loader, ChevronRight } from "lucide-react";
 
-const AMOUNTS = [25, 50, 100, 200];
+const AMOUNTS = [50, 100, 200, 500];
 
 interface GiftCardForm {
   amount: number | null;

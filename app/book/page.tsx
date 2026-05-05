@@ -481,7 +481,7 @@ function DateTimeStep({ date, time, onSelect, onBack }: { date: string; time: st
 }
 
 // ── Card capture form (step 4 — new users) ────────────────────────────────────
-function CardCaptureForm({ user, onSuccess }: { user: AuthCustomer; onSuccess: (data: CardData) => void }) {
+function CardCaptureForm({ user, onSuccess, onSkipCard }: { user: AuthCustomer; onSuccess: (data: CardData) => void; onSkipCard?: () => void }) {
   const stripe   = useStripe();
   const elements = useElements();
 
@@ -506,9 +506,9 @@ function CardCaptureForm({ user, onSuccess }: { user: AuthCustomer; onSuccess: (
       .then(r => r.json())
       .then(data => {
         if (data.clientSecret) { setClientSecret(data.clientSecret); setCustomerId(data.customerId); setIntentReady(true); }
-        else setIntentError(data.error ?? "Unable to connect to payment system");
+        else { setIntentError(data.error ?? "Unable to connect to payment system"); onSkipCard?.(); }
       })
-      .catch(() => setIntentError("Unable to connect to payment system"));
+      .catch(() => { setIntentError("Unable to connect to payment system"); onSkipCard?.(); });
   }, [user.email, user.name]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
@@ -674,13 +674,13 @@ function ConfirmStep({
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [error,      setError]      = useState("");
+  const [skipCard,   setSkipCard]   = useState(false);
 
   const formattedDate = selection.date
     ? new Date(selection.date + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
     : "";
 
   const handleSubmit = useCallback(async () => {
-    if (!cardData) { setError("Please add your card to continue."); return; }
     setSubmitting(true);
     setError("");
     try {
@@ -734,7 +734,7 @@ function ConfirmStep({
         </div>
       </div>
 
-      {!cardData ? (
+      {!cardData && !skipCard ? (
         /* New user — card capture */
         <div className="luxury-card p-6 md:p-8">
           <div className="flex items-center gap-3 mb-6">
@@ -744,7 +744,7 @@ function ConfirmStep({
               <p className="text-[var(--mc-muted)] text-xs mt-0.5">Saved once — instant booking every time after</p>
             </div>
           </div>
-          <CardCaptureForm user={user} onSuccess={onCardCapture} />
+          <CardCaptureForm user={user} onSuccess={onCardCapture} onSkipCard={() => setSkipCard(true)} />
         </div>
       ) : (
         /* Returning user — submit form */

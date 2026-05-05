@@ -8,7 +8,6 @@ const BOOTSTRAP_EMAIL    = "hello@mchairsalon.com";
 const BOOTSTRAP_PASSWORD = "MCAdmin2040!";
 
 export async function GET(req: NextRequest) {
-  // Safety: only works if no admin exists yet OR called with the correct token
   const token = req.nextUrl.searchParams.get("token");
   const EXPECTED = process.env.BOOTSTRAP_TOKEN || "mc-bootstrap-2040";
 
@@ -17,15 +16,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Check if admin customer already exists
-    const existing = await db
-      .select()
-      .from(customers)
-      .where(eq(customers.email, BOOTSTRAP_EMAIL));
+    const passwordHash = bcrypt.hashSync(BOOTSTRAP_PASSWORD, 10);
 
-    if (existing.length === 0) {
-      const passwordHash = bcrypt.hashSync(BOOTSTRAP_PASSWORD, 10);
-      await db.insert(customers).values({
+    // Always upsert — resets password if account existed with wrong hash
+    await db
+      .insert(customers)
+      .values({
         id: "admin-001",
         name: "MC Admin",
         email: BOOTSTRAP_EMAIL,
@@ -38,15 +34,21 @@ export async function GET(req: NextRequest) {
         tier: "Bronze",
         visitStreak: 0,
         blowoutsEarned: 0,
-      }).onConflictDoNothing();
-    }
+      })
+      .onConflictDoUpdate({
+        target: customers.email,
+        set: { passwordHash },
+      });
 
     // Ensure admin row exists
-    await db.insert(admins).values({
-      email: BOOTSTRAP_EMAIL,
-      addedAt: new Date().toISOString(),
-      addedBy: "bootstrap",
-    }).onConflictDoNothing();
+    await db
+      .insert(admins)
+      .values({
+        email: BOOTSTRAP_EMAIL,
+        addedAt: new Date().toISOString(),
+        addedBy: "bootstrap",
+      })
+      .onConflictDoNothing();
 
     return NextResponse.json({
       success: true,

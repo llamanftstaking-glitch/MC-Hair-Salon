@@ -214,3 +214,8 @@ table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
 * { -webkit-tap-highlight-color: transparent; }
+
+*:focus-visible {
+  outline: 2px solid var(--mc-accent);
+  outline-offset: 3px;
+}

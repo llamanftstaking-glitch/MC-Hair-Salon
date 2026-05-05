@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin, Train, Car, ParkingSquare, Compass,
   ExternalLink, ChevronRight, Clock, Phone,
@@ -426,17 +425,9 @@ export default function VisitPage() {
           </div>
 
           {/* Tab content */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.18 }}
-            >
-              {TAB_CONTENT[activeTab]}
-            </motion.div>
-          </AnimatePresence>
+          <div key={activeTab} style={{ animation: "fadeUp 0.18s ease-out both" }}>
+            {TAB_CONTENT[activeTab]}
+          </div>
 
         </div>
       </section>

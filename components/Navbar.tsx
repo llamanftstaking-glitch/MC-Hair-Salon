@@ -171,7 +171,7 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`px-3 py-2.5 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-3 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                   pathname === l.href
                     ? "text-[var(--mc-accent)]"
                     : "text-[var(--mc-muted)] hover:text-[var(--mc-accent)]"
@@ -185,7 +185,7 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`px-3 py-2.5 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                className={`px-3 py-3 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1 ${
                   pathname === l.href
                     ? "text-[var(--mc-accent)]"
                     : "text-[#C9A84C] hover:text-[var(--mc-accent)]"

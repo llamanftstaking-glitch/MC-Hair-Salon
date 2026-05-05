@@ -96,7 +96,7 @@ export default function WorkShowcase() {
                 <button key={i} onClick={() => setActive(i)}
                   aria-label={`Slide ${i + 1}`}
                   className={`h-[3px] rounded-full transition-all duration-300 cursor-pointer ${
-                    i === active ? "w-8 bg-[var(--mc-accent)]" : "w-3 bg-white/40 hover:bg-white/70"
+                    i === active ? "w-8 bg-[var(--mc-accent)]" : "w-3 bg-[var(--mc-text)]/30 hover:bg-[var(--mc-text)]/60"
                   }`} />
               ))}
             </div>

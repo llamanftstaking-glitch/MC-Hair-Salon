@@ -179,7 +179,7 @@ export default function CurlyBot() {
           {/* Chat tab */}
           {tab === "chat" && (
             <>
-              <div className="flex-1 overflow-y-auto bg-[#f0f2f5] p-4 space-y-3">
+              <div className="flex-1 overflow-y-auto bg-[var(--mc-surface)] p-4 space-y-3">
                 {messages.map((m, i) => (
                   <div key={i} className={`flex ${m.from === "user" ? "justify-end" : "justify-start"}`}>
                     {m.from === "curly" && (
@@ -213,12 +213,12 @@ export default function CurlyBot() {
               </div>
 
               {/* Input */}
-              <div className="bg-white border-t border-gray-200 p-3 flex items-center gap-2 flex-shrink-0">
+              <div className="bg-[var(--mc-surface)] border-t border-[var(--mc-border)] p-3 flex items-center gap-2 flex-shrink-0">
                 <input
                   value={input} onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && send()}
                   placeholder="Ask Curly anything..."
-                  className="flex-1 text-sm text-gray-800 placeholder-gray-400 bg-gray-100 rounded-full px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0a1628]/20"
+                  className="flex-1 text-sm text-[var(--mc-text)] placeholder-[var(--mc-text-dim)] bg-[var(--mc-surface-2)] rounded-full px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#0a1628]/20"
                 />
                 <button onClick={send} disabled={!input.trim()}
                   className="w-9 h-9 rounded-full bg-[#0a1628] flex items-center justify-center text-white disabled:opacity-30 cursor-pointer hover:bg-[#142036] transition-colors shrink-0">
@@ -230,22 +230,22 @@ export default function CurlyBot() {
 
           {/* FAQ tab */}
           {tab === "faq" && (
-            <div className="flex-1 overflow-y-auto bg-[#f0f2f5]">
+            <div className="flex-1 overflow-y-auto bg-[var(--mc-surface)]">
               <div className="p-4 pb-2">
-                <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-3">Frequently Asked Questions</p>
+                <p className="text-xs text-[var(--mc-muted)] uppercase tracking-widest font-semibold mb-3">Frequently Asked Questions</p>
               </div>
               <div className="px-3 pb-4 space-y-2">
                 {FAQS.map((faq, i) => (
-                  <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                  <div key={i} className="bg-[var(--mc-surface-2)] rounded-xl overflow-hidden border border-[var(--mc-border)]">
                     <button
                       onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                      className="w-full flex items-center justify-between px-4 py-3.5 text-left cursor-pointer hover:bg-gray-50 transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-3.5 text-left cursor-pointer hover:bg-[var(--mc-surface-dark)] transition-colors"
                     >
-                      <span className="text-sm font-semibold text-gray-800 pr-3 leading-snug">{faq.q}</span>
-                      <ChevronDown size={16} className={`text-gray-400 shrink-0 transition-transform duration-200 ${openFaq === i ? "rotate-180" : ""}`} />
+                      <span className="text-sm font-semibold text-[var(--mc-text)] pr-3 leading-snug">{faq.q}</span>
+                      <ChevronDown size={16} className={`text-[var(--mc-muted)] shrink-0 transition-transform duration-200 ${openFaq === i ? "rotate-180" : ""}`} />
                     </button>
                     {openFaq === i && (
-                      <div className="px-4 pb-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
+                      <div className="px-4 pb-4 text-sm text-[var(--mc-text-body)] leading-relaxed border-t border-[var(--mc-border)] pt-3">
                         {faq.a}
                       </div>
                     )}

@@ -160,7 +160,7 @@ export default function ContactPage() {
       {/* Map */}
       <section className="h-80 relative">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3021.4826707!2d-73.9533!3d40.7726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c258b38f3aaaab%3A0x1234!2s336+E+78th+St%2C+New+York%2C+NY+10075!5e0!3m2!1sen!2sus!4v1234567890"
+          src="https://maps.google.com/maps?q=336+East+78th+St,+New+York,+NY+10075&z=17&output=embed"
           width="100%" height="100%" style={{ border: 0, filter: "grayscale(100%) invert(90%) contrast(80%)" }}
           allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade"
           title="MC Hair Salon & Spa Location"

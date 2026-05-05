@@ -10,6 +10,24 @@ export async function POST(req: NextRequest) {
   if (!email || !password)
     return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
 
+  // Allow env-var admin credentials without a DB row (bootstrap / Replit deploy)
+  const envAdminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const envAdminPassword = process.env.ADMIN_PASSWORD?.trim();
+  if (
+    envAdminEmail &&
+    envAdminPassword &&
+    email.toLowerCase() === envAdminEmail &&
+    password === envAdminPassword
+  ) {
+    const token = await signToken({ id: "admin-001", email, name: "MC Admin", isAdmin: true });
+    const res = NextResponse.json({ success: true, customer: { id: "admin-001", name: "MC Admin", email, isAdmin: true } });
+    res.cookies.set("mc-session", token, {
+      httpOnly: true, secure: process.env.NODE_ENV === "production",
+      sameSite: "lax", maxAge: 60 * 60 * 24 * 30, path: "/",
+    });
+    return res;
+  }
+
   const customer = await getCustomerByEmail(email);
   if (!customer)
     return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });

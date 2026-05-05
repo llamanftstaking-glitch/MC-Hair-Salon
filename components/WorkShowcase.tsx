@@ -63,7 +63,7 @@ export default function WorkShowcase() {
             fill
             priority={i < 2}
             sizes="100vw"
-            className="object-cover object-top"
+            className="object-contain object-center"
           />
         </div>
       ))}

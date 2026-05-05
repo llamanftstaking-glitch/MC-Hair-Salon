@@ -106,7 +106,7 @@ export default function HeroLogo() {
 
       {/* Desktop gradient overlays */}
       <div className="absolute inset-0 pointer-events-none hidden md:block"
-        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.30) 30%, rgba(0,0,0,0.30) 60%, rgba(0,0,0,0.75) 100%)" }} />
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.80) 100%)" }} />
       <div className="absolute inset-0 pointer-events-none hidden md:block"
         style={{ background: "radial-gradient(ellipse 70% 50% at 50% 38%, var(--mc-hero-glow) 0%, transparent 70%)" }} />
 
@@ -125,15 +125,17 @@ export default function HeroLogo() {
           <span className="gold-gradient block text-6xl md:text-8xl pb-4">Every Service.</span>
           <span className="gold-gradient block text-6xl md:text-8xl">One Studio.</span>
         </h1>
-        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mt-8 max-w-xl">
+        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 mt-8 max-w-xl"
+          style={{ textShadow: "0 1px 6px rgba(0,0,0,0.9)" }}>
           {SERVICES.map((s, i) => (
             <span key={s} className="flex items-center gap-2 whitespace-nowrap">
-              {i > 0 && <span className="text-[var(--mc-border)] text-[10px]">·</span>}
-              <span className="text-[var(--mc-muted)] text-xs uppercase tracking-widest">{s}</span>
+              {i > 0 && <span className="text-white/30 text-[10px]">·</span>}
+              <span className="text-white/70 text-xs uppercase tracking-widest">{s}</span>
             </span>
           ))}
         </div>
-        <p className="text-[var(--mc-text-dim)] text-[10px] uppercase tracking-widest mt-4">
+        <p className="text-white/50 text-[10px] uppercase tracking-widest mt-4"
+          style={{ textShadow: "0 1px 6px rgba(0,0,0,0.9)" }}>
           10,000+ Clients · 5-Star Rated · Serving New York Since 2011
         </p>
         <div className="mt-10 flex items-center gap-3 px-5 py-3 border border-[var(--mc-accent)]/40 bg-[var(--mc-accent)]/5">

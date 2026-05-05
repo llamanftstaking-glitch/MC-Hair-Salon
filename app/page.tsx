@@ -35,6 +35,7 @@ export default async function Home() {
   return (
     <>
       <HeroLogo />
+      <SectionDivider />
       <WorkShowcase />
 
       {/* TRUST STRIP */}

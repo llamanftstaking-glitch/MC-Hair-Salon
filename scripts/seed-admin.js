@@ -10,8 +10,8 @@
 const bcrypt   = require("bcryptjs");
 const postgres = require("postgres");
 
-const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || "admin@mchairsalonspa.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "MCAdmin2026!";
+const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || "hello@mchairsalon.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "MCAdmin2040!";
 
 if (!process.env.DATABASE_URL) {
   console.error("ERROR: DATABASE_URL is not set. Please add it as a Replit secret.");

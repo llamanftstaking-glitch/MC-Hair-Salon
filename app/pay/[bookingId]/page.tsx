@@ -14,7 +14,7 @@ export default async function PayPage({ params }: Props) {
   if (!booking || booking.status !== "confirmed") notFound();
   if (!booking.servicePrice || booking.servicePrice <= 0) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="min-h-screen bg-[var(--mc-bg)] flex items-center justify-center px-4">
         <div className="text-center">
           <h1 className="font-serif text-2xl font-bold text-[#C9A84C] mb-2">MC Hair Salon & Spa</h1>
           <p className="text-[#888] mt-4">Online payment is not available for this booking.</p>

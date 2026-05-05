@@ -110,13 +110,13 @@ export default function ScanPage() {
   const reset = () => setResult(null);
 
   if (loading) return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="min-h-screen bg-[var(--mc-bg)] flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-[#222] border-t-[var(--mc-accent)] rounded-full animate-spin" />
     </div>
   );
 
   if (error) return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-6">
+    <div className="min-h-screen bg-[var(--mc-bg)] flex items-center justify-center px-6">
       <div className="text-center max-w-sm">
         <AlertTriangle size={48} className="text-red-400 mx-auto mb-4" />
         <p className="text-white font-serif text-2xl font-bold mb-2">Client Not Found</p>
@@ -130,7 +130,7 @@ export default function ScanPage() {
   const tierColor = TIER_COLOR[client.tier] ?? "#B8860B";
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-[var(--mc-bg)] flex flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
 
         {/* Salon header */}

@@ -434,8 +434,8 @@ function MaintenanceLogPanel() {
     "in-progress":"text-blue-400 border-blue-400/30 bg-blue-400/10",
     resolved:     "text-green-400 border-green-400/30 bg-green-400/10",
   };
-  const STATUS_BORDER: Record<string, string> = {
-    pending: "border-l-yellow-400", "in-progress": "border-l-blue-400", resolved: "border-l-green-400",
+  const STATUS_BG: Record<string, string> = {
+    pending: "bg-yellow-400/8", "in-progress": "bg-blue-400/8", resolved: "bg-green-400/8",
   };
 
   const filtered = statusFilter === "all" ? entries : entries.filter(e => e.status === statusFilter);
@@ -489,7 +489,7 @@ function MaintenanceLogPanel() {
       ) : (
         <div className="space-y-3">
           {filtered.map(e => (
-            <div key={e.id} className={`luxury-card border-l-4 ${STATUS_BORDER[e.status] ?? "border-l-[var(--mc-border)]"} p-5`}>
+            <div key={e.id} className={`luxury-card ${STATUS_BG[e.status] ?? ""} p-5`}>
               <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -563,8 +563,8 @@ function SupplyOrdersPanel() {
     ordered:  "text-blue-400 border-blue-400/30 bg-blue-400/10",
     received: "text-green-400 border-green-400/30 bg-green-400/10",
   };
-  const STATUS_BORDER: Record<string, string> = {
-    ok: "border-l-green-400", low: "border-l-red-400", ordered: "border-l-blue-400", received: "border-l-green-400",
+  const STATUS_BG: Record<string, string> = {
+    ok: "bg-green-400/8", low: "bg-red-400/8", ordered: "bg-blue-400/8", received: "bg-green-400/8",
   };
 
   const lowCount = items.filter(i => i.status === "low").length;
@@ -631,7 +631,7 @@ function SupplyOrdersPanel() {
       ) : (
         <div className="space-y-3">
           {filtered.map(item => (
-            <div key={item.id} className={`luxury-card border-l-4 ${STATUS_BORDER[item.status]} p-5`}>
+            <div key={item.id} className={`luxury-card ${STATUS_BG[item.status] ?? ""} p-5`}>
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -2825,7 +2825,7 @@ export default function AdminPage() {
                     <p className="text-[#444] text-xs mt-1">Paragraph text below the heading</p>
                   </div>
                   {/* Live preview */}
-                  <div className="border border-[var(--mc-border)] p-6 bg-black text-center">
+                  <div className="border border-[var(--mc-border)] p-6 bg-[var(--mc-bg)] text-center">
                     <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest mb-2">Preview</p>
                     <h2 className="font-serif text-2xl font-bold text-white">{settingsForm.hero.headline}</h2>
                     <h2 className="font-serif text-2xl font-bold gold-gradient">{settingsForm.hero.headlineAccent}</h2>

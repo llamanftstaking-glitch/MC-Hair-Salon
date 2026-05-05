@@ -14,7 +14,7 @@ export default async function WeddingsPage() {
   return (
     <>
       {/* ── HERO ── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 bg-black overflow-hidden">
+      <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 bg-[var(--mc-bg)] overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0">
           <Image
@@ -117,7 +117,7 @@ export default async function WeddingsPage() {
       </section>
 
       {/* ── SERVICES & PRICING ── */}
-      <section className="py-24 px-6 bg-black">
+      <section className="py-24 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Transparent Pricing</p>
@@ -179,7 +179,7 @@ export default async function WeddingsPage() {
                 </div>
               </a>
               <div className="w-px h-8 bg-[#1a1a1a] hidden sm:block" />
-              <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
+              <a href="https://www.theknot.com/marketplace/mc-hair-salon-and-spa-new-york-ny-2103062"
                 target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-3 group cursor-pointer">
                 <div className="text-center">
@@ -346,7 +346,7 @@ export default async function WeddingsPage() {
       </section>
 
       {/* ── GALLERY ── */}
-      <section className="py-24 px-6 bg-black">
+      <section className="py-24 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Our Work</p>
@@ -427,7 +427,7 @@ export default async function WeddingsPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-24 px-6 bg-black">
+      <section className="py-24 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="font-serif text-4xl font-bold text-white">Wedding FAQ</h2>
@@ -458,7 +458,7 @@ export default async function WeddingsPage() {
 
       {/* ── FINAL CTA ── */}
       <section className="relative py-28 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-black">
+        <div className="absolute inset-0 bg-[var(--mc-bg)]">
           <Image
             src="/instagram/mchairsalonspa_1664479225_2938187155735434916_509340228.jpg"
             alt="Bridal beauty"

@@ -45,7 +45,7 @@ export default function WorkShowcase() {
   const slide = SLIDES[active];
 
   return (
-    <section className="mc-dark-section relative w-full bg-black overflow-hidden" style={{ height: "80vh", minHeight: 560 }}>
+    <section className="mc-dark-section relative w-full bg-[var(--mc-bg)] overflow-hidden" style={{ height: "80vh", minHeight: 560 }}>
 
       {/* Slides — GPU-composited crossfade via will-change + CSS transition */}
       {SLIDES.map((s, i) => (
@@ -63,7 +63,7 @@ export default function WorkShowcase() {
             fill
             priority={i < 2}
             sizes="100vw"
-            className="object-contain"
+            className="object-cover object-top"
           />
         </div>
       ))}

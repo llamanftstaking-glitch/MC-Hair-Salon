@@ -15,7 +15,7 @@ export default function ServicesPage() {
   return (
     <>
       {/* Header */}
-      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-[var(--mc-bg)] text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">What We Offer</p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Services & Pricing</h1>
         <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed text-sm sm:text-base">
@@ -27,7 +27,7 @@ export default function ServicesPage() {
       <div className="h-px gold-gradient-bg mx-auto w-24 mb-0" />
 
       {/* Services */}
-      <section className="py-14 sm:py-20 px-4 sm:px-6 bg-black">
+      <section className="py-14 sm:py-20 px-4 sm:px-6 bg-[var(--mc-bg)]">
         <div className="max-w-5xl mx-auto space-y-16 sm:space-y-24">
           {SERVICES.map((category, ci) => (
             <div key={category.category}>

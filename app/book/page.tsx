@@ -816,10 +816,10 @@ function SuccessScreen({ name, onReset }: { name: string; onReset: () => void })
       <div className="w-20 h-20 rounded-full gold-gradient-bg flex items-center justify-center mx-auto mb-6">
         <Check size={36} strokeWidth={3} className="text-black" />
       </div>
-      <p className="text-[var(--mc-accent)] text-xs uppercase tracking-[0.4em] font-semibold mb-3">Request Sent</p>
-      <h2 className="font-serif text-4xl font-bold text-white mb-3">You&apos;re on the list!</h2>
+      <p className="text-[var(--mc-accent)] text-xs uppercase tracking-[0.4em] font-semibold mb-3">Appointment Requested</p>
+      <h2 className="font-serif text-4xl font-bold text-white mb-3">We&apos;ll Confirm Shortly</h2>
       <p className="text-[var(--mc-muted)] text-sm max-w-sm mx-auto mb-8 leading-relaxed">
-        Your appointment request has been received, {name.split(" ")[0]}. We&apos;ll confirm your time within 24 hours.
+        Your request has been received, {name.split(" ")[0]}. We&apos;ll confirm your appointment by email within 24 hours.
       </p>
       <div className="inline-flex items-center gap-2 border border-[#1a1a1a] bg-[#080808] px-6 py-3 text-sm text-[var(--mc-muted)] mb-8">
         <ShieldCheck size={14} className="text-[var(--mc-accent)]" />
@@ -840,7 +840,7 @@ function SuccessScreen({ name, onReset }: { name: string; onReset: () => void })
 
 // ── Main flow ─────────────────────────────────────────────────────────────────
 function BookingFlow() {
-  const [step,        setStep]        = useState<Step>(0);
+  const [step,        setStep]        = useState<Step>(1);
   const [done,        setDone]        = useState(false);
   const [user,        setUser]        = useState<AuthCustomer | null>(null);
   const [cardData,    setCardData]    = useState<CardData | null>(null);
@@ -865,7 +865,6 @@ function BookingFlow() {
     if (u.stripeCustomerId && u.stripePaymentMethodId) {
       setCardData({ name: u.name, email: u.email, phone: u.phone, stripeCustomerId: u.stripeCustomerId, stripePaymentMethodId: u.stripePaymentMethodId });
     }
-    setStep(1);
   }
 
   const handleSignIn = useCallback((u: AuthCustomer) => applyAuth(u), []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -878,7 +877,7 @@ function BookingFlow() {
 
   if (!authChecked) {
     return (
-      <section className="pt-40 pb-24 flex items-center justify-center bg-black">
+      <section className="pt-40 pb-24 flex items-center justify-center bg-[var(--mc-bg)]">
         <div className="w-6 h-6 border-2 border-[#222] border-t-[var(--mc-accent)] rounded-full animate-spin" />
       </section>
     );
@@ -887,34 +886,30 @@ function BookingFlow() {
   return (
     <>
       {/* Hero */}
-      <section className="pt-28 sm:pt-36 pb-8 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-8 px-6 bg-[var(--mc-bg)] text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
           Reserve Your Visit
         </p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4">
-          {done ? "Request Sent" : "Book Appointment"}
+          {done ? "Appointment Requested" : "Book Appointment"}
         </h1>
         <p className="text-[var(--mc-muted)] max-w-md mx-auto text-sm leading-relaxed mb-8">
-          {step === 0
-            ? "Sign in once — every future booking takes under a minute."
-            : done
+          {done
             ? "We'll confirm your appointment within 24 hours."
+            : step === 4 && !user
+            ? "Sign in to complete your booking."
             : "A luxury experience begins with a single step."}
         </p>
         {!done && step >= 1 && step <= 4 && <StepBreadcrumb step={step as 1 | 2 | 3 | 4} />}
       </section>
 
       {/* Content */}
-      <section className="pb-24 px-6 bg-black">
+      <section className="pb-24 px-6 bg-[var(--mc-bg)]">
         {done ? (
           <div className="max-w-2xl mx-auto">
             <div className="luxury-card p-8 md:p-10">
               <SuccessScreen name={user?.name ?? ""} onReset={reset} />
             </div>
-          </div>
-        ) : step === 0 ? (
-          <div className="max-w-xl mx-auto">
-            <SignInGate onSignIn={handleSignIn} />
           </div>
         ) : (
           <div className="max-w-5xl mx-auto">
@@ -950,6 +945,14 @@ function BookingFlow() {
                     onSelect={(date, time) => { setSelection(s => ({ ...s, date, time })); setStep(4); }}
                     onBack={() => setStep(2)}
                   />
+                )}
+                {step === 4 && !user && (
+                  <div className="luxury-card p-6 md:p-8">
+                    <p className="text-[var(--mc-accent)] text-xs uppercase tracking-[0.4em] font-semibold mb-2">One Last Step</p>
+                    <h3 className="font-serif text-2xl font-bold text-white mb-1">Sign In to Confirm</h3>
+                    <p className="text-[var(--mc-muted)] text-sm mb-6">Your selections are saved. Sign in to complete your booking.</p>
+                    <SignInGate onSignIn={handleSignIn} />
+                  </div>
                 )}
                 {step === 4 && user && (
                   <ConfirmStep

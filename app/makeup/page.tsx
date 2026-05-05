@@ -15,7 +15,7 @@ export default function MakeupPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="pt-28 sm:pt-36 pb-16 px-6 bg-black text-center relative overflow-hidden">
+      <section className="pt-28 sm:pt-36 pb-16 px-6 bg-[var(--mc-bg)] text-center relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(184,134,11,0.12) 0%, transparent 70%)" }} />
         <div className="relative z-10 max-w-3xl mx-auto">
@@ -75,7 +75,7 @@ export default function MakeupPage() {
       </section>
 
       {/* ── Portfolio Gallery ── */}
-      <section className="py-16 px-6 bg-black">
+      <section className="py-16 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-3">The Work</p>
@@ -152,7 +152,7 @@ export default function MakeupPage() {
       </section>
 
       {/* ── Why Choose Us ── */}
-      <section className="py-16 px-6 bg-black">
+      <section className="py-16 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="font-serif text-3xl font-bold text-white">The MC Difference</h2>

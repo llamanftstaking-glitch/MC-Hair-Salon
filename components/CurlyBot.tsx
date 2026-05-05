@@ -202,9 +202,9 @@ export default function CurlyBot() {
                     <div className="w-7 h-7 rounded-full bg-[#0a1628] flex items-center justify-center text-xs shrink-0">✂️</div>
                     <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
                       <span className="flex gap-1">
-                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: "0ms" }} />
+                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: "200ms" }} />
+                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: "400ms" }} />
                       </span>
                     </div>
                   </div>

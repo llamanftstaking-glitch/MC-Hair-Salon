@@ -136,7 +136,7 @@ export default function StaffPortal() {
 
   if (!authCheck || loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--mc-bg)] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-[#222] border-t-[#C9A84C] rounded-full animate-spin" />
       </div>
     );
@@ -151,7 +151,7 @@ export default function StaffPortal() {
   const daysInView = view === "day" ? 1 : view === "week" ? 7 : endOfMonth(anchor).getDate();
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[var(--mc-bg)] text-white">
       {/* Header */}
       <div className="border-b border-[#1a1a1a] bg-[#0a0a0a]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
@@ -258,7 +258,7 @@ export default function StaffPortal() {
               return (
                 <div className="grid grid-cols-7 gap-px bg-[#1a1a1a]">
                   {cells.map((cell, i) => {
-                    if (!cell) return <div key={i} className="bg-black h-20" />;
+                    if (!cell) return <div key={i} className="bg-[var(--mc-bg)] h-20" />;
                     const ds = toDateStr(cell);
                     const dayBookings = bookings.filter(b => b.date === ds);
                     const isToday = ds === toDateStr(new Date());

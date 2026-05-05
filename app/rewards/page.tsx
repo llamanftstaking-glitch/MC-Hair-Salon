@@ -122,7 +122,7 @@ export default function RewardsPage() {
   return (
     <>
       {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="relative pt-28 sm:pt-40 pb-20 px-6 bg-black text-center overflow-hidden">
+      <section className="relative pt-28 sm:pt-40 pb-20 px-6 bg-[var(--mc-bg)] text-center overflow-hidden">
         {/* Background glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-10"
@@ -194,7 +194,7 @@ export default function RewardsPage() {
       </section>
 
       {/* ── Punch Card ─────────────────────────────────────────────────────── */}
-      <section className="py-20 px-6 bg-black border-t border-[#111]">
+      <section className="py-20 px-6 bg-[var(--mc-bg)] border-t border-[#111]">
         <div className="max-w-4xl mx-auto">
           <div className="luxury-card overflow-hidden">
             <div className="grid md:grid-cols-2 gap-0">
@@ -321,7 +321,7 @@ export default function RewardsPage() {
       </section>
 
       {/* ── Ways to Earn ───────────────────────────────────────────────────── */}
-      <section className="py-20 px-6 bg-black border-t border-[#111]">
+      <section className="py-20 px-6 bg-[var(--mc-bg)] border-t border-[#111]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Earn Points</p>
@@ -375,7 +375,7 @@ export default function RewardsPage() {
       </section>
 
       {/* ── QR + How to Use at Salon ───────────────────────────────────────── */}
-      <section className="py-20 px-6 bg-black border-t border-[#111]">
+      <section className="py-20 px-6 bg-[var(--mc-bg)] border-t border-[#111]">
         <div className="max-w-4xl mx-auto">
           <div className="luxury-card p-8 sm:p-12">
             <div className="grid md:grid-cols-2 gap-10 items-center">
@@ -468,7 +468,7 @@ export default function RewardsPage() {
       </section>
 
       {/* ── CTA ────────────────────────────────────────────────────────────── */}
-      <section className="py-24 px-6 bg-black border-t border-[#111] text-center">
+      <section className="py-24 px-6 bg-[var(--mc-bg)] border-t border-[#111] text-center">
         <div className="max-w-xl mx-auto">
           <div className="w-16 h-px bg-[var(--mc-accent)] mx-auto mb-8 opacity-50" />
           <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Ready to Start?</p>

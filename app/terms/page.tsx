@@ -93,7 +93,7 @@ export default function TermsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="pt-28 sm:pt-36 pb-12 px-6 bg-black text-center border-b border-[#111]">
+      <section className="pt-28 sm:pt-36 pb-12 px-6 bg-[var(--mc-bg)] text-center border-b border-[#111]">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Legal</p>
         <h1 className="font-serif text-4xl sm:text-5xl font-bold text-white mb-4">Terms & Conditions</h1>
         <p className="text-[var(--mc-muted)] max-w-xl mx-auto text-sm leading-relaxed">
@@ -104,7 +104,7 @@ export default function TermsPage() {
         </p>
       </section>
 
-      <div className="bg-black py-16 px-6">
+      <div className="bg-[var(--mc-bg)] py-16 px-6">
         <div className="max-w-6xl mx-auto flex gap-16 items-start">
 
           {/* Table of Contents — sticky sidebar on desktop */}

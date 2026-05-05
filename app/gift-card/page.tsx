@@ -71,7 +71,7 @@ export default function GiftCardPage() {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="pt-28 sm:pt-36 pb-16 px-6 bg-black text-center relative overflow-hidden">
+      <section className="pt-28 sm:pt-36 pb-16 px-6 bg-[var(--mc-bg)] text-center relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(184,134,11,0.15) 0%, transparent 70%)" }} />
         <div className="relative z-10 max-w-2xl mx-auto">

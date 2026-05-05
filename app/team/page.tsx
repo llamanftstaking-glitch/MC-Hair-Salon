@@ -28,7 +28,7 @@ export default async function TeamPage() {
 
   return (
     <>
-      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-[var(--mc-bg)] text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">The Experts</p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Our Team</h1>
         <p className="text-[var(--mc-muted)] max-w-xl mx-auto leading-relaxed">
@@ -36,7 +36,7 @@ export default async function TeamPage() {
         </p>
       </section>
 
-      <section className="py-20 px-6 bg-black">
+      <section className="py-20 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-2 gap-4 sm:gap-10">
           {team.map((member) => (
             <div key={member.id} className="luxury-card overflow-hidden group">

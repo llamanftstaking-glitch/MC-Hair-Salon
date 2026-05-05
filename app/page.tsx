@@ -35,24 +35,15 @@ export default async function Home() {
   return (
     <>
       <HeroLogo />
-      <MarqueeStrip />
       <WorkShowcase />
 
-      {/* STATS BAR */}
-      <section className="bg-[var(--mc-surface)] border-y border-[var(--mc-border)] py-6 sm:py-8">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 text-center">
-          {[
-            { value: "13+", label: "Years of Excellence" },
-            { value: "5★",  label: "Average Rating" },
-            { value: "10K+", label: "Happy Clients" },
-            { value: "8",   label: "Team Members" },
-          ].map((s, i) => (
-            <FadeIn key={s.label} delay={i * 80}>
-              <p className="font-serif text-3xl gold-gradient font-bold">{s.value}</p>
-              <p className="text-[var(--mc-text-dim)] text-xs uppercase tracking-widest mt-1">{s.label}</p>
-            </FadeIn>
-          ))}
-        </div>
+      {/* TRUST STRIP */}
+      <section className="bg-[var(--mc-surface)] border-y border-[var(--mc-border)] py-4">
+        <FadeIn>
+          <p className="text-center text-[var(--mc-muted)] text-xs tracking-widest uppercase">
+            Serving the Upper East Side since 2011&nbsp;&nbsp;·&nbsp;&nbsp;10,000+ clients&nbsp;&nbsp;·&nbsp;&nbsp;5-star rated&nbsp;&nbsp;·&nbsp;&nbsp;8 stylists
+          </p>
+        </FadeIn>
       </section>
 
       {/* PRICING CALLOUT */}
@@ -84,51 +75,8 @@ export default async function Home() {
 
       <ResultsGallery />
 
-      {/* WEDDINGWIRE + THE KNOT FEATURE */}
-      <section className="py-16 sm:py-20 px-6 bg-[#050400] border-y border-[#1a1500]">
-        <div className="max-w-5xl mx-auto text-center">
-          <FadeIn>
-            <p className="text-[var(--mc-accent)] uppercase tracking-[0.5em] text-[10px] font-semibold mb-6">As Trusted By NYC Brides On</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 mb-10">
-              <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
-                target="_blank" rel="noopener noreferrer"
-                className="flex flex-col items-center gap-2 group cursor-pointer">
-                <p className="font-bold text-2xl sm:text-3xl text-white tracking-tight group-hover:text-[var(--mc-accent)] transition-colors">WeddingWire</p>
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#C9A84C"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  ))}
-                </div>
-                <p className="text-[#555] text-[10px] uppercase tracking-widest">5.0 · Verified Reviews</p>
-              </a>
-              <div className="w-px h-14 bg-[#1a1a1a] hidden sm:block" />
-              <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
-                target="_blank" rel="noopener noreferrer"
-                className="flex flex-col items-center gap-2 group cursor-pointer">
-                <p className="font-bold text-2xl sm:text-3xl text-white tracking-tight group-hover:text-[var(--mc-accent)] transition-colors">The Knot</p>
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#C9A84C"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  ))}
-                </div>
-                <p className="text-[#555] text-[10px] uppercase tracking-widest">5.0 · Verified Reviews</p>
-              </a>
-            </div>
-            <p className="text-[var(--mc-muted)] text-sm max-w-xl mx-auto mb-8 leading-relaxed">
-              MC Hair Salon & Spa is an official vendor on both WeddingWire and The Knot — the world&apos;s most trusted wedding platforms. NYC brides choose us for bridal hair, makeup, and full-party beauty.
-            </p>
-            <Link href="/weddings"
-              className="inline-block border border-[var(--mc-accent)] text-[var(--mc-accent)] px-10 py-3 uppercase tracking-widest text-xs hover:bg-[var(--mc-accent)] hover:text-black transition-all duration-300 cursor-pointer">
-              Plan Your Wedding Beauty →
-            </Link>
-          </FadeIn>
-        </div>
-      </section>
-
-      <SectionDivider bg="bg-[var(--mc-surface-dark)]" />
-
       {/* TESTIMONIALS */}
-      <section className="py-16 sm:py-24 px-6 bg-black">
+      <section className="py-16 sm:py-24 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-7xl mx-auto">
           <FadeIn className="text-center mb-10 sm:mb-16">
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Client Love</p>
@@ -138,8 +86,6 @@ export default async function Home() {
           <TestimonialsCarousel />
         </div>
       </section>
-
-      <NewsletterStrip />
 
       {/* FAQ */}
       <section className="py-16 sm:py-24 px-6 bg-[var(--mc-surface-dark)]">

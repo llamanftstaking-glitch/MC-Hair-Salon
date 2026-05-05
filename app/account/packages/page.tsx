@@ -39,7 +39,7 @@ export default async function PackagesPage({ searchParams }: { searchParams: Pro
 
         {/* Success banner */}
         {justPurchased && (
-          <div className="luxury-card p-5 border-l-4 border-l-green-500 flex items-center gap-4">
+          <div className="luxury-card p-5 border border-green-500/30 bg-green-900/10 flex items-center gap-4">
             <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
               <Check size={18} className="text-green-400" />
             </div>

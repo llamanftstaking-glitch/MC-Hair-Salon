@@ -61,7 +61,7 @@ export default function BlogPage() {
   return (
     <>
       {/* Hero */}
-      <section className="pt-28 sm:pt-36 pb-12 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-12 px-6 bg-[var(--mc-bg)] text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
           Expert Advice
         </p>
@@ -73,7 +73,7 @@ export default function BlogPage() {
         </p>
       </section>
 
-      <section className="py-16 px-6 bg-black">
+      <section className="py-16 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-4xl mx-auto space-y-12">
 
           {/* Featured post */}

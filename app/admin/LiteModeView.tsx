@@ -28,11 +28,11 @@ interface Props {
   onFullMode: () => void;
 }
 
-const statusBorder: Record<string, string> = {
-  pending:   "border-l-yellow-400",
-  confirmed: "border-l-green-400",
-  cancelled: "border-l-red-400",
-  no_show:   "border-l-orange-400",
+const statusBg: Record<string, string> = {
+  pending:   "bg-yellow-400/8",
+  confirmed: "bg-green-400/8",
+  cancelled: "bg-red-400/8",
+  no_show:   "bg-orange-400/8",
 };
 
 const statusLabel: Record<string, string> = {
@@ -70,7 +70,7 @@ export default function LiteModeView({
     });
 
   return (
-    <div className="min-h-screen bg-black flex flex-col pb-[calc(64px+env(safe-area-inset-bottom))]">
+    <div className="min-h-screen bg-[var(--mc-bg)] flex flex-col pb-[calc(64px+env(safe-area-inset-bottom))]">
 
       {/* ── TODAY TAB ─────────────────────────────────────────────────────── */}
       {tab === "today" && (
@@ -96,7 +96,7 @@ export default function LiteModeView({
           ) : (
             <div className="space-y-3">
               {todayBookings.map(b => (
-                <div key={b.id} className={`luxury-card border-l-4 ${statusBorder[b.status] ?? "border-l-[var(--mc-border)]"} p-4`}>
+                <div key={b.id} className={`luxury-card ${statusBg[b.status] ?? ""} p-4`}>
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="min-w-0">
                       <p className="text-white font-semibold text-sm truncate">{b.name}</p>

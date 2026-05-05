@@ -84,7 +84,7 @@ export default function BlowoutVsKeratinPost() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ARTICLE_SCHEMA) }}
       />
 
-      <section className="pt-28 sm:pt-36 pb-12 px-6 bg-black">
+      <section className="pt-28 sm:pt-36 pb-12 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-3xl mx-auto">
           <Link href="/blog"
             className="inline-flex items-center gap-2 text-[#555] text-xs uppercase tracking-widest hover:text-[var(--mc-accent)] transition-colors cursor-pointer mb-8">
@@ -111,7 +111,7 @@ export default function BlowoutVsKeratinPost() {
         </div>
       </section>
 
-      <article className="py-12 px-6 bg-black">
+      <article className="py-12 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-3xl mx-auto space-y-10 text-[var(--mc-muted)] text-base leading-relaxed">
 
           <section>

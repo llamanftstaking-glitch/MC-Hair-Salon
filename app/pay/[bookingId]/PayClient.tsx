@@ -242,7 +242,7 @@ function PayForm({ booking }: { booking: BookingInfo }) {
 
 export default function PayClient({ booking }: { booking: BookingInfo }) {
   return (
-    <div className="min-h-screen bg-black flex items-start justify-center px-4 py-12">
+    <div className="min-h-screen bg-[var(--mc-bg)] flex items-start justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">

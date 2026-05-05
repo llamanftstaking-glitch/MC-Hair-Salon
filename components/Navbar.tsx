@@ -27,9 +27,8 @@ const secondaryLinks = [
 ];
 
 const THEMES: { id: Theme; label: string; color: string; ring: string }[] = [
-  { id: "bw",    label: "Classic",  color: "#ffffff", ring: "#ffffff" },
-  { id: "gold",  label: "Gold",     color: "#C9A84C", ring: "#C9A84C" },
-  { id: "light", label: "Lavender", color: "#a78bfa", ring: "#7c3aed" },
+  { id: "bw",   label: "Classic", color: "#ffffff", ring: "#ffffff" },
+  { id: "gold", label: "Gold",    color: "#C9A84C", ring: "#C9A84C" },
 ];
 
 interface AuthUser { name: string; email: string }

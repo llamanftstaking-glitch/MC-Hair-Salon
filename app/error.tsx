@@ -15,7 +15,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="min-h-screen bg-black flex flex-col items-center justify-center px-6 text-center">
+    <main className="min-h-screen bg-[var(--mc-bg)] flex flex-col items-center justify-center px-6 text-center">
       <div className="mb-6 flex items-center gap-2">
         <div className="h-px w-10 bg-[#C9A84C]" />
         <span className="text-[#C9A84C] text-[10px] uppercase tracking-[0.3em] font-light">Error</span>

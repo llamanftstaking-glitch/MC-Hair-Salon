@@ -85,7 +85,7 @@ export default function ScanStationPage() {
   const reset = () => { setClient(null); setResult(null); setQuery(""); setNotFound(false); setError(""); };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-start pt-20 px-6 pb-12">
+    <div className="min-h-screen bg-[var(--mc-bg)] flex flex-col items-center justify-start pt-20 px-6 pb-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <p className="font-serif text-2xl font-bold gold-gradient">MC Hair Salon</p>

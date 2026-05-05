@@ -30,12 +30,12 @@ export default function ContactPage() {
 
   return (
     <>
-      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-[var(--mc-bg)] text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Get in Touch</p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6">Contact Us</h1>
       </section>
 
-      <section className="py-16 px-6 bg-black">
+      <section className="py-16 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div>
             <h2 className="font-serif text-3xl font-bold text-white mb-10">Visit Us</h2>

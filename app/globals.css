@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #000000;
-  --color-foreground: #ffffff;
+  --color-background: #0a0900;
+  --color-foreground: #f5f0e8;
   --color-gold: #C9A84C;
   --color-gold-light: #FFD700;
   --color-gold-dark: #8B6914;
@@ -16,10 +16,10 @@
 
 /* ── B&W (DEFAULT) ─────────────────────────────────────────────────────────── */
 :root {
-  --mc-bg:           #000000;
-  --mc-surface:      #0f0f0f;
-  --mc-surface-2:    #111111;
-  --mc-surface-dark: #050505;
+  --mc-bg:           #0a0a0a;
+  --mc-surface:      #111111;
+  --mc-surface-2:    #161616;
+  --mc-surface-dark: #070707;
   --mc-border:       #282828;
   --mc-text:         #ffffff;
   --mc-text-body:    #e8e8e8;
@@ -39,10 +39,10 @@
 
 /* ── GOLD DARK ─────────────────────────────────────────────────────────────── */
 html[data-theme="gold"] {
-  --mc-bg:           #000000;
-  --mc-surface:      #0f0f0f;
-  --mc-surface-2:    #1a1a1a;
-  --mc-surface-dark: #050505;
+  --mc-bg:           #090800;
+  --mc-surface:      #100e00;
+  --mc-surface-2:    #1a1700;
+  --mc-surface-dark: #060500;
   --mc-border:       #2a2a2a;
   --mc-text:         #f5f0e8;
   --mc-text-body:    #d4c8b0;
@@ -60,28 +60,6 @@ html[data-theme="gold"] {
   --mc-card-border:  #2a2a2a;
 }
 
-/* ── LIGHT / LAVENDER ──────────────────────────────────────────────────────── */
-html[data-theme="light"] {
-  --mc-bg:           #faf8ff;
-  --mc-surface:      #f5f3ff;
-  --mc-surface-2:    #f0eeff;
-  --mc-surface-dark: #ede9fe;
-  --mc-border:       #c4b5fd;
-  --mc-text:         #1e1b4b;
-  --mc-text-body:    #2d2a5e;
-  --mc-muted:        #4a3a80;   /* darkened — 7:1 contrast on lightest lavender bg */
-  --mc-text-dim:     #5c4a8a;   /* darkened — 5.6:1 contrast */
-  --mc-accent:       #6d28d9;
-  --mc-accent-2:     #7c3aed;
-  --mc-hero-glow:    rgba(109,40,217,0.08);
-  --mc-hero-pulse:   rgba(124,58,237,0.15);
-  --mc-divider:      rgba(109,40,217,0.3);
-  --mc-scrollbar:    #7c3aed;
-  --mc-title-grad:   linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #7c3aed 100%);
-  --mc-shimmer:      linear-gradient(90deg, #4c1d95 0%, #6d28d9 25%, #7c3aed 50%, #6d28d9 75%, #4c1d95 100%);
-  --mc-card-bg:      #ffffff;
-  --mc-card-border:  #ddd6fe;
-}
 
 /* ── BASE ──────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
@@ -101,10 +79,7 @@ body {
 
 /* ── THEMED UTILITY CLASSES ────────────────────────────────────────────────── */
 .gold-gradient {
-  background: var(--mc-title-grad);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--mc-accent);
 }
 
 .gold-gradient-bg {
@@ -130,140 +105,12 @@ body {
 }
 
 .shimmer-text {
-  background: var(--mc-shimmer);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 4s linear infinite;
+  color: var(--mc-accent);
 }
 
-/* ── LOGO VISIBILITY PER THEME ─────────────────────────────────────────────── */
-/* White logo (bw) used for all themes — inverted to dark on lavender */
+/* ── LOGO VISIBILITY ────────────────────────────────────────────────────────── */
 .logo-bw    { display: block; }
 .logo-light { display: none; }
-
-/* Lavender: invert white logo to black, blend away the white background */
-html[data-theme="light"] .logo-bw {
-  filter: invert(1);
-  mix-blend-mode: multiply;
-}
-
-/* ── NAVBAR: always dark even in light mode (overlays dark hero) ───────────── */
-html[data-theme="light"] .mc-navbar {
-  --mc-bg:      #0c0820;
-  --mc-surface: #100c28;
-  --mc-border:  rgba(124, 58, 237, 0.22);
-  --mc-text:    #ede9fe;
-  --mc-muted:   #c4b5fd;
-  --mc-accent:  #a78bfa;
-  background-color: var(--mc-surface) !important;
-  border-color: var(--mc-border) !important;
-}
-/* Undo the logo invert — white logo looks correct on dark navbar and dark hero */
-html[data-theme="light"] .mc-navbar .logo-bw,
-html[data-theme="light"] .mc-hero .logo-bw {
-  filter: none;
-  mix-blend-mode: normal;
-}
-
-/* ── SECTIONS THAT ARE ALWAYS DARK (video / image bg) ─────────────────────── */
-/* Use light-lavender palette so text is readable on the dark visual background */
-html[data-theme="light"] .mc-hero,
-html[data-theme="light"] .mc-dark-section {
-  --mc-accent:     #c4b5fd;
-  --mc-accent-2:   #a78bfa;
-  --mc-muted:      rgba(196, 181, 253, 0.9);
-  --mc-text-dim:   rgba(221, 214, 254, 0.6);
-  --mc-border:     rgba(196, 181, 253, 0.35);
-  --mc-title-grad: linear-gradient(135deg, #ede9fe 0%, #ffffff 50%, #ddd6fe 100%);
-  --mc-hero-glow:  rgba(196, 181, 253, 0.14);
-  --mc-hero-pulse: rgba(196, 181, 253, 0.25);
-}
-/* Keep the section itself dark — video/images are the background */
-html[data-theme="light"] .mc-hero.bg-black,
-html[data-theme="light"] .mc-dark-section.bg-black {
-  background-color: #000000 !important;
-}
-/* text-white must stay white on these dark sections */
-html[data-theme="light"] .mc-hero .text-white,
-html[data-theme="light"] .mc-hero h1.text-white,
-html[data-theme="light"] .mc-hero h2.text-white,
-html[data-theme="light"] .mc-hero p.text-white,
-html[data-theme="light"] .mc-hero span.text-white,
-html[data-theme="light"] .mc-dark-section .text-white,
-html[data-theme="light"] .mc-dark-section h1.text-white,
-html[data-theme="light"] .mc-dark-section h2.text-white,
-html[data-theme="light"] .mc-dark-section h3.text-white,
-html[data-theme="light"] .mc-dark-section p.text-white,
-html[data-theme="light"] .mc-dark-section span.text-white {
-  color: #ffffff !important;
-}
-/* Image overlay labels (gallery photo captions on dark photo gradients) */
-html[data-theme="light"] .mc-img-label {
-  color: #ffffff !important;
-}
-
-/* ── LIGHT MODE OVERRIDES ──────────────────────────────────────────────────── */
-
-/* ---- Backgrounds ---- */
-html[data-theme="light"] .bg-black {
-  background-color: var(--mc-surface) !important;
-}
-html[data-theme="light"] [class*="bg-[#0"] {
-  background-color: var(--mc-surface-2) !important;
-}
-html[data-theme="light"] [class*="bg-[#1"] {
-  background-color: var(--mc-surface) !important;
-}
-html[data-theme="light"] nav.bg-black\/95,
-html[data-theme="light"] nav {
-  background-color: rgba(250, 248, 255, 0.96) !important;
-}
-html[data-theme="light"] footer {
-  background-color: var(--mc-surface) !important;
-}
-
-/* ---- Text: white text is invisible on light bg — force to --mc-text ---- */
-html[data-theme="light"] .text-white {
-  color: var(--mc-text) !important;
-}
-
-/* ---- Headings with text-white on light bg sections ---- */
-html[data-theme="light"] h1.text-white,
-html[data-theme="light"] h2.text-white,
-html[data-theme="light"] h3.text-white,
-html[data-theme="light"] h4.text-white,
-html[data-theme="light"] p.text-white,
-html[data-theme="light"] span.text-white {
-  color: var(--mc-text) !important;
-}
-
-/* ---- Hardcoded very-dark text that becomes near-invisible on white/near-white ---- */
-html[data-theme="light"] [class*="text-[#1"],
-html[data-theme="light"] [class*="text-[#2"],
-html[data-theme="light"] [class*="text-[#3"] {
-  color: var(--mc-muted) !important;
-}
-
-/* ---- Borders: dark borders stay visible as structure on light bg ---- */
-html[data-theme="light"] [class*="border-[#0"],
-html[data-theme="light"] [class*="border-[#1"] {
-  border-color: var(--mc-border) !important;
-}
-
-/* ---- Dividers / lines ---- */
-html[data-theme="light"] .h-px.bg-\[\#1a1a1a\],
-html[data-theme="light"] [class*="bg-[#1a1a1a]"],
-html[data-theme="light"] [class*="bg-[#111"] {
-  background-color: var(--mc-border) !important;
-}
-
-/* ---- Cards: ensure card text is readable ---- */
-html[data-theme="light"] .luxury-card {
-  background: var(--mc-card-bg) !important;
-  border-color: var(--mc-card-border) !important;
-}
 
 /* ── SCROLLBAR ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }

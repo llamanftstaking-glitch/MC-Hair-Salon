@@ -102,7 +102,7 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <section className="pt-28 sm:pt-36 pb-16 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-16 px-6 bg-[var(--mc-bg)] text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
           Our Story
         </p>
@@ -134,7 +134,7 @@ export default function AboutPage() {
       </section>
 
       {/* Our Story */}
-      <section className="py-20 px-6 bg-black">
+      <section className="py-20 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-3xl mx-auto">
           <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
             The Story
@@ -206,7 +206,7 @@ export default function AboutPage() {
       </section>
 
       {/* Why Us */}
-      <section className="py-20 px-6 bg-black">
+      <section className="py-20 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">
@@ -248,7 +248,7 @@ export default function AboutPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 px-6 bg-black">
+      <section className="py-20 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-3xl mx-auto">
           <FaqSection faqs={ABOUT_FAQ} title="About MC Hair Salon — FAQ" />
         </div>

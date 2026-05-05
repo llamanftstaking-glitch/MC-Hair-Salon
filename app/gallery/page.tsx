@@ -19,7 +19,7 @@ export default function GalleryPage() {
 
   return (
     <>
-      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-black text-center">
+      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-6 bg-[var(--mc-bg)] text-center">
         <p className="text-[var(--mc-accent)] uppercase tracking-[0.4em] text-xs font-semibold mb-4">Our Work</p>
         <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4">Gallery</h1>
         <div className="mx-auto h-px w-20 bg-gradient-to-r from-transparent via-[var(--mc-accent)] to-transparent mb-6" />
@@ -28,7 +28,7 @@ export default function GalleryPage() {
         </p>
       </section>
 
-      <section className="py-12 px-6 bg-black">
+      <section className="py-12 px-6 bg-[var(--mc-bg)]">
         <div className="max-w-7xl mx-auto">
           {/* Category filters */}
           <div className="flex gap-2 flex-wrap justify-center mb-10">

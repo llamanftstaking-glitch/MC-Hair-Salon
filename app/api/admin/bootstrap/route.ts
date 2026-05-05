@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { customers, admins } from "@/lib/schema";
 import { eq } from "drizzle-orm";
+import { signToken } from "@/lib/auth";
 
 const BOOTSTRAP_EMAIL    = "hello@mchairsalon.com";
 const BOOTSTRAP_PASSWORD = "MCAdmin2040!";
@@ -21,7 +22,6 @@ export async function GET(req: NextRequest) {
     const existing = await db.select().from(customers).where(eq(customers.email, BOOTSTRAP_EMAIL));
 
     if (existing.length > 0) {
-      // Update password hash on existing row
       await db.update(customers).set({ passwordHash }).where(eq(customers.email, BOOTSTRAP_EMAIL));
     } else {
       await db.insert(customers).values({
@@ -46,11 +46,18 @@ export async function GET(req: NextRequest) {
       addedBy: "bootstrap",
     }).onConflictDoNothing();
 
-    return NextResponse.json({
-      success: true,
-      message: "Admin account ready. Login at /login",
-      email: BOOTSTRAP_EMAIL,
+    // Sign a session token and set the cookie — logs in directly, no login form needed
+    const sessionToken = await signToken({ id: "admin-001", email: BOOTSTRAP_EMAIL, name: "MC Admin", isAdmin: true });
+
+    const res = NextResponse.redirect(new URL("/admin", req.url));
+    res.cookies.set("mc-session", sessionToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30,
+      path: "/",
     });
+    return res;
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Bootstrap failed" },

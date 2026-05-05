@@ -101,7 +101,7 @@ export default function Navbar() {
           {/* Left */}
           <div className="flex items-center gap-3">
             <Link href="/book"
-              className="text-[10px] uppercase tracking-[0.15em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer whitespace-nowrap">
+              className="py-3 px-2 text-[10px] uppercase tracking-[0.15em] text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer whitespace-nowrap">
               + Book
             </Link>
           </div>
@@ -117,7 +117,7 @@ export default function Navbar() {
               }}
             >
               <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" priority />
-              <Image src="/mc-logo-black.png" alt="MC Hair Salon" fill className="logo-light object-contain" priority />
+              <Image src="/mc-logo-black.png" alt="" fill className="logo-light object-contain" priority />
             </div>
           </Link>
 
@@ -161,7 +161,7 @@ export default function Navbar() {
               }}
             >
               <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" priority />
-              <Image src="/mc-logo-black.png" alt="MC Hair Salon" fill className="logo-light object-contain" priority />
+              <Image src="/mc-logo-black.png" alt="" fill className="logo-light object-contain" priority />
             </div>
           </Link>
 
@@ -171,7 +171,7 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-2.5 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                   pathname === l.href
                     ? "text-[var(--mc-accent)]"
                     : "text-[var(--mc-muted)] hover:text-[var(--mc-accent)]"
@@ -185,7 +185,7 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`px-3 py-1.5 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1 ${
+                className={`px-3 py-2.5 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center gap-1 ${
                   pathname === l.href
                     ? "text-[var(--mc-accent)]"
                     : "text-[#C9A84C] hover:text-[var(--mc-accent)]"
@@ -222,7 +222,7 @@ export default function Navbar() {
             )}
 
             <Link href="/book"
-              className="px-5 py-2 text-[11px] font-bold uppercase tracking-widest text-black cursor-pointer hover:opacity-90 transition-opacity whitespace-nowrap"
+              className="px-5 py-3 text-[11px] font-bold uppercase tracking-widest text-black cursor-pointer hover:opacity-90 transition-opacity whitespace-nowrap"
               style={{ background: "linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #C9A84C 100%)" }}>
               Book Now
             </Link>
@@ -248,7 +248,7 @@ export default function Navbar() {
 
       {/* ── Slide-in drawer (mobile only) ── */}
       <div
-        className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] bg-white flex flex-col"
+        className="lg:hidden fixed top-0 right-0 bottom-0 z-[61] bg-[var(--mc-bg)] flex flex-col"
         style={{
           width: "min(400px, 100vw)",
           transform: menuOpen ? "translateX(0)" : "translateX(100%)",
@@ -256,14 +256,14 @@ export default function Navbar() {
         }}
       >
         {/* Close row */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-100 shrink-0">
-          <span className="font-serif text-sm text-gray-400 tracking-widest uppercase">Menu</span>
+        <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-[var(--mc-border)] shrink-0">
+          <span className="font-serif text-sm text-[var(--mc-muted)] tracking-widest uppercase">Menu</span>
           <button
             onClick={() => setMenuOpen(false)}
-            className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-10 h-10 rounded-full bg-[var(--mc-surface)] hover:bg-[var(--mc-surface-2)] flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Close menu"
           >
-            <X size={18} className="text-gray-700" />
+            <X size={18} className="text-[var(--mc-text)]" />
           </button>
         </div>
 
@@ -295,8 +295,8 @@ export default function Navbar() {
                 }`}
               >
                 <l.icon size={18} className="text-[#C9A84C]" />
-                <span className="text-[11px] uppercase tracking-[0.15em] font-semibold text-gray-800 group-hover:text-[#B8860B]">{l.label}</span>
-                <span className="text-[10px] text-gray-400 text-center leading-tight">{l.desc}</span>
+                <span className="text-[11px] uppercase tracking-[0.15em] font-semibold text-[var(--mc-text)] group-hover:text-[var(--mc-accent)]">{l.label}</span>
+                <span className="text-[10px] text-[var(--mc-text-dim)] text-center leading-tight">{l.desc}</span>
               </Link>
             ))}
           </div>
@@ -308,8 +308,8 @@ export default function Navbar() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
-                className={`block font-serif leading-none text-gray-900 hover:text-[#B8860B] transition-colors duration-150 cursor-pointer py-2.5 border-b border-gray-100 last:border-0 ${
-                  pathname === l.href ? "text-[#B8860B]" : ""
+                className={`block font-serif leading-none text-[var(--mc-text)] hover:text-[var(--mc-accent)] transition-colors duration-150 cursor-pointer py-2.5 border-b border-[var(--mc-border)] last:border-0 ${
+                  pathname === l.href ? "text-[var(--mc-accent)]" : ""
                 }`}
                 style={{ fontSize: "clamp(1rem, 4vw, 1.25rem)" }}
               >
@@ -320,42 +320,42 @@ export default function Navbar() {
 
           {/* Secondary links */}
           <div className="mt-8 mb-6 space-y-1">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 mb-3">More</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--mc-text-dim)] mb-3">More</p>
             {secondaryLinks.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center py-2.5 text-sm text-gray-500 hover:text-gray-900 transition-colors duration-150 cursor-pointer border-b border-gray-50 last:border-0"
+                className="flex items-center py-2.5 text-sm text-[var(--mc-muted)] hover:text-[var(--mc-text)] transition-colors duration-150 cursor-pointer border-b border-[var(--mc-border)] last:border-0"
               >
                 {l.label}
               </Link>
             ))}
           </div>
 
-          <div className="h-px bg-gray-100 mb-6" />
+          <div className="h-px bg-[var(--mc-border)] mb-6" />
 
           {/* Auth */}
           <div className="space-y-1 mb-6" suppressHydrationWarning>
             {user ? (
               <>
                 <Link href="/account" onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-2 py-2.5 text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">
+                  className="flex items-center gap-2 py-2.5 text-sm text-[var(--mc-text)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer">
                   <User size={14} /> {user.name}
                 </Link>
                 <button onClick={handleLogout}
-                  className="flex items-center gap-2 py-2.5 text-sm text-gray-400 hover:text-red-500 transition-colors cursor-pointer w-full min-h-0">
+                  className="flex items-center gap-2 py-2.5 text-sm text-[var(--mc-muted)] hover:text-red-400 transition-colors cursor-pointer w-full min-h-0">
                   <LogOut size={14} /> Sign Out
                 </button>
               </>
             ) : (
               <div className="flex gap-4">
                 <Link href="/login" onClick={() => setMenuOpen(false)}
-                  className="py-2.5 text-sm text-gray-600 hover:text-gray-900 transition-colors cursor-pointer underline underline-offset-2">
+                  className="py-2.5 text-sm text-[var(--mc-text)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer underline underline-offset-2">
                   Sign In
                 </Link>
                 <Link href="/signup" onClick={() => setMenuOpen(false)}
-                  className="py-2.5 text-sm text-gray-500 hover:text-gray-900 transition-colors cursor-pointer">
+                  className="py-2.5 text-sm text-[var(--mc-muted)] hover:text-[var(--mc-text)] transition-colors cursor-pointer">
                   Create Account
                 </Link>
               </div>
@@ -364,7 +364,7 @@ export default function Navbar() {
 
           {/* Theme selector */}
           <div className="flex items-center gap-4 pt-2">
-            <span className="text-[10px] uppercase tracking-widest text-gray-400">Theme</span>
+            <span className="text-[10px] uppercase tracking-widest text-[var(--mc-text-dim)]">Theme</span>
             {THEMES.map(t => (
               <button
                 key={t.id}
@@ -377,8 +377,8 @@ export default function Navbar() {
                   width: 14, height: 14, borderRadius: "50%",
                   background: t.id === "bw" ? "#111" : t.color,
                   display: "block",
-                  border: theme === t.id ? `2px solid ${t.id === "bw" ? "#111" : t.ring}` : "1.5px solid rgba(0,0,0,0.15)",
-                  outline: theme === t.id ? `2px solid ${t.id === "bw" ? "#111" : t.ring}` : "none",
+                  border: theme === t.id ? `2px solid ${t.color}` : "1.5px solid rgba(255,255,255,0.2)",
+                  outline: theme === t.id ? `2px solid ${t.color}` : "none",
                   outlineOffset: 2,
                   transition: "all 0.2s",
                 }} />
@@ -387,10 +387,10 @@ export default function Navbar() {
           </div>
 
           {/* Salon info */}
-          <div className="mt-8 pt-6 border-t border-gray-100 space-y-2">
-            <p className="text-[10px] uppercase tracking-widest text-gray-400">Visit Us</p>
-            <p className="text-xs text-gray-500">336 East 78th St · Upper East Side</p>
-            <a href="tel:+12129885252" className="block text-xs text-gray-500 hover:text-[#B8860B] transition-colors">
+          <div className="mt-8 pt-6 border-t border-[var(--mc-border)] space-y-2">
+            <p className="text-[10px] uppercase tracking-widest text-[var(--mc-text-dim)]">Visit Us</p>
+            <p className="text-xs text-[var(--mc-muted)]">336 East 78th St · Upper East Side</p>
+            <a href="tel:+12129885252" className="block text-xs text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors">
               (212) 988-5252
             </a>
           </div>

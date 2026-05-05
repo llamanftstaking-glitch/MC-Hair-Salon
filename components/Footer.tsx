@@ -81,8 +81,8 @@ export default async function Footer() {
         </div>
 
         {/* WeddingWire + The Knot strip */}
-        <div className="border-t border-[#1a1500] py-6 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 bg-[#050400]">
-          <p className="text-[#444] text-[9px] uppercase tracking-[0.4em] shrink-0">Official Vendor On</p>
+        <div className="border-t border-[var(--mc-border)] py-6 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 bg-[var(--mc-surface-dark)]">
+          <p className="text-[var(--mc-text-dim)] text-[9px] uppercase tracking-[0.4em] shrink-0">Official Vendor On</p>
           <a href="https://www.weddingwire.com/biz/mc-hair-salon-and-spa/a3991b6360a5145a.html"
             target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-2 group cursor-pointer">
@@ -109,7 +109,7 @@ export default async function Footer() {
         <div className="border-t border-[var(--mc-border)] pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <p className="text-[var(--mc-text-dim)] text-xs">© {new Date().getFullYear()} MC Hair Salon & Spa. All rights reserved.</p>
-            <Link href="/terms" className="text-[#444] text-xs hover:text-[var(--mc-accent)] transition-colors uppercase tracking-widest">Terms & Conditions</Link>
+            <Link href="/terms" className="text-[var(--mc-text-dim)] text-xs hover:text-[var(--mc-accent)] transition-colors uppercase tracking-widest">Terms & Conditions</Link>
           </div>
           {/* LGBTQ+ Friendly badge */}
           <div className="flex items-center gap-3">

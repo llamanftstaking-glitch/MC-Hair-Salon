@@ -48,7 +48,7 @@ export default function FaqSection({
         {faqs.map((item, i) => (
           <FadeIn key={i} delay={i * 45}>
           <div
-            className="border border-[#1a1a1a] bg-[#080808] overflow-hidden"
+            className="border border-[var(--mc-border)] bg-[var(--mc-surface-dark)] overflow-hidden"
           >
             <button
               onClick={() => setOpen(open === i ? null : i)}
@@ -64,7 +64,7 @@ export default function FaqSection({
               />
             </button>
             {open === i && (
-              <div className="px-6 pb-5 text-[var(--mc-muted)] text-sm leading-relaxed border-t border-[#111]">
+              <div className="px-6 pb-5 text-[var(--mc-muted)] text-sm leading-relaxed border-t border-[var(--mc-border)]">
                 <div className="pt-4">{item.a}</div>
               </div>
             )}

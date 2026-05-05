@@ -22,7 +22,10 @@ export default function FadeIn({ children, className = "", delay = 0 }: Props) {
       return;
     }
 
-    const play = () => { el.style.animationPlayState = "running"; };
+    const play = () => {
+      el.style.animationPlayState = "running";
+      el.addEventListener("animationend", () => { el.style.willChange = "auto"; }, { once: true });
+    };
 
     const rect = el.getBoundingClientRect();
     if (rect.top < window.innerHeight * 1.1) {

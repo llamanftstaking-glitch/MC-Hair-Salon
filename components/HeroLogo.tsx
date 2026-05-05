@@ -92,7 +92,7 @@ export default function HeroLogo() {
     <section className="mc-hero relative flex flex-col items-center md:justify-center overflow-hidden bg-[var(--mc-bg)] mt-[88px] min-h-[calc(100vh-88px)] sm:mt-[93px] sm:min-h-[calc(100vh-93px)] max-w-[100vw]">
 
       {/* ══════════════ DESKTOP: 3-column full-height bg ══════════════ */}
-      <div className="absolute inset-0 hidden md:flex">
+      <div className="absolute inset-0 hidden md:flex" aria-hidden="true">
         <div className="flex-1 relative border-r border-white/[0.06]">
           <VideoColumn colKey="d0" swapEvery={10000} />
         </div>
@@ -114,7 +114,7 @@ export default function HeroLogo() {
       <div className="relative z-10 hidden md:flex flex-col items-center py-12 px-4 text-center w-full max-w-full">
         <div className="relative w-72 h-72">
           <Image src="/mc-logo-bw.png"    alt="MC Hair Salon & Spa" fill className="logo-bw    object-contain" priority />
-          <Image src="/mc-logo-black.png" alt="MC Hair Salon & Spa" fill className="logo-light object-contain" priority />
+          <Image src="/mc-logo-black.png" alt="" fill className="logo-light object-contain" priority />
         </div>
         <div className="mt-10 h-px w-32"
           style={{ background: "linear-gradient(90deg, transparent, var(--mc-accent), transparent)" }} />
@@ -166,10 +166,10 @@ export default function HeroLogo() {
 
       {/* ══════════════ MOBILE: 2-column video zone (top) ══════════════ */}
       <div className="md:hidden relative w-full flex shrink-0" style={{ height: "min(46vh, 280px)" }}>
-        <div className="flex-1 relative">
+        <div className="flex-1 relative" aria-hidden="true">
           <VideoColumn colKey="m0" swapEvery={10000} />
         </div>
-        <div className="flex-1 relative border-l border-white/[0.06]">
+        <div className="flex-1 relative border-l border-white/[0.06]" aria-hidden="true">
           <VideoColumn colKey="m1" swapEvery={12000} />
         </div>
         {/* Fade videos to black at bottom */}
@@ -179,7 +179,7 @@ export default function HeroLogo() {
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pb-6">
           <div className="relative w-36 h-36">
             <Image src="/mc-logo-bw.png"    alt="MC Hair Salon & Spa" fill className="logo-bw    object-contain" priority />
-            <Image src="/mc-logo-black.png" alt="MC Hair Salon & Spa" fill className="logo-light object-contain" priority />
+            <Image src="/mc-logo-black.png" alt="" fill className="logo-light object-contain" priority />
           </div>
           <div className="mt-5 h-px w-28"
             style={{ background: "linear-gradient(90deg, transparent, var(--mc-accent), transparent)" }} />

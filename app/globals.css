@@ -179,38 +179,38 @@ table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 /* ── ADMIN PANEL THEMES ─────────────────────────────────────────────────────── */
 .admin-light {
-  --admin-bg:           #ffffff;
-  --admin-surface:      #f5f5f5;
-  --admin-surface-dark: #ebebeb;
-  --admin-border:       #e0e0e0;
-  --admin-text:         #111111;
-  --admin-muted:        #666666;
-  /* override site-wide dark vars so all admin content goes light */
-  --mc-bg:              #ffffff;
-  --mc-surface:         #f5f5f5;
-  --mc-surface-2:       #efefef;
-  --mc-surface-dark:    #ebebeb;
-  --mc-border:          #e0e0e0;
-  --mc-text:            #111111;
-  --mc-text-body:       #333333;
-  --mc-muted:           #666666;
-  --mc-text-dim:        #999999;
-  --mc-accent:          #111111;
-  --mc-accent-2:        #444444;
-  --mc-card-bg:         #f5f5f5;
-  --mc-card-border:     #e0e0e0;
-  background-color:     #ffffff;
-  color:                #111111;
+  --admin-bg:           #f8f6f2;
+  --admin-surface:      #ffffff;
+  --admin-surface-dark: #f0ede8;
+  --admin-border:       #ddd8d0;
+  --admin-text:         #1a1612;
+  --admin-muted:        #8c7d6e;
+  /* override site-wide vars — warm paper base, gold accent preserved */
+  --mc-bg:              #f8f6f2;
+  --mc-surface:         #ffffff;
+  --mc-surface-2:       #f0ede8;
+  --mc-surface-dark:    #e8e3db;
+  --mc-border:          #ddd8d0;
+  --mc-text:            #1a1612;
+  --mc-text-body:       #3d3530;
+  --mc-muted:           #8c7d6e;
+  --mc-text-dim:        #a89a8a;
+  --mc-accent:          #C9A84C;
+  --mc-accent-2:        #b8960a;
+  --mc-card-bg:         #ffffff;
+  --mc-card-border:     #ddd8d0;
+  background-color:     #f8f6f2;
+  color:                #1a1612;
 }
 .admin-dark {
-  --admin-bg:           #000000;
-  --admin-surface:      #0f0f0f;
-  --admin-surface-dark: #050505;
-  --admin-border:       #2a2a2a;
-  --admin-text:         #ffffff;
+  --admin-bg:           #0d0d0d;
+  --admin-surface:      #161616;
+  --admin-surface-dark: #0a0a0a;
+  --admin-border:       #2e2e2e;
+  --admin-text:         #f0ece4;
   --admin-muted:        #888888;
-  background-color:     #000000;
-  color:                #ffffff;
+  background-color:     #0d0d0d;
+  color:                #f0ece4;
 }
 
 * { -webkit-tap-highlight-color: transparent; }

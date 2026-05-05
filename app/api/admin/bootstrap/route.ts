@@ -9,9 +9,14 @@ const BOOTSTRAP_EMAIL    = "hello@mchairsalon.com";
 const BOOTSTRAP_PASSWORD = "MCAdmin2040!";
 
 export async function GET(req: NextRequest) {
+  const EXPECTED = process.env.BOOTSTRAP_TOKEN;
+  if (!EXPECTED) {
+    return NextResponse.json(
+      { error: "BOOTSTRAP_TOKEN secret is not set on the server" },
+      { status: 503 }
+    );
+  }
   const token = req.nextUrl.searchParams.get("token");
-  const EXPECTED = process.env.BOOTSTRAP_TOKEN || "mc-bootstrap-2040";
-
   if (token !== EXPECTED) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

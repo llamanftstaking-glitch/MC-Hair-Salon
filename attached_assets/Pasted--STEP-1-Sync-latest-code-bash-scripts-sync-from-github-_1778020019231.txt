@@ -1,0 +1,45 @@
+  STEP 1 — Sync latest code
+  bash scripts/sync-from-github.sh
+
+  STEP 2 — Redeploy (full rebuild)
+
+  STEP 3 — Set these Replit Secrets (Secrets tab):
+
+  ┌────────────────────────────────────┬─────────────────────────────────┐
+  │               Secret               │              Value              │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ JWT_SECRET                         │ any long random string (e.g.    │
+  │                                    │ mc-hair-2040-secret-xyz)        │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ NEXT_PUBLIC_SITE_URL               │ https://mchairsalon.com         │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ RESEND_API_KEY                     │ real Resend key                 │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ RESEND_FROM_EMAIL                  │ hello@mchairsalon.com           │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ SALON_INBOX_EMAIL                  │ email to receive booking        │
+  │                                    │ notifications                   │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ STRIPE_SECRET_KEY                  │ real Stripe secret key          │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY │ real Stripe publishable key     │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ STRIPE_WEBHOOK_SECRET              │ from Stripe dashboard webhook   │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ ADMIN_EMAIL                        │ hello@mchairsalon.com           │
+  ├────────────────────────────────────┼─────────────────────────────────┤
+  │ ADMIN_PASSWORD                     │ MCAdmin2040!                    │
+  └────────────────────────────────────┴─────────────────────────────────┘
+
+  STEP 4 — Create admin account
+  https://mchairsalon.com/api/admin/bootstrap?token=mc-bootstrap-2040
+
+  STEP 5 — Clear test bookings
+  node scripts/clear-bookings.js
+
+  STEP 6 — Verify — hit the site, test booking flow, confirm admin panel
+  loads.
+
+  ---
+  JWT_SECRET and real Stripe/Resend keys are the most critical. Without
+  them: sessions are insecure, payments fail, emails don't send.

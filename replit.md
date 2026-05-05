@@ -119,13 +119,36 @@ Published via Replit Deployments (autoscale).
 
 ---
 
+## One-shot Production Cleanup Endpoint
+
+`POST /api/admin/cleanup` with header `Authorization: Bearer <BOOTSTRAP_TOKEN>` (idempotent)
+
+Both `/api/admin/bootstrap` and `/api/admin/cleanup` require the `BOOTSTRAP_TOKEN` secret to be set. There is no hardcoded fallback. Set `BOOTSTRAP_TOKEN` to a long random string in Deployment Secrets before using these endpoints.
+
+Cleanup endpoint removes the rogue admin entries left over from early seeding and deletes the original test booking. Safe to call multiple times.
+
+- Removes from `admins`: `sally@mchairsalon.com`, `nathaly@mchairsalon.com`, `admin@mchairsalonspa.com`
+- Deletes booking: `MC-1778003032772`
+- Returns final state of `admins` table and remaining booking count
+
+Example call:
+```
+curl -X POST https://mc-hair-salon-and-spa.replit.app/api/admin/cleanup \
+  -H "Authorization: Bearer $BOOTSTRAP_TOKEN"
+```
+
+After running bootstrap and cleanup, the production `admins` table should contain only `hello@mchairsalon.com`.
+
 ## Wednesday Go-Live Checklist
 
 ### Pre-deploy (do in order)
 - [ ] Set all required Replit secrets: `DATABASE_URL`, `JWT_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
-- [ ] Run `npm run db:push` on Replit (adds `services` jsonb column to bookings table)
-- [ ] Deploy the app — startup script auto-seeds admin + 7 staff accounts
-- [ ] Confirm in Replit console that startup logs show "Staff accounts: all 7 already exist" (or "created N new accounts")
+- [ ] In **Deployment Secrets** tab: ensure `ADMIN_EMAIL=hello@mchairsalon.com` (NOT `admin@mchairsalonspa.com`). If wrong, update and redeploy.
+- [ ] In **Deployment Secrets** tab: set `BOOTSTRAP_TOKEN` to a long random string (e.g. `mc-launch-$(openssl rand -hex 16)`). Required for the bootstrap and cleanup endpoints.
+- [ ] Deploy the app — startup script auto-runs `drizzle-kit push`, seeds admin, seeds 7 staff
+- [ ] Confirm in Replit console that startup logs show "Staff accounts: all 7 already exist"
+- [ ] Hit `https://mc-hair-salon-and-spa.replit.app/api/admin/bootstrap?token=<BOOTSTRAP_TOKEN>` in the browser — sets admin password to `MCAdmin2040!` and logs you in
+- [ ] Run `curl -X POST https://mc-hair-salon-and-spa.replit.app/api/admin/cleanup -H "Authorization: Bearer <BOOTSTRAP_TOKEN>"` — removes rogue admins (Sally, Nathaly, orphan) and the test booking
 - [ ] Complete Google OAuth origin checklist above
 
 ### Smoke tests (run on the live .replit.app URL)

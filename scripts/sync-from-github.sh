@@ -49,6 +49,7 @@ FILES=(
   "app/admin/ServicesTab.tsx"
   "app/admin/TimeClockTab.tsx"
   "app/admin/VibeTab.tsx"
+  "app/api/admin/bootstrap/route.ts"
   "app/api/admin/inventory-reminder/route.ts"
   "app/api/admin/users/route.ts"
   "app/api/analytics/route.ts"

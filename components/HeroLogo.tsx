@@ -21,11 +21,13 @@ function VideoColumn({ colKey, swapEvery }: { colKey: string; swapEvery: number 
   const slotRef = useRef(0);
   const nextVideoRef = useRef(1 % videos.length);
   const [slot, setSlot] = useState(0);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const v0 = ref0.current!;
+    v0.oncanplay = () => setReady(true);
     v0.src = videos[0];
     v0.load();
     if (!mq.matches) v0.play().catch(() => {});
@@ -70,7 +72,7 @@ function VideoColumn({ colKey, swapEvery }: { colKey: string; swapEvery: number 
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    opacity: slot === i ? 1 : 0,
+    opacity: ready ? (slot === i ? 1 : 0) : 0,
     transition: "opacity 0.8s ease",
     willChange: slot === i ? "opacity" : "auto",
   });

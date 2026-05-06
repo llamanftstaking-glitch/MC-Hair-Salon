@@ -770,6 +770,8 @@ export default function AdminPage() {
   const [addClientError, setAddClientError] = useState("");
   const [importResult, setImportResult] = useState<{ inserted: number; skipped: number; errors: number } | null>(null);
   const [importing, setImporting] = useState(false);
+  const [seedingClients, setSeedingClients] = useState(false);
+  const [seedProgress, setSeedProgress] = useState("");
 
   const openClientProfile = async (email: string) => {
     setSelectedClientEmail(email);
@@ -2494,6 +2496,33 @@ export default function AdminPage() {
                   placeholder="Search by name or email…"
                   className="bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[var(--admin-muted)] w-56"
                 />
+                <button
+                  disabled={seedingClients}
+                  onClick={async () => {
+                    setSeedingClients(true);
+                    setSeedProgress("Starting…");
+                    let offset = 0, totalInserted = 0, totalSkipped = 0;
+                    const limit = 200;
+                    try {
+                      while (true) {
+                        const res = await fetch(`/api/customers/seed?offset=${offset}&limit=${limit}`);
+                        const data = await res.json();
+                        totalInserted += data.inserted ?? 0;
+                        totalSkipped  += data.skipped  ?? 0;
+                        setSeedProgress(`Imported ${totalInserted} / ${data.total} (${totalSkipped} skipped)…`);
+                        if (data.done || !data.nextOffset) break;
+                        offset = data.nextOffset;
+                      }
+                      setSeedProgress(`Done — ${totalInserted} added, ${totalSkipped} already existed`);
+                    } catch {
+                      setSeedProgress("Error — check console");
+                    } finally {
+                      setSeedingClients(false);
+                    }
+                  }}
+                  className={`border border-blue-500/50 text-blue-400 font-bold px-4 py-1.5 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5 ${seedingClients ? "opacity-50 pointer-events-none" : ""}`}>
+                  {seedingClients ? seedProgress : "⟳ Seed Clients"}
+                </button>
                 <label className={`border border-[var(--mc-accent)]/50 text-[var(--mc-accent)] font-bold px-4 py-1.5 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5 ${importing ? "opacity-50 pointer-events-none" : ""}`}>
                   <input type="file" accept=".json" className="hidden" onChange={async e => {
                     const file = e.target.files?.[0];
@@ -2525,6 +2554,14 @@ export default function AdminPage() {
                 </button>
               </div>
             </div>
+
+            {/* Seed progress banner */}
+            {seedProgress && (
+              <div className={`flex items-center justify-between px-4 py-2.5 mb-4 text-sm border ${seedingClients ? "border-blue-500/30 bg-blue-900/20 text-blue-400" : "border-green-500/30 bg-green-900/20 text-green-400"}`}>
+                <span>{seedProgress}</span>
+                {!seedingClients && <button onClick={() => setSeedProgress("")} className="text-[#555] hover:text-white ml-4 cursor-pointer"><X size={14} /></button>}
+              </div>
+            )}
 
             {/* Import result banner */}
             {importResult && (

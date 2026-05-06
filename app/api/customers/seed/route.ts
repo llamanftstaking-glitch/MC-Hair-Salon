@@ -7,17 +7,23 @@ import { randomUUID } from "crypto";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-export async function GET() {
+// Accept ?offset=0&limit=200 to paginate — call repeatedly until done=true
+export async function GET(req: Request) {
   const err = await requireAdmin();
   if (err) return err;
 
+  const url = new URL(req.url);
+  const offset = parseInt(url.searchParams.get("offset") ?? "0", 10);
+  const limit  = parseInt(url.searchParams.get("limit")  ?? "200", 10);
+
   const filePath = join(process.cwd(), "public", "mc_clients.json");
-  const clients: { name: string; email: string; phone: string }[] =
+  const all: { name: string; email: string; phone: string }[] =
     JSON.parse(readFileSync(filePath, "utf8"));
 
+  const batch = all.slice(offset, offset + limit);
   let inserted = 0, skipped = 0, errors = 0;
 
-  for (const c of clients) {
+  for (const c of batch) {
     if (!c.name?.trim()) { errors++; continue; }
 
     const email = c.email?.trim().toLowerCase() ||
@@ -50,5 +56,12 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json({ ok: true, inserted, skipped, errors, total: clients.length });
+  const nextOffset = offset + limit;
+  const done = nextOffset >= all.length;
+
+  return NextResponse.json({
+    ok: true, inserted, skipped, errors,
+    offset, limit, nextOffset: done ? null : nextOffset,
+    done, total: all.length,
+  });
 }

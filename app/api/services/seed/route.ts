@@ -11,15 +11,14 @@ const SEED_SERVICES: Array<{
   durationMins: number | null;
   sortOrder: number;
 }> = [
-  // Haircuts
-  { name: "Men's Haircut",                    category: "Haircuts",   priceMin: 50,  priceMax: null, durationMins: 30,  sortOrder: 10  },
-  { name: "Women's Haircut",                  category: "Haircuts",   priceMin: 120, priceMax: null, durationMins: 60,  sortOrder: 20  },
-  { name: "Girl's Haircut",                   category: "Haircuts",   priceMin: 55,  priceMax: null, durationMins: 60,  sortOrder: 30  },
-  { name: "Boy's Haircut",                    category: "Haircuts",   priceMin: 45,  priceMax: null, durationMins: 30,  sortOrder: 40  },
-  { name: "Bangs",                            category: "Haircuts",   priceMin: 20,  priceMax: null, durationMins: 10,  sortOrder: 50  },
-  // Blowout & Styling
-  { name: "Blowdry",                          category: "Styling",    priceMin: 45,  priceMax: null, durationMins: 45,  sortOrder: 60  },
-  { name: "Updo",                             category: "Styling",    priceMin: 85,  priceMax: null, durationMins: 60,  sortOrder: 70  },
+  // Hair
+  { name: "Men's Haircut",                    category: "Hair",       priceMin: 50,  priceMax: null, durationMins: 30,  sortOrder: 10  },
+  { name: "Women's Haircut",                  category: "Hair",       priceMin: 120, priceMax: null, durationMins: 60,  sortOrder: 20  },
+  { name: "Girl's Haircut",                   category: "Hair",       priceMin: 55,  priceMax: null, durationMins: 60,  sortOrder: 30  },
+  { name: "Boy's Haircut",                    category: "Hair",       priceMin: 45,  priceMax: null, durationMins: 30,  sortOrder: 40  },
+  { name: "Bangs",                            category: "Hair",       priceMin: 20,  priceMax: null, durationMins: 10,  sortOrder: 50  },
+  { name: "Blowdry",                          category: "Hair",       priceMin: 45,  priceMax: null, durationMins: 45,  sortOrder: 60  },
+  { name: "Updo",                             category: "Hair",       priceMin: 85,  priceMax: null, durationMins: 60,  sortOrder: 70  },
   // Color
   { name: "Clear Glossy",                     category: "Color",      priceMin: 35,  priceMax: null, durationMins: 15,  sortOrder: 80  },
   { name: "Single Process",                   category: "Color",      priceMin: 100, priceMax: null, durationMins: 40,  sortOrder: 90  },

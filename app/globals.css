@@ -185,7 +185,7 @@ table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   --admin-surface-dark:    #ede6d8;
   --admin-border:          #d6cab8;
   --admin-text:            #2a1f14;
-  --admin-muted:           #7a6552;
+  --admin-muted:           #5a4535;
 
   --mc-bg:                 #f7f2eb;
   --mc-surface:            #fdfaf5;
@@ -194,8 +194,8 @@ table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   --mc-border:             #d6cab8;
   --mc-text:               #2a1f14;
   --mc-text-body:          #4a3828;
-  --mc-muted:              #7a6552;
-  --mc-text-dim:           #a8917a;
+  --mc-muted:              #5a4535;
+  --mc-text-dim:           #7a6552;
 
   /* Terracotta as primary accent — organic, warm */
   --mc-accent:             #b85c38;

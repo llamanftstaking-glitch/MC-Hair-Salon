@@ -18,7 +18,7 @@ interface ImportAppt {
 }
 
 export async function POST(req: Request) {
-  const err = await requireAdmin();
+  const err = await requireAdmin(req);
   if (err) return err;
 
   const body = await req.json() as { appointments: ImportAppt[] };

@@ -73,11 +73,17 @@ export async function getSession(): Promise<CustomerPayload | null> {
   }
 }
 
-export async function requireAdmin(): Promise<NextResponse | null> {
+export async function requireAdmin(req?: Request): Promise<NextResponse | null> {
   // TEMPORARY: open admin for testing. Set ADMIN_OPEN_ACCESS=false (or
   // delete the secret) to re-enable auth before public launch.
   if (process.env.ADMIN_OPEN_ACCESS === "true") {
     return null;
+  }
+  // Internal server-to-server calls via token header
+  const internalToken = process.env.INTERNAL_API_TOKEN;
+  if (internalToken && req) {
+    const header = (req as Request & { headers: Headers }).headers.get("x-internal-token");
+    if (header === internalToken) return null;
   }
   const session = await getSession();
   if (!session) {

@@ -8,33 +8,17 @@ import { resolve } from "path";
 
 const jsonPath = process.argv[2] || "/Users/rayquinones/Downloads/appointments.json";
 const baseUrl  = process.argv[3] || "https://mchairsalon.com";
-const email    = process.env.ADMIN_EMAIL    || "hello@mchairsalon.com";
-const password = process.env.ADMIN_PASSWORD || "MCAdmin2040!";
+const token = process.env.INTERNAL_API_TOKEN || "local-dev-token";
 
 const appointments = JSON.parse(readFileSync(resolve(jsonPath), "utf8"));
 console.log(`Importing ${appointments.length} appointments to ${baseUrl}...`);
 
-// Login to get session cookie
-const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email, password }),
-});
-
-if (!loginRes.ok) {
-  console.error("Login failed:", await loginRes.text());
-  process.exit(1);
-}
-
-const cookies = loginRes.headers.get("set-cookie") || "";
-console.log("Logged in ✓");
-
-// Import all appointments
+// Import all appointments using internal token (no login needed)
 const res = await fetch(`${baseUrl}/api/bookings/import`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
-    "Cookie": cookies,
+    "x-internal-token": token,
   },
   body: JSON.stringify({ appointments }),
 });

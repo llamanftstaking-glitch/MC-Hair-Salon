@@ -1373,9 +1373,9 @@ export default function AdminPage() {
       )}
 
       {/* ── FULL ADMIN ────────────────────────────────────────────────────── */}
-      {!liteMode && <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-5">
-        {/* Tabs — scrollable on narrow screens */}
-        <div className="flex mb-6 border-b border-[var(--mc-border)] overflow-x-auto scrollbar-none">
+      {!liteMode && <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-5 pb-24 sm:pb-5">
+        {/* Tabs — desktop only (hidden on mobile, replaced by bottom nav) */}
+        <div className="hidden sm:flex mb-6 border-b border-[var(--mc-border)] overflow-x-auto scrollbar-none">
           {tabs.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`relative flex items-center gap-1.5 px-3 py-2 text-[11px] uppercase tracking-wider font-semibold transition-all cursor-pointer border-b-2 -mb-px whitespace-nowrap ${
@@ -1387,6 +1387,12 @@ export default function AdminPage() {
               ) : null}
             </button>
           ))}
+        </div>
+
+        {/* Mobile tab label */}
+        <div className="sm:hidden flex items-center gap-2 mb-4 border-b border-[var(--mc-border)] pb-3">
+          <span className="text-[var(--mc-accent)]">{tabs.find(t => t.id === tab)?.icon}</span>
+          <span className="text-[var(--admin-text)] font-semibold text-sm uppercase tracking-widest">{tabs.find(t => t.id === tab)?.label}</span>
         </div>
 
         {/* ── OVERVIEW ─────────────────────────────────────────────────────── */}
@@ -2699,8 +2705,8 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="luxury-card overflow-hidden">
-                {/* Table header */}
-                <div className="grid grid-cols-[1fr_1fr_60px_80px_80px_80px] gap-0 border-b border-[var(--mc-border)]/40 px-4 py-2">
+                {/* Table header — desktop only */}
+                <div className="hidden sm:grid grid-cols-[1fr_1fr_60px_80px_80px_80px] gap-0 border-b border-[var(--mc-border)]/40 px-4 py-2">
                   {([
                     { label: "Client",  col: "name"    },
                     { label: "Email",   col: "email"   },
@@ -2744,9 +2750,27 @@ export default function AdminPage() {
                     const upcoming = sorted.filter(v => v.date >= new Date().toISOString().split("T")[0] && v.status !== "cancelled");
                     const initials = client.name.split(" ").map((n: string) => n[0]).join("").slice(0,2).toUpperCase();
                     return (
-                      <button key={client.email}
+                      <>
+                        {/* Mobile card */}
+                        <button key={`mob-${client.email}`}
+                          onClick={() => openClientProfile(client.email)}
+                          className="sm:hidden w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[var(--mc-accent)]/[0.04] transition-colors cursor-pointer border-b border-[var(--mc-border)]/20 last:border-b-0">
+                          <div className="w-9 h-9 rounded-full bg-[var(--mc-accent)]/10 border border-[var(--mc-accent)]/30 flex items-center justify-center shrink-0">
+                            <span className="text-[10px] font-bold text-[var(--mc-accent)]">{initials}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[var(--admin-text)] text-sm font-semibold truncate">{client.name}</p>
+                            <p className="text-[var(--admin-muted)] text-xs truncate">{client.phone || client.email}</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-[var(--mc-accent)] text-xs font-bold">{visits.length > 0 ? `${visits.length} visits` : "—"}</p>
+                            {upcoming.length > 0 && <p className="text-[9px] text-green-400">↑ upcoming</p>}
+                          </div>
+                        </button>
+                        {/* Desktop row */}
+                        <button key={`desk-${client.email}`}
                         onClick={() => openClientProfile(client.email)}
-                        className={`w-full grid grid-cols-[1fr_1fr_60px_80px_80px_80px] gap-0 px-4 py-2.5 text-left hover:bg-[var(--mc-accent)]/[0.04] transition-colors cursor-pointer border-b border-[var(--mc-border)]/20 last:border-b-0 ${i % 2 === 0 ? "" : "bg-[var(--admin-surface)]/40"}`}>
+                        className={`hidden sm:grid w-full grid-cols-[1fr_1fr_60px_80px_80px_80px] gap-0 px-4 py-2.5 text-left hover:bg-[var(--mc-accent)]/[0.04] transition-colors cursor-pointer border-b border-[var(--mc-border)]/20 last:border-b-0 ${i % 2 === 0 ? "" : "bg-[var(--admin-surface)]/40"}`}>
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="w-7 h-7 rounded-full bg-[var(--mc-accent)]/10 border border-[var(--mc-accent)]/30 flex items-center justify-center shrink-0">
                             <span className="text-[9px] font-bold text-[var(--mc-accent)]">{initials}</span>
@@ -2764,6 +2788,7 @@ export default function AdminPage() {
                           {lastVisit ? lastVisit.status : "—"}
                         </span>
                       </button>
+                      </>
                     );
                   })}
               </div>
@@ -3938,6 +3963,31 @@ export default function AdminPage() {
         )}
 
       </div>}
+
+      {/* ── MOBILE BOTTOM NAV ─────────────────────────────────────────────── */}
+      {!liteMode && (
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--admin-surface)] border-t border-[var(--admin-border)] flex">
+          {[
+            { id: "overview",      icon: <LayoutGrid size={18} />,     label: "Overview" },
+            { id: "reservations",  icon: <Calendar size={18} />,       label: "Bookings",  badge: pending },
+            { id: "clients",       icon: <Users size={18} />,          label: "Clients" },
+            { id: "payroll",       icon: <DollarSign size={18} />,     label: "Payroll" },
+            { id: "operations",    icon: <Wrench size={18} />,         label: "Ops" },
+            { id: "settings",      icon: <Settings size={18} />,       label: "Settings" },
+          ].map(item => (
+            <button key={item.id} onClick={() => setTab(item.id as typeof tab)}
+              className={`relative flex-1 flex flex-col items-center justify-center py-2 gap-0.5 transition-colors cursor-pointer ${
+                tab === item.id ? "text-[var(--mc-accent)]" : "text-[var(--admin-muted)]"
+              }`}>
+              {item.icon}
+              <span className="text-[8px] uppercase tracking-wider">{item.label}</span>
+              {item.badge && item.badge > 0 ? (
+                <span className="absolute top-1.5 right-1/4 bg-[var(--mc-accent)] text-black text-[8px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">{item.badge}</span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+      )}
 
     </div>
   );

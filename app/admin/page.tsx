@@ -80,7 +80,7 @@ interface AdminUser {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 const statusColors: Record<string, string> = {
   pending:   "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",
-  confirmed: "text-green-400 border-green-400/30 bg-green-400/10",
+  confirmed: "text-green-600 border-green-600/40 bg-green-600/15",
   cancelled: "text-red-400 border-red-400/30 bg-red-400/10",
   no_show:   "text-orange-400 border-orange-400/30 bg-orange-400/10",
 };
@@ -827,11 +827,23 @@ export default function AdminPage() {
   const [editForm,       setEditForm]       = useState<Partial<Booking>>({});
   const [editLoading,    setEditLoading]    = useState(false);
 
+  // ── Schedule / who's working ─────────────────────────────────────────────────
+  const [scheduleRows,        setScheduleRows]        = useState<{ staffName: string; dayOfWeek: number; isWorking: boolean }[]>([]);
+  const [dailyWorkingOverride, setDailyWorkingOverride] = useState<Record<string, boolean>>({}); // key = `${date}:${staffName}`
+
+  // ── Drag & drop / grid overrides ─────────────────────────────────────────────
+  const [gridOverrides, setGridOverrides] = useState<Record<string, { time: string; stylist: string }>>({});
+  const [undoStack,     setUndoStack]     = useState<Array<{ bookingId: string; prevTime: string; prevStylist: string }>>([]);
+  const [dragBookingId, setDragBookingId] = useState<string | null>(null);
+  const [dropTarget,    setDropTarget]    = useState<{ time: string; stylist: string } | null>(null);
+  const [gridSaving,    setGridSaving]    = useState(false);
+
   // ── Create booking state (admin walk-in / phone) ─────────────────────────────
   const [createBookingOpen, setCreateBookingOpen] = useState(false);
   const [createForm, setCreateForm] = useState({ name: "", email: "", phone: "", service: "", stylist: "", date: new Date().toISOString().split("T")[0], time: "", notes: "" });
   const [createServices, setCreateServices] = useState<string[]>([]);
   const [createLoading, setCreateLoading] = useState(false);
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
 
   // ── Fetch functions ─────────────────────────────────────────────────────────
   const fetchBookings = useCallback(async () => {
@@ -864,6 +876,13 @@ export default function AdminPage() {
       setStaff(Array.isArray(data) ? data : []);
     } catch { /* non-fatal */ }
   }, []);
+  const fetchSchedule = useCallback(async () => {
+    try {
+      const res = await fetch("/api/schedule");
+      if (res.ok) setScheduleRows(await res.json());
+    } catch { /* non-fatal */ }
+  }, []);
+
   const fetchSettings = useCallback(async () => {
     const res = await fetch("/api/settings");
     const data = await res.json();
@@ -893,8 +912,8 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); fetchAutomation();
-  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards, fetchAdminUsers, fetchAutomation]);
+    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); fetchAutomation(); fetchSchedule();
+  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards, fetchAdminUsers, fetchAutomation, fetchSchedule]);
 
   // Auto-route on initial load: pending → reservations/pending; none → stay on overview
   useEffect(() => {
@@ -907,6 +926,15 @@ export default function AdminPage() {
       }
     }
   }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Warn before leaving with unsaved grid changes
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (Object.keys(gridOverrides).length > 0) { e.preventDefault(); e.returnValue = ""; }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [gridOverrides]);
 
   // ── Booking handlers ────────────────────────────────────────────────────────
   const [noshowLoading, setNoshowLoading] = useState<Record<string, boolean>>({});
@@ -1633,49 +1661,120 @@ export default function AdminPage() {
                 );
               })()
             ) : viewMode === "daily" ? (() => {
-              const STYLIST_COLS = [...STYLISTS_LIST_ALL, "Unassigned"];
-              const dayBookings = bookings
-                .filter(b => b.date === dailyDate)
-                .filter(b => filter === "all" || b.status === filter);
-              const isToday = dailyDate === new Date().toISOString().split("T")[0];
-              const dateObj = new Date(dailyDate + "T12:00:00");
-              const dateLabel = dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+              // ── Daily-view locals ──────────────────────────────────────────────
+              const dateObj    = new Date(dailyDate + "T12:00:00");
+              // staffSchedule uses 0=Mon,6=Sun; getDay() uses 0=Sun,1=Mon
+              const scheduleDow = dateObj.getDay() === 0 ? 6 : dateObj.getDay() - 1;
+
+              const workingStaff = STYLISTS_LIST_ALL.filter(name => {
+                const overrideKey = `${dailyDate}:${name}`;
+                if (overrideKey in dailyWorkingOverride) return dailyWorkingOverride[overrideKey];
+                const row = scheduleRows.find(r => r.staffName === name && r.dayOfWeek === scheduleDow);
+                return row ? row.isWorking : true;
+              });
+              const STYLIST_COLS = [...workingStaff, "Unassigned"];
+
+              // Apply drag-drop overrides on top of live bookings
+              const rawDayBookings = bookings.filter(b => b.date === dailyDate).filter(b => filter === "all" || b.status === filter);
+              const dayBookings = rawDayBookings.map(b => {
+                const ov = gridOverrides[b.id];
+                return ov ? { ...b, time: ov.time, stylist: ov.stylist } : b;
+              });
+
+              const hasPending   = Object.keys(gridOverrides).length > 0;
+              const isToday      = dailyDate === new Date().toISOString().split("T")[0];
+              const dateLabel    = dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
               const prevDay = () => { const d = new Date(dailyDate + "T12:00:00"); d.setDate(d.getDate() - 1); setDailyDate(d.toISOString().split("T")[0]); };
               const nextDay = () => { const d = new Date(dailyDate + "T12:00:00"); d.setDate(d.getDate() + 1); setDailyDate(d.toISOString().split("T")[0]); };
               const openCreate = (time: string, stylist: string) => {
                 setCreateForm(f => ({ ...f, date: dailyDate, time, stylist }));
                 setCreateBookingOpen(true);
               };
+
+              const saveGridChanges = async () => {
+                setGridSaving(true);
+                try {
+                  await Promise.all(Object.entries(gridOverrides).map(([id, { time, stylist }]) =>
+                    fetch("/api/bookings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, time, stylist }) })
+                  ));
+                  setGridOverrides({});
+                  setUndoStack([]);
+                  fetchBookings();
+                } finally { setGridSaving(false); }
+              };
+
+              const undoLast = () => {
+                const last = undoStack[undoStack.length - 1];
+                if (!last) return;
+                const original = rawDayBookings.find(b => b.id === last.bookingId);
+                setGridOverrides(prev => {
+                  const next = { ...prev };
+                  if (original && original.time === last.prevTime && original.stylist === last.prevStylist) {
+                    delete next[last.bookingId];
+                  } else {
+                    next[last.bookingId] = { time: last.prevTime, stylist: last.prevStylist };
+                  }
+                  return next;
+                });
+                setUndoStack(prev => prev.slice(0, -1));
+              };
+
               return (
                 <div>
-                  {/* Day nav — single compact row on all screen sizes */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <button onClick={prevDay}
-                      className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
-                      <ChevronLeft size={14} />
-                    </button>
+                  {/* Day nav */}
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <button onClick={prevDay} className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0"><ChevronLeft size={14} /></button>
                     <div className="flex-1 flex items-center gap-2 min-w-0 overflow-hidden">
-                      <p className={`text-xs font-semibold truncate ${isToday ? "text-[var(--mc-accent)]" : "text-white"}`}>{dateLabel}</p>
-                      <button onClick={() => setDailyDate(new Date().toISOString().split("T")[0])}
-                        className="shrink-0 text-[var(--admin-muted)] text-[10px] uppercase tracking-wider hover:text-[var(--mc-accent)] transition-colors cursor-pointer hidden sm:block">
-                        Today
-                      </button>
-                      <input type="date" value={dailyDate} onChange={e => setDailyDate(e.target.value)}
-                        className="shrink-0 bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-[var(--admin-text)] text-[10px] px-1.5 py-1 focus:outline-none focus:border-[var(--mc-accent)] cursor-pointer w-[110px]"
-                        style={{ colorScheme: "dark" }} />
+                      <p className={`text-xs font-semibold truncate ${isToday ? "text-[var(--mc-accent)]" : "text-[var(--admin-text)]"}`}>{dateLabel}</p>
+                      <button onClick={() => setDailyDate(new Date().toISOString().split("T")[0])} className="shrink-0 text-[var(--admin-muted)] text-[10px] uppercase tracking-wider hover:text-[var(--mc-accent)] transition-colors cursor-pointer hidden sm:block">Today</button>
+                      <input type="date" value={dailyDate} onChange={e => setDailyDate(e.target.value)} className="shrink-0 bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-[var(--admin-text)] text-[10px] px-1.5 py-1 focus:outline-none focus:border-[var(--mc-accent)] cursor-pointer w-[110px]" style={{ colorScheme: "dark" }} />
                     </div>
-                    <button onClick={nextDay}
-                      className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
-                      <ChevronRight size={14} />
-                    </button>
+                    <button onClick={nextDay} className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0"><ChevronRight size={14} /></button>
+
+                    {/* Pending changes bar */}
+                    {hasPending && (
+                      <div className="flex items-center gap-2 ml-auto">
+                        <span className="text-[10px] text-[var(--mc-accent)] font-semibold">{Object.keys(gridOverrides).length} unsaved</span>
+                        <button onClick={undoLast} disabled={undoStack.length === 0}
+                          className="flex items-center gap-1 border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer px-2 py-1 text-[10px] uppercase tracking-wider disabled:opacity-30">
+                          ↩ Undo
+                        </button>
+                        <button onClick={saveGridChanges} disabled={gridSaving}
+                          className="flex items-center gap-1 gold-gradient-bg text-black text-[10px] font-bold px-3 py-1 uppercase tracking-wider cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50">
+                          {gridSaving ? "Saving…" : "Save Changes"}
+                        </button>
+                      </div>
+                    )}
+
                     <button onClick={() => { setCreateForm(f => ({ ...f, date: dailyDate, time: "", stylist: "" })); setCreateBookingOpen(true); }}
                       className="shrink-0 flex items-center gap-1 gold-gradient-bg text-black text-[10px] font-bold px-2.5 py-1.5 uppercase tracking-wider cursor-pointer hover:opacity-90 transition-opacity">
                       <Plus size={11} /> <span className="hidden sm:inline">New </span>Booking
                     </button>
                   </div>
 
-                  {/* DaySmart-style grid */}
-                  <div className="overflow-x-auto border border-[var(--mc-border)]/40">
+                  {/* Who's working today */}
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <span className="text-[10px] text-[var(--admin-muted)] uppercase tracking-widest shrink-0">Working:</span>
+                    {STYLISTS_LIST_ALL.map(name => {
+                      const overrideKey = `${dailyDate}:${name}`;
+                      const isWorking = overrideKey in dailyWorkingOverride
+                        ? dailyWorkingOverride[overrideKey]
+                        : (scheduleRows.find(r => r.staffName === name && r.dayOfWeek === scheduleDow)?.isWorking ?? true);
+                      return (
+                        <button key={name}
+                          onClick={() => setDailyWorkingOverride(prev => ({ ...prev, [overrideKey]: !isWorking }))}
+                          className={`text-[10px] px-2 py-0.5 border cursor-pointer transition-all ${isWorking ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-[var(--mc-border)] text-[var(--admin-muted)] opacity-40 line-through"}`}>
+                          {name}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Grid */}
+                  <div className="overflow-x-auto border border-[var(--mc-border)]/40"
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={e => { e.preventDefault(); setDropTarget(null); }}
+                  >
                     <div style={{ minWidth: `${80 + STYLIST_COLS.length * 130}px` }}>
                       {/* Header */}
                       <div className="grid border-b border-[var(--mc-border)]/40 bg-[var(--admin-surface)]" style={{ gridTemplateColumns: `80px repeat(${STYLIST_COLS.length}, 1fr)` }}>
@@ -1695,16 +1794,34 @@ export default function AdminPage() {
                       {TIME_SLOTS_LIST.map((slot, si) => (
                         <div key={slot} className={`grid border-b ${si % 2 === 0 ? "border-[var(--mc-border)]/25" : "border-[var(--mc-border)]/15"}`} style={{ gridTemplateColumns: `80px repeat(${STYLIST_COLS.length}, 1fr)` }}>
                           <div className="border-r border-[var(--mc-border)]/30 px-2 py-2 flex items-center">
-                            <span className={`text-[10px] whitespace-nowrap ${slot.endsWith("00 AM") || slot.endsWith("00 PM") ? "text-[var(--mc-muted)] font-semibold" : "text-[var(--mc-border)]"}`}>{slot}</span>
+                            <span className={`text-[10px] whitespace-nowrap ${slot.endsWith(":00 AM") || slot.endsWith(":00 PM") ? "text-[var(--mc-muted)] font-semibold" : "text-[var(--mc-border)]"}`}>{slot}</span>
                           </div>
                           {STYLIST_COLS.map(col => {
                             const cellBookings = dayBookings.filter(b =>
                               b.time === slot && (col === "Unassigned" ? !b.stylist : b.stylist === col)
                             );
+                            const isDropTarget = dropTarget?.time === slot && dropTarget?.stylist === (col === "Unassigned" ? "" : col);
                             return (
                               <div key={col}
-                                className="border-r border-[var(--mc-border)]/20 min-h-[48px] p-1 last:border-r-0 cursor-pointer hover:bg-[var(--mc-accent)]/[0.03] transition-colors group"
+                                className={`border-r border-[var(--mc-border)]/20 min-h-[48px] p-1 last:border-r-0 transition-colors group ${isDropTarget ? "bg-[var(--mc-accent)]/10 border-[var(--mc-accent)]/30" : "hover:bg-[var(--mc-accent)]/[0.03]"}`}
                                 onClick={() => { if (!cellBookings.length) openCreate(slot, col === "Unassigned" ? "" : col); }}
+                                onDragOver={e => { e.preventDefault(); setDropTarget({ time: slot, stylist: col === "Unassigned" ? "" : col }); }}
+                                onDragLeave={() => setDropTarget(null)}
+                                onDrop={e => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (!dragBookingId) return;
+                                  const origOverride = gridOverrides[dragBookingId];
+                                  const origBooking  = rawDayBookings.find(b => b.id === dragBookingId);
+                                  const prevTime     = origOverride?.time    ?? origBooking?.time    ?? "";
+                                  const prevStylist  = origOverride?.stylist ?? origBooking?.stylist ?? "";
+                                  const newStylist   = col === "Unassigned" ? "" : col;
+                                  if (prevTime === slot && prevStylist === newStylist) { setDragBookingId(null); setDropTarget(null); return; }
+                                  setUndoStack(prev => [...prev, { bookingId: dragBookingId, prevTime, prevStylist }]);
+                                  setGridOverrides(prev => ({ ...prev, [dragBookingId]: { time: slot, stylist: newStylist } }));
+                                  setDragBookingId(null);
+                                  setDropTarget(null);
+                                }}
                               >
                                 {cellBookings.length === 0 && (
                                   <div className="w-full h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1712,12 +1829,18 @@ export default function AdminPage() {
                                   </div>
                                 )}
                                 {cellBookings.map(b => (
-                                  <button key={b.id}
-                                    onClick={e => { e.stopPropagation(); startEditBooking(b); }}
-                                    className={`w-full text-left px-2 py-1.5 border cursor-pointer hover:opacity-80 transition-opacity mb-0.5 ${statusColors[b.status]}`}>
-                                    <p className="text-[10px] font-bold truncate">{b.name.split(" ")[0]}</p>
-                                    <p className="text-[10px] opacity-70 truncate">{b.service.split("(")[0].split("–")[0].trim()}</p>
-                                  </button>
+                                  <div key={b.id}
+                                    draggable
+                                    onDragStart={e => { setDragBookingId(b.id); e.dataTransfer.effectAllowed = "move"; }}
+                                    onDragEnd={() => { setDragBookingId(null); setDropTarget(null); }}
+                                    className={`w-full text-left px-2 py-1.5 border cursor-grab active:cursor-grabbing mb-0.5 select-none transition-opacity ${dragBookingId === b.id ? "opacity-40" : "opacity-100"} ${statusColors[b.status]}`}>
+                                    <div className="flex items-start justify-between gap-1">
+                                      <div className="min-w-0 flex-1" onClick={e => { e.stopPropagation(); startEditBooking(rawDayBookings.find(rb => rb.id === b.id) ?? b); }}>
+                                        <p className="text-[10px] font-bold truncate">{b.name.split(" ")[0]}</p>
+                                        <p className="text-[10px] opacity-70 truncate">{b.service.split("(")[0].split("–")[0].trim()}</p>
+                                      </div>
+                                    </div>
+                                  </div>
                                 ))}
                               </div>
                             );
@@ -1726,7 +1849,7 @@ export default function AdminPage() {
                       ))}
                     </div>
                   </div>
-                  <p className="text-[var(--admin-muted)] text-[10px] mt-2 text-center">Click any empty cell to create a booking · Click a booking chip to edit</p>
+                  <p className="text-[var(--admin-muted)] text-[10px] mt-2 text-center">Drag bookings to reschedule · Click to edit · Click empty cell to create</p>
                 </div>
               );
             })()
@@ -1957,10 +2080,33 @@ export default function AdminPage() {
                     </div>
 
                     <div className="space-y-4">
-                      <div>
+                      <div className="relative">
                         <label className={labelCls}>Client Name</label>
-                        <input type="text" value={createForm.name} onChange={e => setCreateForm(f => ({ ...f, name: e.target.value }))}
-                          className={inputCls} placeholder="Full name" />
+                        <input type="text" value={createForm.name}
+                          onChange={e => { setCreateForm(f => ({ ...f, name: e.target.value })); setShowNameSuggestions(true); }}
+                          onFocus={() => setShowNameSuggestions(true)}
+                          onBlur={() => setTimeout(() => setShowNameSuggestions(false), 150)}
+                          className={inputCls} placeholder="Full name" autoComplete="off" />
+                        {showNameSuggestions && createForm.name.length >= 2 && (() => {
+                          const q = createForm.name.toLowerCase();
+                          const seen = new Set<string>();
+                          const suggestions = bookings.filter(b => {
+                            if (!b.name.toLowerCase().includes(q) || seen.has(b.email)) return false;
+                            seen.add(b.email); return true;
+                          }).slice(0, 6);
+                          return suggestions.length > 0 ? (
+                            <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-[var(--admin-surface)] border border-[var(--mc-border)] shadow-xl max-h-48 overflow-y-auto">
+                              {suggestions.map(s => (
+                                <button key={s.email} type="button"
+                                  onMouseDown={e => { e.preventDefault(); setCreateForm(f => ({ ...f, name: s.name, email: s.email, phone: s.phone || f.phone })); setShowNameSuggestions(false); }}
+                                  className="w-full text-left px-3 py-2 hover:bg-[var(--mc-accent)]/10 transition-colors cursor-pointer border-b border-[var(--mc-border)]/30 last:border-0">
+                                  <p className="text-[var(--admin-text)] text-sm font-semibold">{s.name}</p>
+                                  <p className="text-[var(--admin-muted)] text-xs">{s.email} · {s.phone}</p>
+                                </button>
+                              ))}
+                            </div>
+                          ) : null;
+                        })()}
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>

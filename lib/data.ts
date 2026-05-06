@@ -117,6 +117,20 @@ export const TEAM = [
     image: "/instagram/mchairsalonspa_1708007392_3303327885522806092_509340228.jpg",
   },
   {
+    name: "Nazareth",
+    role: "Stylist",
+    bio: "Nazareth brings precision and versatility to every chair. Available Tuesday through Friday, she specializes in cuts, color, and styling services for all hair types.",
+    specialties: ["Haircuts", "Color", "Balayage", "Blowdry"],
+    image: "",
+  },
+  {
+    name: "Nathaly",
+    role: "Stylist",
+    bio: "Nathaly joins the MC team on weekends, offering precision haircuts, blowouts, and styling for clients looking for a luxury Saturday or Sunday appointment.",
+    specialties: ["Haircuts", "Blowdry", "Styling"],
+    image: "",
+  },
+  {
     name: "Dhariana Suriel",
     role: "Professional Makeup Artist",
     bio: "Dhariana Suriel brings 18 years of professional makeup artistry to MC Hair Salon. As our resident bridal specialist — featured on WeddingWire and The Knot — she creates timeless, polished looks that photograph beautifully and last all day. Fluent in English and Spanish.",

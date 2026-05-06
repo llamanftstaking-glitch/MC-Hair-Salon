@@ -94,13 +94,15 @@ const SERVICE_CATEGORIES = [
 ];
 
 const STYLISTS_DATA = [
-  { name: "No preference",  role: "Any available stylist" },
-  { name: "Maria",          role: "Stylist"               },
-  { name: "Meagan",         role: "Stylist"               },
-  { name: "Sally",          role: "Color Specialist"      },
-  { name: "Kato",           role: "Stylist"               },
-  { name: "Juany",          role: "Stylist"               },
-  { name: "Dhariana",       role: "Makeup Artist"         },
+  { name: "No preference", role: "Any available stylist" },
+  { name: "Maria",         role: "Stylist"               },
+  { name: "Meagan",        role: "Stylist"               },
+  { name: "Sally",         role: "Color Specialist"      },
+  { name: "Kato",          role: "Stylist"               },
+  { name: "Juany",         role: "Stylist"               },
+  { name: "Nazareth",      role: "Stylist"               },
+  { name: "Nathaly",       role: "Stylist"               },
+  { name: "Dhariana",      role: "Makeup Artist"         },
 ];
 
 const TIME_SLOTS = [
@@ -453,9 +455,14 @@ function SpecialistStep({ selected, onSelect, onBack }: { selected: string; onSe
 
 // ── Step 3 — Date & Time ──────────────────────────────────────────────────────
 type HoursEntry = { day: string; open: string; close: string; closed?: boolean };
-function DateTimeStep({ date, time, openingHours, onSelect, onBack }: {
-  date: string; time: string;
+type ScheduleRow = { staffName: string; dayOfWeek: number; isWorking: boolean; startTime: string; endTime: string };
+
+function hhmm(t: string) { const [h, m] = t.split(":").map(Number); return h * 60 + m; }
+
+function DateTimeStep({ date, time, stylist, openingHours, scheduleRows, onSelect, onBack }: {
+  date: string; time: string; stylist: string;
   openingHours: HoursEntry[];
+  scheduleRows: ScheduleRow[];
   onSelect: (date: string, time: string) => void;
   onBack: () => void;
 }) {
@@ -467,20 +474,34 @@ function DateTimeStep({ date, time, openingHours, onSelect, onBack }: {
     ? openingHours.find(h => h.day === DAY_NAMES[new Date(selectedDate + "T12:00:00").getDay()])
     : null;
 
-  const availableSlots = dayEntry && !dayEntry.closed
-    ? TIME_SLOTS.filter(s => slotToMins(s) >= slotToMins(dayEntry.open) && slotToMins(s) <= slotToMins(dayEntry.close))
-    : openingHours.length > 0
-      ? [] // date selected but no hours found — shouldn't happen
-      : TIME_SLOTS; // hours not loaded yet — show all
+  // dayOfWeek: getDay() returns 0=Sun…6=Sat; schedule uses 0=Mon…6=Sun
+  const scheduleDow = selectedDate
+    ? (() => { const d = new Date(selectedDate + "T12:00:00").getDay(); return d === 0 ? 6 : d - 1; })()
+    : -1;
+
+  const stylistRow = stylist && stylist !== "No preference" && scheduleRows.length > 0
+    ? scheduleRows.find(r => r.staffName === stylist && r.dayOfWeek === scheduleDow)
+    : null;
+
+  const stylistNotWorking = stylistRow ? !stylistRow.isWorking : false;
+
+  const availableSlots = (() => {
+    if (!dayEntry || dayEntry.closed) return openingHours.length > 0 ? [] : TIME_SLOTS;
+    return TIME_SLOTS.filter(s => {
+      const m = slotToMins(s);
+      if (m < slotToMins(dayEntry.open) || m > slotToMins(dayEntry.close)) return false;
+      if (stylistRow && !stylistRow.isWorking) return false;
+      if (stylistRow && stylistRow.isWorking) {
+        return m >= hhmm(stylistRow.startTime) && m <= hhmm(stylistRow.endTime);
+      }
+      return true;
+    });
+  })();
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
     setSelectedDate(newDate);
-    const entry = openingHours.find(h => h.day === DAY_NAMES[new Date(newDate + "T12:00:00").getDay()]);
-    if (entry && !entry.closed && selectedTime) {
-      const m = slotToMins(selectedTime);
-      if (m < slotToMins(entry.open) || m > slotToMins(entry.close)) setSelectedTime("");
-    }
+    setSelectedTime(""); // clear time on date change — re-validate
   };
 
   return (
@@ -502,13 +523,18 @@ function DateTimeStep({ date, time, openingHours, onSelect, onBack }: {
         {dayEntry?.closed && (
           <p className="text-red-400 text-xs mt-2">We are closed on this day. Please select another date.</p>
         )}
+        {!dayEntry?.closed && stylistNotWorking && (
+          <p className="text-red-400 text-xs mt-2">{stylist} is not available on this day. Please choose another date or select a different stylist.</p>
+        )}
       </div>
 
       {/* Time slots */}
       <div className="mb-6">
         <label className={labelCls}>Time</label>
         {availableSlots.length === 0 && selectedDate && openingHours.length > 0 ? (
-          <p className="text-[var(--mc-muted)] text-sm mt-2">No available times for this day.</p>
+          <p className="text-[var(--mc-muted)] text-sm mt-2">
+            {stylistNotWorking ? `${stylist} is off on this day.` : "No available times for this day."}
+          </p>
         ) : (
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {availableSlots.map(slot => (
@@ -902,7 +928,8 @@ function BookingFlow() {
     service: "", servicePrice: undefined, selectedServices: [], stylist: "No preference", date: "", time: "", notes: "",
   });
   const [authChecked, setAuthChecked] = useState(false);
-  const [openingHours, setOpeningHours] = useState<{ day: string; open: string; close: string; closed?: boolean }[]>([]);
+  const [openingHours,  setOpeningHours]  = useState<{ day: string; open: string; close: string; closed?: boolean }[]>([]);
+  const [scheduleRows,  setScheduleRows]  = useState<{ staffName: string; dayOfWeek: number; isWorking: boolean; startTime: string; endTime: string }[]>([]);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -915,6 +942,10 @@ function BookingFlow() {
     fetch("/api/settings")
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data?.hours) setOpeningHours(data.hours); })
+      .catch(() => {});
+    fetch("/api/schedule")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (Array.isArray(data)) setScheduleRows(data); })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1001,7 +1032,9 @@ function BookingFlow() {
                   <DateTimeStep
                     date={selection.date}
                     time={selection.time}
+                    stylist={selection.stylist}
                     openingHours={openingHours}
+                    scheduleRows={scheduleRows}
                     onSelect={(date, time) => { setSelection(s => ({ ...s, date, time })); setStep(4); }}
                     onBack={() => setStep(2)}
                   />

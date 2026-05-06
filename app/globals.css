@@ -179,28 +179,51 @@ table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 /* ── ADMIN PANEL THEMES ─────────────────────────────────────────────────────── */
 .admin-light {
-  --admin-bg:           #f8f6f2;
-  --admin-surface:      #ffffff;
-  --admin-surface-dark: #f0ede8;
-  --admin-border:       #ddd8d0;
-  --admin-text:         #1a1612;
-  --admin-muted:        #8c7d6e;
-  /* override site-wide vars — warm paper base, gold accent preserved */
-  --mc-bg:              #f8f6f2;
-  --mc-surface:         #ffffff;
-  --mc-surface-2:       #f0ede8;
-  --mc-surface-dark:    #e8e3db;
-  --mc-border:          #ddd8d0;
-  --mc-text:            #1a1612;
-  --mc-text-body:       #3d3530;
-  --mc-muted:           #8c7d6e;
-  --mc-text-dim:        #a89a8a;
-  --mc-accent:          #C9A84C;
-  --mc-accent-2:        #b8960a;
-  --mc-card-bg:         #ffffff;
-  --mc-card-border:     #ddd8d0;
-  background-color:     #f8f6f2;
-  color:                #1a1612;
+  /* Bohemian — warm parchment, terracotta, sage, dusty gold */
+  --admin-bg:              #f7f2eb;
+  --admin-surface:         #fdfaf5;
+  --admin-surface-dark:    #ede6d8;
+  --admin-border:          #d6cab8;
+  --admin-text:            #2a1f14;
+  --admin-muted:           #7a6552;
+
+  --mc-bg:                 #f7f2eb;
+  --mc-surface:            #fdfaf5;
+  --mc-surface-2:          #ede6d8;
+  --mc-surface-dark:       #e4dace;
+  --mc-border:             #d6cab8;
+  --mc-text:               #2a1f14;
+  --mc-text-body:          #4a3828;
+  --mc-muted:              #7a6552;
+  --mc-text-dim:           #a8917a;
+
+  /* Terracotta as primary accent — organic, warm */
+  --mc-accent:             #b85c38;
+  --mc-accent-2:           #7b9e7a;   /* sage green secondary */
+
+  --mc-card-bg:            #fdfaf5;
+  --mc-card-border:        #d6cab8;
+
+  background-color:        #f7f2eb;
+  color:                   #2a1f14;
+
+  /* Boho texture: subtle warm grain overlay */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+
+  /* Boho button — terracotta gradient */
+  --mc-title-grad: linear-gradient(135deg, #c0613a 0%, #e07d54 50%, #b85c38 100%);
+}
+
+/* Boho card style in light mode */
+.admin-light .luxury-card {
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(42, 31, 20, 0.06), 0 0 0 1px rgba(214, 202, 184, 0.6);
+  border-color: #d6cab8;
+}
+.admin-light .luxury-card:hover {
+  box-shadow: 0 4px 12px rgba(184, 92, 56, 0.12), 0 0 0 1px rgba(184, 92, 56, 0.25);
+  border-color: #b85c38;
+  transform: translateY(-1px);
 }
 .admin-dark {
   --admin-bg:           #0d0d0d;

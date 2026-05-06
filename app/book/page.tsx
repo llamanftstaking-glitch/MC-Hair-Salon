@@ -88,8 +88,8 @@ const SERVICE_CATEGORIES = [
 
 const STYLISTS_DATA = [
   { name: "No preference",  role: "Any available stylist" },
-  { name: "Maria",          role: "Master Stylist"        },
-  { name: "Meagan",         role: "Senior Stylist"        },
+  { name: "Maria",          role: "Stylist"               },
+  { name: "Meagan",         role: "Stylist"               },
   { name: "Sally",          role: "Color Specialist"      },
   { name: "Kato",           role: "Stylist"               },
   { name: "Juany",          role: "Stylist"               },

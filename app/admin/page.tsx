@@ -24,6 +24,7 @@ import VibeTab from "./VibeTab";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Tab =
+  | "overview"
   | "reservations"
   | "clients"
   | "rewards"
@@ -113,8 +114,8 @@ function VendorsPanel() {
     <div>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <p className="text-white font-semibold text-lg flex items-center gap-2"><Building2 size={18} className="text-[var(--mc-accent)]" /> Vendors & Suppliers</p>
-          <p className="text-[#555] text-sm mt-1">Contacts for products, maintenance, equipment, and services</p>
+          <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2"><Building2 size={18} className="text-[var(--mc-accent)]" /> Vendors & Suppliers</p>
+          <p className="text-[var(--admin-muted)] text-sm mt-1">Contacts for products, maintenance, equipment, and services</p>
         </div>
         <button onClick={() => setAdding(!adding)}
           className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer transition-opacity">
@@ -124,7 +125,7 @@ function VendorsPanel() {
 
       {adding && (
         <div className="luxury-card p-6 mb-6 border border-[var(--mc-accent)]/20">
-          <p className="text-white font-semibold mb-4">New Vendor</p>
+          <p className="text-[var(--admin-text)] font-semibold mb-4">New Vendor</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {([
               { key: "name", label: "Company Name", placeholder: "e.g. Wella Professional" },
@@ -152,28 +153,28 @@ function VendorsPanel() {
           </div>
           <div className="flex gap-3 mt-4">
             <button onClick={add} className="gold-gradient-bg text-black font-bold px-6 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer">Save Vendor</button>
-            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
+            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[var(--admin-muted)] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
           </div>
         </div>
       )}
 
       {vendors.length === 0 && !adding ? (
-        <div className="text-center py-20 luxury-card"><Building2 size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No vendors added yet</p></div>
+        <div className="text-center py-20 luxury-card"><Building2 size={48} className="text-[var(--admin-muted)] mx-auto mb-4" /><p className="text-[var(--admin-muted)]">No vendors added yet</p></div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {vendors.map(v => (
             <div key={v.id} className="luxury-card p-5">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div>
-                  <p className="text-white font-semibold">{v.name}</p>
+                  <p className="text-[var(--admin-text)] font-semibold">{v.name}</p>
                   {v.category && <span className="text-[10px] px-2 py-0.5 border border-[var(--mc-accent)]/30 text-[var(--mc-accent)] uppercase tracking-wider">{v.category}</span>}
                 </div>
-                <button onClick={() => remove(v.id)} className="text-[#555] hover:text-red-400 transition-colors cursor-pointer shrink-0"><Trash2 size={14} /></button>
+                <button onClick={() => remove(v.id)} className="text-[var(--admin-muted)] hover:text-red-400 transition-colors cursor-pointer shrink-0"><Trash2 size={14} /></button>
               </div>
-              {v.contact && <p className="text-[var(--mc-muted)] text-xs mt-2"><span className="text-[#555]">Contact:</span> {v.contact}</p>}
+              {v.contact && <p className="text-[var(--mc-muted)] text-xs mt-2"><span className="text-[var(--admin-muted)]">Contact:</span> {v.contact}</p>}
               {v.phone   && <p className="text-[var(--mc-muted)] text-xs"><a href={`tel:${v.phone}`} className="hover:text-[var(--mc-accent)] transition-colors">{v.phone}</a></p>}
               {v.email   && <p className="text-[var(--mc-muted)] text-xs"><a href={`mailto:${v.email}`} className="hover:text-[var(--mc-accent)] transition-colors">{v.email}</a></p>}
-              {v.notes   && <p className="text-[#555] text-xs mt-2 border-t border-[var(--mc-border)] pt-2">{v.notes}</p>}
+              {v.notes   && <p className="text-[var(--admin-muted)] text-xs mt-2 border-t border-[var(--mc-border)] pt-2">{v.notes}</p>}
             </div>
           ))}
         </div>
@@ -228,10 +229,10 @@ function DailyTasksPanel() {
     <div>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <p className="text-white font-semibold text-lg flex items-center gap-2"><Check size={18} className="text-[var(--mc-accent)]" /> Daily Tasks & Checklists</p>
-          <p className="text-[#555] text-sm mt-1">{done} / {tasks.length} completed today</p>
+          <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2"><Check size={18} className="text-[var(--mc-accent)]" /> Daily Tasks & Checklists</p>
+          <p className="text-[var(--admin-muted)] text-sm mt-1">{done} / {tasks.length} completed today</p>
         </div>
-        <button onClick={resetAll} className="px-4 py-2 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+        <button onClick={resetAll} className="px-4 py-2 border border-[var(--mc-border)] text-[var(--admin-muted)] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
           Reset All
         </button>
       </div>
@@ -263,7 +264,7 @@ function DailyTasksPanel() {
           <div key={cat.id} className="mb-6">
             <div className="flex items-center gap-2 mb-3">
               <span className={`text-[10px] px-2 py-0.5 border uppercase tracking-wider font-semibold ${cat.color}`}>{cat.label}</span>
-              <span className="text-[#444] text-xs">{catTasks.filter(t=>t.done).length}/{catTasks.length}</span>
+              <span className="text-[var(--admin-muted)] text-xs">{catTasks.filter(t=>t.done).length}/{catTasks.length}</span>
             </div>
             <div className="space-y-2">
               {catTasks.map(task => (
@@ -274,8 +275,8 @@ function DailyTasksPanel() {
                     }`}>
                     {task.done && <Check size={11} className="text-black" />}
                   </button>
-                  <span className={`flex-1 text-sm transition-all ${task.done ? "line-through text-[#444]" : "text-[var(--mc-muted)]"}`}>{task.text}</span>
-                  <button onClick={() => removeTask(task.id)} className="text-[#333] hover:text-red-400 transition-colors cursor-pointer shrink-0"><X size={13} /></button>
+                  <span className={`flex-1 text-sm transition-all ${task.done ? "line-through text-[var(--admin-muted)]" : "text-[var(--mc-muted)]"}`}>{task.text}</span>
+                  <button onClick={() => removeTask(task.id)} className="text-[var(--admin-muted)] hover:text-red-400 transition-colors cursor-pointer shrink-0"><X size={13} /></button>
                 </div>
               ))}
             </div>
@@ -323,11 +324,11 @@ function ExpenseReportsPanel() {
     <div>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <p className="text-white font-semibold text-lg flex items-center gap-2"><DollarSign size={18} className="text-[var(--mc-accent)]" /> Expense Reports</p>
-          <p className="text-[#555] text-sm mt-1">Track and categorize all salon expenses</p>
+          <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2"><DollarSign size={18} className="text-[var(--mc-accent)]" /> Expense Reports</p>
+          <p className="text-[var(--admin-muted)] text-sm mt-1">Track and categorize all salon expenses</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={exportCSV} className="flex items-center gap-1.5 border border-[var(--mc-border)] text-[#555] px-4 py-2 text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+          <button onClick={exportCSV} className="flex items-center gap-1.5 border border-[var(--mc-border)] text-[var(--admin-muted)] px-4 py-2 text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
             <Download size={13} /> Export CSV
           </button>
           <button onClick={() => setAdding(!adding)} className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer transition-opacity">
@@ -347,14 +348,14 @@ function ExpenseReportsPanel() {
           <input type="date" value={rangeEnd} onChange={e => setRangeEnd(e.target.value)} className={`${inputCls} w-44 cursor-pointer`} />
         </div>
         <div className="border border-[var(--mc-accent)]/30 px-5 py-2 bg-[var(--mc-accent)]/5">
-          <p className="text-[10px] text-[#555] uppercase tracking-widest">Total in Range</p>
+          <p className="text-[10px] text-[var(--admin-muted)] uppercase tracking-widest">Total in Range</p>
           <p className="text-[var(--mc-accent)] font-bold text-xl">${total.toLocaleString("en-US",{minimumFractionDigits:2})}</p>
         </div>
       </div>
 
       {adding && (
         <div className="luxury-card p-6 mb-6 border border-[var(--mc-accent)]/20">
-          <p className="text-white font-semibold mb-4">New Expense</p>
+          <p className="text-[var(--admin-text)] font-semibold mb-4">New Expense</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div><label className={labelCls}>Date</label><input type="date" value={form.date} onChange={e => setForm(p=>({...p,date:e.target.value}))} className={`${inputCls} cursor-pointer`} /></div>
             <div><label className={labelCls}>Amount ($)</label><input type="number" min="0" step="0.01" value={form.amount || ""} onChange={e => setForm(p=>({...p,amount:parseFloat(e.target.value)||0}))} className={inputCls} placeholder="0.00" /></div>
@@ -364,7 +365,7 @@ function ExpenseReportsPanel() {
           </div>
           <div className="flex gap-3 mt-4">
             <button onClick={add} className="gold-gradient-bg text-black font-bold px-6 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer">Save Expense</button>
-            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
+            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[var(--admin-muted)] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
           </div>
         </div>
       )}
@@ -380,8 +381,8 @@ function ExpenseReportsPanel() {
                 <div className="flex-1 bg-[var(--mc-surface-dark)] h-2 relative">
                   <div className="absolute inset-y-0 left-0 gold-gradient-bg" style={{ width: `${Math.round((amt/total)*100)}%` }} />
                 </div>
-                <span className="text-white text-sm font-semibold w-20 text-right shrink-0">${amt.toFixed(2)}</span>
-                <span className="text-[#555] text-xs w-10 text-right shrink-0">{Math.round((amt/total)*100)}%</span>
+                <span className="text-[var(--admin-text)] text-sm font-semibold w-20 text-right shrink-0">${amt.toFixed(2)}</span>
+                <span className="text-[var(--admin-muted)] text-xs w-10 text-right shrink-0">{Math.round((amt/total)*100)}%</span>
               </div>
             ))}
           </div>
@@ -389,17 +390,17 @@ function ExpenseReportsPanel() {
       )}
 
       {inRange.length === 0 ? (
-        <div className="text-center py-16 luxury-card"><DollarSign size={40} className="text-[#333] mx-auto mb-3" /><p className="text-[#555] text-sm">No expenses in this date range</p></div>
+        <div className="text-center py-16 luxury-card"><DollarSign size={40} className="text-[var(--admin-muted)] mx-auto mb-3" /><p className="text-[var(--admin-muted)] text-sm">No expenses in this date range</p></div>
       ) : (
         <div className="space-y-2">
           {inRange.map(e => (
             <div key={e.id} className="luxury-card px-5 py-3 flex items-center gap-4 flex-wrap">
-              <span className="text-[#555] text-xs w-24 shrink-0">{new Date(e.date+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</span>
+              <span className="text-[var(--admin-muted)] text-xs w-24 shrink-0">{new Date(e.date+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</span>
               <span className="text-[var(--mc-accent)] font-bold text-sm w-20 shrink-0">${e.amount.toFixed(2)}</span>
-              <span className="text-[10px] border border-[var(--mc-border)] text-[#555] px-2 py-0.5 uppercase tracking-wider shrink-0">{e.category}</span>
+              <span className="text-[10px] border border-[var(--mc-border)] text-[var(--admin-muted)] px-2 py-0.5 uppercase tracking-wider shrink-0">{e.category}</span>
               <span className="text-[var(--mc-muted)] text-sm flex-1 min-w-0 truncate">{e.description}</span>
-              {e.vendor && <span className="text-[#555] text-xs shrink-0">{e.vendor}</span>}
-              <button onClick={() => remove(e.id)} className="text-[#333] hover:text-red-400 transition-colors cursor-pointer shrink-0"><Trash2 size={13} /></button>
+              {e.vendor && <span className="text-[var(--admin-muted)] text-xs shrink-0">{e.vendor}</span>}
+              <button onClick={() => remove(e.id)} className="text-[var(--admin-muted)] hover:text-red-400 transition-colors cursor-pointer shrink-0"><Trash2 size={13} /></button>
             </div>
           ))}
         </div>
@@ -445,8 +446,8 @@ function MaintenanceLogPanel() {
     <div>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <p className="text-white font-semibold text-lg flex items-center gap-2"><Wrench size={18} className="text-[var(--mc-accent)]" /> Maintenance Log</p>
-          <p className="text-[#555] text-sm mt-1">{openCount} open issue{openCount !== 1 ? "s" : ""} · {entries.filter(e=>e.status==="resolved").length} resolved</p>
+          <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2"><Wrench size={18} className="text-[var(--mc-accent)]" /> Maintenance Log</p>
+          <p className="text-[var(--admin-muted)] text-sm mt-1">{openCount} open issue{openCount !== 1 ? "s" : ""} · {entries.filter(e=>e.status==="resolved").length} resolved</p>
         </div>
         <button onClick={() => setAdding(!adding)} className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer transition-opacity">
           <Plus size={14} /> Log Issue
@@ -458,7 +459,7 @@ function MaintenanceLogPanel() {
         {(["all","pending","in-progress","resolved"] as const).map(s => (
           <button key={s} onClick={() => setStatusFilter(s)}
             className={`shrink-0 px-3 py-1.5 text-[10px] uppercase tracking-widest cursor-pointer transition-all whitespace-nowrap ${
-              statusFilter === s ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
+              statusFilter === s ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)]"
             }`}>
             {s} {s === "all" ? `(${entries.length})` : `(${entries.filter(e=>e.status===s).length})`}
           </button>
@@ -467,7 +468,7 @@ function MaintenanceLogPanel() {
 
       {adding && (
         <div className="luxury-card p-6 mb-6 border border-[var(--mc-accent)]/20">
-          <p className="text-white font-semibold mb-4">New Maintenance Entry</p>
+          <p className="text-[var(--admin-text)] font-semibold mb-4">New Maintenance Entry</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div><label className={labelCls}>Equipment</label><select value={form.equipment} onChange={e=>setForm(p=>({...p,equipment:e.target.value}))} className={`${inputCls} cursor-pointer`}>{EQUIPMENT.map(eq=><option key={eq} value={eq}>{eq}</option>)}</select></div>
             <div className="sm:col-span-2"><label className={labelCls}>Issue / Task</label><input type="text" value={form.issue} onChange={e=>setForm(p=>({...p,issue:e.target.value}))} className={inputCls} placeholder="Describe the problem or maintenance task" /></div>
@@ -479,13 +480,13 @@ function MaintenanceLogPanel() {
           </div>
           <div className="flex gap-3 mt-4">
             <button onClick={add} className="gold-gradient-bg text-black font-bold px-6 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer">Save Entry</button>
-            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
+            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[var(--admin-muted)] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
           </div>
         </div>
       )}
 
       {filtered.length === 0 ? (
-        <div className="text-center py-16 luxury-card"><Wrench size={40} className="text-[#333] mx-auto mb-3" /><p className="text-[#555] text-sm">No entries</p></div>
+        <div className="text-center py-16 luxury-card"><Wrench size={40} className="text-[var(--admin-muted)] mx-auto mb-3" /><p className="text-[var(--admin-muted)] text-sm">No entries</p></div>
       ) : (
         <div className="space-y-3">
           {filtered.map(e => (
@@ -493,14 +494,14 @@ function MaintenanceLogPanel() {
               <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <p className="text-white font-semibold text-sm">{e.equipment}</p>
+                    <p className="text-[var(--admin-text)] font-semibold text-sm">{e.equipment}</p>
                     <span className={`text-[10px] px-2 py-0.5 border uppercase tracking-wider font-semibold ${STATUS_STYLE[e.status]}`}>{e.status}</span>
                     {e.cost > 0 && <span className="text-[var(--mc-accent)] text-xs font-semibold">${e.cost.toFixed(2)}</span>}
                   </div>
                   <p className="text-[var(--mc-muted)] text-sm">{e.issue}</p>
-                  {e.technician && <p className="text-[#555] text-xs mt-1">Technician: {e.technician}</p>}
-                  {e.notes && <p className="text-[#444] text-xs mt-1">{e.notes}</p>}
-                  <p className="text-[#444] text-xs mt-2">Reported: {e.reportedDate}{e.resolvedDate ? ` · Resolved: ${e.resolvedDate}` : ""}</p>
+                  {e.technician && <p className="text-[var(--admin-muted)] text-xs mt-1">Technician: {e.technician}</p>}
+                  {e.notes && <p className="text-[var(--admin-muted)] text-xs mt-1">{e.notes}</p>}
+                  <p className="text-[var(--admin-muted)] text-xs mt-2">Reported: {e.reportedDate}{e.resolvedDate ? ` · Resolved: ${e.resolvedDate}` : ""}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {e.status !== "resolved" && (
@@ -509,7 +510,7 @@ function MaintenanceLogPanel() {
                       {e.status === "pending" ? "→ In Progress" : "→ Resolved"}
                     </button>
                   )}
-                  <button onClick={() => remove(e.id)} className="text-[#555] hover:text-red-400 transition-colors cursor-pointer"><Trash2 size={14} /></button>
+                  <button onClick={() => remove(e.id)} className="text-[var(--admin-muted)] hover:text-red-400 transition-colors cursor-pointer"><Trash2 size={14} /></button>
                 </div>
               </div>
             </div>
@@ -575,11 +576,11 @@ function SupplyOrdersPanel() {
     <div>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <p className="text-white font-semibold text-lg flex items-center gap-2"><Tag size={18} className="text-[var(--mc-accent)]" /> Supply Orders</p>
+          <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2"><Tag size={18} className="text-[var(--mc-accent)]" /> Supply Orders</p>
           <div className="flex items-center gap-3 mt-1 flex-wrap">
             {lowCount > 0 && <span className="text-red-400 text-xs font-semibold flex items-center gap-1"><AlertTriangle size={11} /> {lowCount} item{lowCount!==1?"s":""} low/out</span>}
             {orderedCount > 0 && <span className="text-blue-400 text-xs">{orderedCount} order{orderedCount!==1?"s":""} pending</span>}
-            {lowCount === 0 && orderedCount === 0 && <span className="text-[#555] text-xs">{items.length} items tracked</span>}
+            {lowCount === 0 && orderedCount === 0 && <span className="text-[var(--admin-muted)] text-xs">{items.length} items tracked</span>}
           </div>
         </div>
         <button onClick={() => setAdding(!adding)} className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer transition-opacity">
@@ -600,7 +601,7 @@ function SupplyOrdersPanel() {
         {(["all","low","ordered"] as const).map(f => (
           <button key={f} onClick={() => setFilter(f)}
             className={`px-3 py-1.5 text-[10px] uppercase tracking-widest cursor-pointer transition-all ${
-              filter === f ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)]"
+              filter === f ? "gold-gradient-bg text-black font-bold" : "border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)]"
             }`}>
             {f === "all" ? `All (${items.length})` : f === "low" ? `Low Stock (${lowCount})` : `Ordered (${orderedCount})`}
           </button>
@@ -609,7 +610,7 @@ function SupplyOrdersPanel() {
 
       {adding && (
         <div className="luxury-card p-6 mb-6 border border-[var(--mc-accent)]/20">
-          <p className="text-white font-semibold mb-4">Add Supply Item</p>
+          <p className="text-[var(--admin-text)] font-semibold mb-4">Add Supply Item</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div><label className={labelCls}>Item Name</label><input type="text" value={form.name} onChange={e=>setForm(p=>({...p,name:e.target.value}))} className={inputCls} placeholder="e.g. Wella Koleston 7/0" /></div>
             <div><label className={labelCls}>Category</label><select value={form.category} onChange={e=>setForm(p=>({...p,category:e.target.value}))} className={`${inputCls} cursor-pointer`}>{SUPPLY_CATS.map(c=><option key={c} value={c}>{c}</option>)}</select></div>
@@ -621,13 +622,13 @@ function SupplyOrdersPanel() {
           </div>
           <div className="flex gap-3 mt-4">
             <button onClick={add} className="gold-gradient-bg text-black font-bold px-6 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer">Add Item</button>
-            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[#555] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
+            <button onClick={() => setAdding(false)} className="px-6 py-2.5 border border-[var(--mc-border)] text-[var(--admin-muted)] text-xs uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">Cancel</button>
           </div>
         </div>
       )}
 
       {filtered.length === 0 ? (
-        <div className="text-center py-16 luxury-card"><Tag size={40} className="text-[#333] mx-auto mb-3" /><p className="text-[#555] text-sm">{filter === "low" ? "No low-stock items" : filter === "ordered" ? "No pending orders" : "No supply items added yet"}</p></div>
+        <div className="text-center py-16 luxury-card"><Tag size={40} className="text-[var(--admin-muted)] mx-auto mb-3" /><p className="text-[var(--admin-muted)] text-sm">{filter === "low" ? "No low-stock items" : filter === "ordered" ? "No pending orders" : "No supply items added yet"}</p></div>
       ) : (
         <div className="space-y-3">
           {filtered.map(item => (
@@ -635,22 +636,22 @@ function SupplyOrdersPanel() {
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <p className="text-white font-semibold text-sm">{item.name}</p>
+                    <p className="text-[var(--admin-text)] font-semibold text-sm">{item.name}</p>
                     <span className={`text-[10px] px-2 py-0.5 border uppercase tracking-wider font-semibold ${STATUS_STYLE[item.status]}`}>{item.status.toUpperCase()}</span>
-                    <span className="text-[10px] border border-[var(--mc-border)] text-[#555] px-2 py-0.5">{item.category}</span>
+                    <span className="text-[10px] border border-[var(--mc-border)] text-[var(--admin-muted)] px-2 py-0.5">{item.category}</span>
                   </div>
                   <div className="flex items-center gap-4 flex-wrap">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => updateStock(item.id, -1)} className="w-7 h-7 border border-[var(--mc-border)] text-[#555] flex items-center justify-center hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] cursor-pointer transition-all"><Minus size={11} /></button>
+                      <button onClick={() => updateStock(item.id, -1)} className="w-7 h-7 border border-[var(--mc-border)] text-[var(--admin-muted)] flex items-center justify-center hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] cursor-pointer transition-all"><Minus size={11} /></button>
                       <span className={`text-lg font-bold w-12 text-center ${item.currentStock <= item.reorderThreshold ? "text-red-400" : "text-white"}`}>{item.currentStock}</span>
-                      <button onClick={() => updateStock(item.id, 1)} className="w-7 h-7 border border-[var(--mc-border)] text-[#555] flex items-center justify-center hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] cursor-pointer transition-all"><Plus size={11} /></button>
-                      <span className="text-[#555] text-xs">{item.unit}</span>
+                      <button onClick={() => updateStock(item.id, 1)} className="w-7 h-7 border border-[var(--mc-border)] text-[var(--admin-muted)] flex items-center justify-center hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] cursor-pointer transition-all"><Plus size={11} /></button>
+                      <span className="text-[var(--admin-muted)] text-xs">{item.unit}</span>
                     </div>
-                    <span className="text-[#555] text-xs">Reorder at: {item.reorderThreshold}</span>
-                    {item.vendor && <span className="text-[#555] text-xs">Vendor: {item.vendor}</span>}
-                    {item.lastOrdered && <span className="text-[#555] text-xs">Last ordered: {item.lastOrdered}</span>}
+                    <span className="text-[var(--admin-muted)] text-xs">Reorder at: {item.reorderThreshold}</span>
+                    {item.vendor && <span className="text-[var(--admin-muted)] text-xs">Vendor: {item.vendor}</span>}
+                    {item.lastOrdered && <span className="text-[var(--admin-muted)] text-xs">Last ordered: {item.lastOrdered}</span>}
                   </div>
-                  {item.notes && <p className="text-[#444] text-xs mt-1">{item.notes}</p>}
+                  {item.notes && <p className="text-[var(--admin-muted)] text-xs mt-1">{item.notes}</p>}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {item.status === "low" && (
@@ -664,7 +665,7 @@ function SupplyOrdersPanel() {
                       Mark Received
                     </button>
                   )}
-                  <button onClick={() => remove(item.id)} className="text-[#555] hover:text-red-400 transition-colors cursor-pointer"><Trash2 size={14} /></button>
+                  <button onClick={() => remove(item.id)} className="text-[var(--admin-muted)] hover:text-red-400 transition-colors cursor-pointer"><Trash2 size={14} /></button>
                 </div>
               </div>
             </div>
@@ -678,7 +679,8 @@ function SupplyOrdersPanel() {
 // ── Component ──────────────────────────────────────────────────────────────────
 export default function AdminPage() {
   // ── Existing state ──────────────────────────────────────────────────────────
-  const [tab, setTab] = useState<Tab>("reservations");
+  const [tab, setTab] = useState<Tab>("overview");
+  const hasAutoRouted = useRef(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
@@ -744,9 +746,63 @@ export default function AdminPage() {
     localStorage.setItem("mc-admin-lite", String(val));
   };
 
-  // ── Clients search ──────────────────────────────────────────────────────────
+  // ── Clients ─────────────────────────────────────────────────────────────────
   const [clientSearch, setClientSearch] = useState("");
   const [selectedClientEmail, setSelectedClientEmail] = useState<string | null>(null);
+  const [clientProfile, setClientProfile] = useState<{
+    customer: {
+      id: string; name: string; email: string; phone: string; points: number;
+      visits: number; totalSpent: number; tier: string; visitStreak: number;
+      blowoutsEarned: number; avatarUrl?: string; birthday?: string;
+      preferredStylist?: string; allergies?: string; adminNotes?: string; createdAt: string;
+    };
+    bookings: Booking[];
+    packages: { id: string; name: string; sessionsTotal: number; sessionsUsed: number; expiresAt: string; price: number }[];
+    rewards: { id: string; name: string; pointsCost: number; redeemedAt: string }[];
+  } | null>(null);
+  const [clientProfileLoading, setClientProfileLoading] = useState(false);
+  const [clientEditFields, setClientEditFields] = useState<Record<string, string>>({});
+  const [clientEditSaving, setClientEditSaving] = useState(false);
+
+  const openClientProfile = async (email: string) => {
+    setSelectedClientEmail(email);
+    setClientProfile(null);
+    setClientEditFields({});
+    setClientProfileLoading(true);
+    try {
+      const res = await fetch(`/api/customers?email=${encodeURIComponent(email)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setClientProfile(data);
+        setClientEditFields({
+          name: data.customer.name,
+          phone: data.customer.phone,
+          birthday: data.customer.birthday || "",
+          preferredStylist: data.customer.preferredStylist || "",
+          allergies: data.customer.allergies || "",
+          adminNotes: data.customer.adminNotes || "",
+        });
+      }
+    } finally {
+      setClientProfileLoading(false);
+    }
+  };
+
+  const saveClientProfile = async () => {
+    if (!selectedClientEmail) return;
+    setClientEditSaving(true);
+    try {
+      await fetch("/api/customers", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: selectedClientEmail, ...clientEditFields }),
+      });
+      // refresh
+      await openClientProfile(selectedClientEmail);
+    } finally {
+      setClientEditSaving(false);
+    }
+  };
 
   // ── Admin theme ──────────────────────────────────────────────────────────────
   const [adminDark, setAdminDark] = useState<boolean>(() => {
@@ -833,6 +889,18 @@ export default function AdminPage() {
   useEffect(() => {
     fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); fetchAutomation();
   }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards, fetchAdminUsers, fetchAutomation]);
+
+  // Auto-route on initial load: pending → reservations/pending; none → stay on overview
+  useEffect(() => {
+    if (!loading && !hasAutoRouted.current) {
+      hasAutoRouted.current = true;
+      const hasPending = bookings.some(b => b.status === "pending");
+      if (hasPending) {
+        setTab("reservations");
+        setFilter("pending");
+      }
+    }
+  }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Booking handlers ────────────────────────────────────────────────────────
   const [noshowLoading, setNoshowLoading] = useState<Record<string, boolean>>({});
@@ -1152,6 +1220,7 @@ export default function AdminPage() {
   };
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
+    { id: "overview",     label: "Overview",     icon: <LayoutGrid size={15} />, badge: pending || undefined },
     { id: "reservations", label: "Reservations", icon: <Calendar size={15} /> },
     { id: "clients",      label: "Clients",      icon: <Users size={15} /> },
     { id: "rewards",      label: "Rewards",      icon: <Gift size={15} /> },
@@ -1249,7 +1318,7 @@ export default function AdminPage() {
           {tabs.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`relative flex items-center gap-1.5 px-3 py-2 text-[11px] uppercase tracking-wider font-semibold transition-all cursor-pointer border-b-2 -mb-px whitespace-nowrap ${
-                tab === t.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
+                tab === t.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[var(--admin-muted)] hover:text-[var(--mc-muted)]"
               }`}>
               {t.icon} {t.label}
               {t.badge && t.badge > 0 ? (
@@ -1258,6 +1327,200 @@ export default function AdminPage() {
             </button>
           ))}
         </div>
+
+        {/* ── OVERVIEW ─────────────────────────────────────────────────────── */}
+        {tab === "overview" && (() => {
+          const todayStr = new Date().toISOString().split("T")[0];
+          const todayBookings = bookings.filter(b => b.date === todayStr && b.status === "confirmed")
+            .sort((a, b) => {
+              const toMin = (t: string) => {
+                const [hm, ap] = t.split(" "); const [h, m] = hm.split(":").map(Number);
+                return (h % 12 + (ap === "PM" ? 12 : 0)) * 60 + m;
+              };
+              return toMin(a.time) - toMin(b.time);
+            });
+          const pendingList = bookings.filter(b => b.status === "pending")
+            .sort((a, b) => a.date.localeCompare(b.date));
+
+          // Week Mon–Sun
+          const weekDays: { label: string; dateStr: string; confirmed: number; pending: number; isToday: boolean }[] = [];
+          const now = new Date();
+          const dayOfWeek = now.getDay(); // 0=Sun
+          const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+          for (let i = 0; i < 7; i++) {
+            const d = new Date(now); d.setDate(now.getDate() + mondayOffset + i);
+            const ds = d.toISOString().split("T")[0];
+            weekDays.push({
+              label: d.toLocaleDateString("en-US", { weekday: "short" }),
+              dateStr: ds,
+              confirmed: bookings.filter(b => b.date === ds && b.status === "confirmed").length,
+              pending: bookings.filter(b => b.date === ds && b.status === "pending").length,
+              isToday: ds === todayStr,
+            });
+          }
+
+          // Month stats
+          const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+          const monthBookings = bookings.filter(b => b.date.startsWith(monthPrefix));
+          const monthRevenue = monthBookings.filter(b => b.status === "confirmed").reduce((s, b) => s + (b.servicePrice ?? 0), 0);
+          const monthAppts = monthBookings.filter(b => b.status === "confirmed").length;
+          const monthNoShows = monthBookings.filter(b => b.status === "no_show").length;
+          const monthEmails = new Set(monthBookings.map(b => b.email));
+          const newClientsMonth = [...monthEmails].filter(email =>
+            bookings.filter(b => b.email === email).every(b => b.date.startsWith(monthPrefix))
+          ).length;
+
+          return (
+            <div className="space-y-6">
+
+              {/* Pending requests */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-serif text-base gold-gradient flex items-center gap-2">
+                    <Clock size={15} /> Pending Requests
+                    {pendingList.length > 0 && (
+                      <span className="text-[10px] bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 px-2 py-0.5 font-sans uppercase tracking-wider">
+                        {pendingList.length} action required
+                      </span>
+                    )}
+                  </h2>
+                  {pendingList.length > 0 && (
+                    <button onClick={() => { setTab("reservations"); setFilter("pending"); }}
+                      className="text-[10px] uppercase tracking-widest text-[var(--mc-accent)] hover:underline cursor-pointer">
+                      View all →
+                    </button>
+                  )}
+                </div>
+                {pendingList.length === 0 ? (
+                  <div className="luxury-card p-5 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-400/10 border border-green-400/30 flex items-center justify-center shrink-0">
+                      <span className="text-green-400 text-sm">✓</span>
+                    </div>
+                    <div>
+                      <p className="text-[var(--admin-text)] text-sm font-semibold">All caught up</p>
+                      <p className="text-[var(--admin-muted)] text-xs mt-0.5">No pending requests — every booking is confirmed or resolved.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid gap-2">
+                    {pendingList.slice(0, 5).map(b => (
+                      <div key={b.id} className="luxury-card p-4 flex items-center gap-4 border-l-2 border-yellow-400/60">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline gap-2 flex-wrap">
+                            <span className="font-semibold text-[var(--admin-text)] text-sm">{b.name}</span>
+                            <span className="text-[var(--admin-muted)] text-xs">{b.date} · {b.time}</span>
+                            {b.stylist && <span className="text-[10px] text-[var(--mc-accent)] uppercase tracking-wider">{b.stylist}</span>}
+                          </div>
+                          <p className="text-xs text-[var(--admin-muted)] mt-0.5 truncate">{b.service}</p>
+                        </div>
+                        <div className="flex gap-1.5 shrink-0">
+                          <button onClick={() => updateStatus(b.id, "confirmed")}
+                            className="px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold bg-green-400/10 border border-green-400/40 text-green-400 hover:bg-green-400/20 transition-all cursor-pointer">
+                            Confirm
+                          </button>
+                          <button onClick={() => updateStatus(b.id, "cancelled")}
+                            className="px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold bg-red-400/10 border border-red-400/30 text-red-400 hover:bg-red-400/20 transition-all cursor-pointer">
+                            Decline
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {pendingList.length > 5 && (
+                      <button onClick={() => { setTab("reservations"); setFilter("pending"); }}
+                        className="w-full py-2.5 text-[10px] uppercase tracking-widest text-[var(--mc-accent)] border border-[var(--mc-border)] hover:border-[var(--mc-accent)] transition-all cursor-pointer">
+                        + {pendingList.length - 5} more pending
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Today's schedule */}
+              <div>
+                <h2 className="font-serif text-base gold-gradient flex items-center gap-2 mb-3">
+                  <Calendar size={15} /> Today's Schedule
+                  <span className="text-[10px] font-sans text-[var(--admin-muted)] normal-case tracking-normal">
+                    {now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+                  </span>
+                </h2>
+                {todayBookings.length === 0 ? (
+                  <div className="luxury-card p-5 text-center text-[var(--admin-muted)] text-sm">
+                    No confirmed appointments today.
+                    <button onClick={() => setCreateBookingOpen(true)}
+                      className="ml-2 text-[var(--mc-accent)] hover:underline cursor-pointer">Add one →</button>
+                  </div>
+                ) : (
+                  <div className="grid gap-1.5">
+                    {todayBookings.map(b => (
+                      <div key={b.id} className="luxury-card px-4 py-3 flex items-center gap-4">
+                        <div className="text-[var(--mc-accent)] font-semibold text-xs w-14 shrink-0">{b.time}</div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[var(--admin-text)] text-sm font-medium">{b.name}</span>
+                          <span className="text-[var(--admin-muted)] text-xs ml-2 truncate">{b.service.split("–").pop()?.trim() || b.service}</span>
+                        </div>
+                        {b.stylist && <span className="text-[10px] uppercase tracking-wider text-[var(--mc-accent)] shrink-0">{b.stylist}</span>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Week at a glance */}
+              <div>
+                <h2 className="font-serif text-base gold-gradient flex items-center gap-2 mb-3">
+                  <BarChart2 size={15} /> Week at a Glance
+                </h2>
+                <div className="grid grid-cols-7 gap-1.5">
+                  {weekDays.map(day => (
+                    <div key={day.dateStr}
+                      className={`luxury-card p-3 text-center ${day.isToday ? "border border-[var(--mc-accent)]/50" : ""}`}>
+                      <p className={`text-[10px] uppercase tracking-wider font-bold mb-1 ${day.isToday ? "text-[var(--mc-accent)]" : "text-[var(--admin-muted)]"}`}>{day.label}</p>
+                      <p className={`text-lg font-bold font-serif ${day.confirmed > 0 ? "gold-gradient" : "text-[var(--admin-muted)]"}`}>{day.confirmed}</p>
+                      <p className="text-[9px] text-[var(--admin-muted)] mt-0.5">confirmed</p>
+                      {day.pending > 0 && (
+                        <p className="text-[9px] text-yellow-400 mt-0.5">{day.pending} pending</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Month snapshot */}
+              <div>
+                <h2 className="font-serif text-base gold-gradient flex items-center gap-2 mb-3">
+                  <Users size={15} /> {now.toLocaleDateString("en-US", { month: "long" })} Snapshot
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { label: "Revenue",      value: `$${monthRevenue.toLocaleString()}`, sub: "confirmed" },
+                    { label: "Appointments", value: monthAppts,                          sub: "confirmed" },
+                    { label: "New Clients",  value: newClientsMonth,                     sub: "first visit" },
+                    { label: "No-Shows",     value: monthNoShows,                        sub: "this month" },
+                  ].map(s => (
+                    <div key={s.label} className="luxury-card p-4 text-center">
+                      <p className="text-xl font-bold font-serif gold-gradient">{s.value}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-[var(--admin-muted)] mt-1">{s.label}</p>
+                      <p className="text-[9px] text-[var(--admin-muted)] mt-0.5 opacity-60">{s.sub}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick actions */}
+              <div className="flex gap-2 pt-2">
+                <button onClick={() => setCreateBookingOpen(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 gold-gradient-bg text-black text-[11px] uppercase tracking-widest font-bold cursor-pointer hover:opacity-90 transition-all">
+                  <Plus size={13} /> New Booking
+                </button>
+                <button onClick={() => { setTab("reservations"); setFilter("all"); }}
+                  className="flex items-center gap-1.5 px-4 py-2 border border-[var(--mc-border)] text-[var(--admin-muted)] text-[11px] uppercase tracking-widest cursor-pointer hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all">
+                  <Calendar size={13} /> All Reservations
+                </button>
+              </div>
+
+            </div>
+          );
+        })()}
 
         {/* ── RESERVATIONS ─────────────────────────────────────────────────── */}
         {tab === "reservations" && (
@@ -1293,7 +1556,7 @@ export default function AdminPage() {
               </div>
             </div>
             {loading ? (
-              <div className="text-center py-20 text-[#555]">Loading...</div>
+              <div className="text-center py-20 text-[var(--admin-muted)]">Loading...</div>
             ) : viewMode === "weekly" ? (
               (() => {
                 const today = new Date();
@@ -1310,14 +1573,14 @@ export default function AdminPage() {
                   <div>
                     {/* Week navigation */}
                     <div className="flex items-center justify-between mb-4">
-                      <button onClick={() => setWeekOffset(o => o - 1)} className="flex items-center gap-1 border border-[var(--mc-border)] text-[#555] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                      <button onClick={() => setWeekOffset(o => o - 1)} className="flex items-center gap-1 border border-[var(--mc-border)] text-[var(--admin-muted)] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
                         <ChevronLeft size={12} /> Prev
                       </button>
                       <div className="text-center">
-                        <p className="text-white text-sm font-semibold">{weekStart} – {weekEnd}</p>
-                        <button onClick={() => setWeekOffset(0)} className="text-[#444] text-xs hover:text-[var(--mc-accent)] transition-colors cursor-pointer">Today</button>
+                        <p className="text-[var(--admin-text)] text-sm font-semibold">{weekStart} – {weekEnd}</p>
+                        <button onClick={() => setWeekOffset(0)} className="text-[var(--admin-muted)] text-xs hover:text-[var(--mc-accent)] transition-colors cursor-pointer">Today</button>
                       </div>
-                      <button onClick={() => setWeekOffset(o => o + 1)} className="flex items-center gap-1 border border-[var(--mc-border)] text-[#555] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                      <button onClick={() => setWeekOffset(o => o + 1)} className="flex items-center gap-1 border border-[var(--mc-border)] text-[var(--admin-muted)] px-3 py-1.5 text-xs hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
                         Next <ChevronRight size={12} />
                       </button>
                     </div>
@@ -1332,12 +1595,12 @@ export default function AdminPage() {
                             .filter(b => filter === "all" || b.status === filter)
                             .sort((a, b) => a.time.localeCompare(b.time));
                           return (
-                            <div key={iso} className={`border ${isToday ? "border-[var(--mc-accent)]/40" : "border-[#1a1a1a]"} bg-[#080808] min-h-[180px]`}>
-                              <div className={`px-2 py-1.5 border-b ${isToday ? "border-[var(--mc-accent)]/40 bg-[#0a0800]" : "border-[#1a1a1a]"}`}>
-                                <p className={`text-xs font-bold uppercase tracking-widest ${isToday ? "text-[var(--mc-accent)]" : "text-[#555]"}`}>
+                            <div key={iso} className={`border ${isToday ? "border-[var(--mc-accent)]/40" : "border-[#1a1a1a]"} bg-[var(--admin-surface)] min-h-[180px]`}>
+                              <div className={`px-2 py-1.5 border-b ${isToday ? "border-[var(--mc-accent)]/40 bg-[var(--admin-surface-dark)]" : "border-[#1a1a1a]"}`}>
+                                <p className={`text-xs font-bold uppercase tracking-widest ${isToday ? "text-[var(--mc-accent)]" : "text-[var(--admin-muted)]"}`}>
                                   {day.toLocaleDateString("en-US", { weekday: "short" })}
                                 </p>
-                                <p className={`text-sm font-semibold ${isToday ? "text-white" : "text-[#444]"}`}>
+                                <p className={`text-sm font-semibold ${isToday ? "text-white" : "text-[var(--admin-muted)]"}`}>
                                   {day.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                                 </p>
                               </div>
@@ -1359,7 +1622,7 @@ export default function AdminPage() {
                         })}
                       </div>
                     </div>
-                    <p className="text-[#444] text-xs mt-3 text-center">Click any reservation to edit</p>
+                    <p className="text-[var(--admin-muted)] text-xs mt-3 text-center">Click any reservation to edit</p>
                   </div>
                 );
               })()
@@ -1382,21 +1645,21 @@ export default function AdminPage() {
                   {/* Day nav — single compact row on all screen sizes */}
                   <div className="flex items-center gap-2 mb-3">
                     <button onClick={prevDay}
-                      className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
+                      className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
                       <ChevronLeft size={14} />
                     </button>
                     <div className="flex-1 flex items-center gap-2 min-w-0 overflow-hidden">
                       <p className={`text-xs font-semibold truncate ${isToday ? "text-[var(--mc-accent)]" : "text-white"}`}>{dateLabel}</p>
                       <button onClick={() => setDailyDate(new Date().toISOString().split("T")[0])}
-                        className="shrink-0 text-[#444] text-[10px] uppercase tracking-wider hover:text-[var(--mc-accent)] transition-colors cursor-pointer hidden sm:block">
+                        className="shrink-0 text-[var(--admin-muted)] text-[10px] uppercase tracking-wider hover:text-[var(--mc-accent)] transition-colors cursor-pointer hidden sm:block">
                         Today
                       </button>
                       <input type="date" value={dailyDate} onChange={e => setDailyDate(e.target.value)}
-                        className="shrink-0 bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white text-[10px] px-1.5 py-1 focus:outline-none focus:border-[var(--mc-accent)] cursor-pointer w-[110px]"
+                        className="shrink-0 bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-[var(--admin-text)] text-[10px] px-1.5 py-1 focus:outline-none focus:border-[var(--mc-accent)] cursor-pointer w-[110px]"
                         style={{ colorScheme: "dark" }} />
                     </div>
                     <button onClick={nextDay}
-                      className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
+                      className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer shrink-0">
                       <ChevronRight size={14} />
                     </button>
                     <button onClick={() => { setCreateForm(f => ({ ...f, date: dailyDate, time: "", stylist: "" })); setCreateBookingOpen(true); }}
@@ -1406,17 +1669,17 @@ export default function AdminPage() {
                   </div>
 
                   {/* DaySmart-style grid */}
-                  <div className="overflow-x-auto border border-[#1a1a1a]">
+                  <div className="overflow-x-auto border border-[var(--mc-border)]/40">
                     <div style={{ minWidth: `${80 + STYLIST_COLS.length * 130}px` }}>
                       {/* Header */}
-                      <div className="grid border-b border-[#1a1a1a] bg-[#080808]" style={{ gridTemplateColumns: `80px repeat(${STYLIST_COLS.length}, 1fr)` }}>
-                        <div className="border-r border-[#1a1a1a] py-2.5" />
+                      <div className="grid border-b border-[var(--mc-border)]/40 bg-[var(--admin-surface)]" style={{ gridTemplateColumns: `80px repeat(${STYLIST_COLS.length}, 1fr)` }}>
+                        <div className="border-r border-[var(--mc-border)]/30 py-2.5" />
                         {STYLIST_COLS.map(col => {
                           const colCount = dayBookings.filter(b => col === "Unassigned" ? !b.stylist : b.stylist === col).length;
                           return (
-                            <div key={col} className="border-r border-[#1a1a1a] py-2.5 px-2 text-center last:border-r-0">
-                              <p className={`text-xs font-bold uppercase tracking-widest ${col === "Unassigned" ? "text-[#333]" : "text-[var(--mc-accent)]"}`}>{col}</p>
-                              {colCount > 0 && <p className="text-[10px] text-[#555] mt-0.5">{colCount} appt{colCount !== 1 ? "s" : ""}</p>}
+                            <div key={col} className="border-r border-[var(--mc-border)]/30 py-2.5 px-2 text-center last:border-r-0">
+                              <p className={`text-xs font-bold uppercase tracking-widest ${col === "Unassigned" ? "text-[var(--mc-muted)]" : "text-[var(--mc-accent)]"}`}>{col}</p>
+                              {colCount > 0 && <p className="text-[10px] text-[var(--mc-muted)] mt-0.5">{colCount} appt{colCount !== 1 ? "s" : ""}</p>}
                             </div>
                           );
                         })}
@@ -1424,9 +1687,9 @@ export default function AdminPage() {
 
                       {/* Time rows */}
                       {TIME_SLOTS_LIST.map((slot, si) => (
-                        <div key={slot} className={`grid border-b ${si % 2 === 0 ? "border-[#181818]" : "border-[#111]"}`} style={{ gridTemplateColumns: `80px repeat(${STYLIST_COLS.length}, 1fr)` }}>
-                          <div className="border-r border-[#1a1a1a] px-2 py-2 flex items-center">
-                            <span className={`text-[10px] whitespace-nowrap ${slot.endsWith("00 AM") || slot.endsWith("00 PM") ? "text-[#555] font-semibold" : "text-[#2a2a2a]"}`}>{slot}</span>
+                        <div key={slot} className={`grid border-b ${si % 2 === 0 ? "border-[var(--mc-border)]/25" : "border-[var(--mc-border)]/15"}`} style={{ gridTemplateColumns: `80px repeat(${STYLIST_COLS.length}, 1fr)` }}>
+                          <div className="border-r border-[var(--mc-border)]/30 px-2 py-2 flex items-center">
+                            <span className={`text-[10px] whitespace-nowrap ${slot.endsWith("00 AM") || slot.endsWith("00 PM") ? "text-[var(--mc-muted)] font-semibold" : "text-[var(--mc-border)]"}`}>{slot}</span>
                           </div>
                           {STYLIST_COLS.map(col => {
                             const cellBookings = dayBookings.filter(b =>
@@ -1434,7 +1697,7 @@ export default function AdminPage() {
                             );
                             return (
                               <div key={col}
-                                className="border-r border-[#111] min-h-[48px] p-1 last:border-r-0 cursor-pointer hover:bg-[var(--mc-accent)]/[0.03] transition-colors group"
+                                className="border-r border-[var(--mc-border)]/20 min-h-[48px] p-1 last:border-r-0 cursor-pointer hover:bg-[var(--mc-accent)]/[0.03] transition-colors group"
                                 onClick={() => { if (!cellBookings.length) openCreate(slot, col === "Unassigned" ? "" : col); }}
                               >
                                 {cellBookings.length === 0 && (
@@ -1457,12 +1720,12 @@ export default function AdminPage() {
                       ))}
                     </div>
                   </div>
-                  <p className="text-[#333] text-[10px] mt-2 text-center">Click any empty cell to create a booking · Click a booking chip to edit</p>
+                  <p className="text-[var(--admin-muted)] text-[10px] mt-2 text-center">Click any empty cell to create a booking · Click a booking chip to edit</p>
                 </div>
               );
             })()
             : filtered.length === 0 ? (
-              <div className="text-center py-20 luxury-card"><Calendar size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No bookings found</p></div>
+              <div className="text-center py-20 luxury-card"><Calendar size={48} className="text-[var(--admin-muted)] mx-auto mb-4" /><p className="text-[var(--admin-muted)]">No bookings found</p></div>
             ) : (
               <div className="space-y-3">
                 {filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((booking) => (
@@ -1470,9 +1733,9 @@ export default function AdminPage() {
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <p className="text-white font-semibold">{booking.name}</p>
+                          <p className="text-[var(--admin-text)] font-semibold">{booking.name}</p>
                           <span className={`text-xs px-2 py-0.5 border uppercase tracking-wider ${statusColors[booking.status]}`}>{booking.status}</span>
-                          <span className="text-[#333] text-xs font-mono">{booking.id}</span>
+                          <span className="text-[var(--admin-muted)] text-xs font-mono">{booking.id}</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm mb-2">
                           <span className="text-[var(--mc-text-dim)] truncate">{booking.email}</span>
@@ -1480,7 +1743,7 @@ export default function AdminPage() {
                           <span className="text-[var(--mc-accent)] font-medium">{booking.date} · {booking.time}</span>
                           <span className="text-[var(--mc-muted)]">{booking.stylist || "No preference"}</span>
                         </div>
-                        <p className="text-[#555] text-sm">
+                        <p className="text-[var(--admin-muted)] text-sm">
                           {booking.services && booking.services.length > 1
                             ? booking.services.map(s => s.name).join(" · ")
                             : booking.service}
@@ -1489,8 +1752,8 @@ export default function AdminPage() {
                         {/* Card on file */}
                         {booking.stripePaymentMethodId && (
                           <div className="flex items-center gap-2 mt-2">
-                            <CreditCard size={12} className={noshowResult[booking.id] === "charged" ? "text-orange-400" : "text-[#555]"} />
-                            <span className="text-[10px] uppercase tracking-wider text-[#555]">
+                            <CreditCard size={12} className={noshowResult[booking.id] === "charged" ? "text-orange-400" : "text-[var(--admin-muted)]"} />
+                            <span className="text-[10px] uppercase tracking-wider text-[var(--admin-muted)]">
                               {booking.cardBrand ? `${booking.cardBrand.charAt(0).toUpperCase()}${booking.cardBrand.slice(1)} ` : "Card "}
                               {booking.cardLast4 ? `·· ${booking.cardLast4}` : "on file"}
                             </span>
@@ -1541,11 +1804,11 @@ export default function AdminPage() {
                           </button>
                         )}
                         <button onClick={() => startEditBooking(booking)} title="Edit reservation"
-                          className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                          className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
                           <Edit2 size={14} />
                         </button>
                         <button onClick={() => deleteBooking(booking.id)}
-                          className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-red-500/50 hover:text-red-400 transition-all cursor-pointer">
+                          className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-red-500/50 hover:text-red-400 transition-all cursor-pointer">
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -1563,10 +1826,10 @@ export default function AdminPage() {
                   <div className="luxury-card w-full max-w-lg p-6 md:p-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h3 className="font-serif text-xl font-bold text-white">Edit Reservation</h3>
-                        {booking && <p className="text-[#555] text-xs mt-0.5">{booking.name} · {booking.id}</p>}
+                        <h3 className="font-serif text-xl font-bold text-[var(--admin-text)]">Edit Reservation</h3>
+                        {booking && <p className="text-[var(--admin-muted)] text-xs mt-0.5">{booking.name} · {booking.id}</p>}
                       </div>
-                      <button onClick={() => setEditBookingId(null)} className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:text-white transition-colors cursor-pointer">
+                      <button onClick={() => setEditBookingId(null)} className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:text-[var(--admin-text)] transition-colors cursor-pointer">
                         <X size={16} />
                       </button>
                     </div>
@@ -1633,7 +1896,7 @@ export default function AdminPage() {
                         {editLoading ? <><Loader size={14} className="animate-spin" /> Saving…</> : <><Save size={14} /> Save Changes</>}
                       </button>
                       <button onClick={() => setEditBookingId(null)}
-                        className="px-5 border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-sm">
+                        className="px-5 border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-sm">
                         Cancel
                       </button>
                     </div>
@@ -1672,10 +1935,10 @@ export default function AdminPage() {
                   <div className="luxury-card w-full max-w-lg p-6 md:p-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h3 className="font-serif text-xl font-bold text-white">New Booking</h3>
-                        <p className="text-[#555] text-xs mt-0.5">Walk-in or phone booking — auto-confirmed</p>
+                        <h3 className="font-serif text-xl font-bold text-[var(--admin-text)]">New Booking</h3>
+                        <p className="text-[var(--admin-muted)] text-xs mt-0.5">Walk-in or phone booking — auto-confirmed</p>
                       </div>
-                      <button onClick={() => setCreateBookingOpen(false)} className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:text-white transition-colors cursor-pointer">
+                      <button onClick={() => setCreateBookingOpen(false)} className="w-8 h-8 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:text-[var(--admin-text)] transition-colors cursor-pointer">
                         <X size={16} />
                       </button>
                     </div>
@@ -1739,7 +2002,7 @@ export default function AdminPage() {
                         {createLoading ? <><Loader size={14} className="animate-spin" /> Creating…</> : <><Plus size={14} /> Create &amp; Confirm</>}
                       </button>
                       <button onClick={() => setCreateBookingOpen(false)}
-                        className="px-5 border border-[var(--mc-border)] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-sm">
+                        className="px-5 border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-sm">
                         Cancel
                       </button>
                     </div>
@@ -1768,7 +2031,7 @@ export default function AdminPage() {
               ] as const).map(s => (
                 <button key={s.id} onClick={() => setPayrollTab(s.id)}
                   className={`px-6 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all whitespace-nowrap ${
-                    payrollTab === s.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
+                    payrollTab === s.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[var(--admin-muted)] hover:text-[var(--mc-muted)]"
                   }`}>
                   {s.label}
                 </button>
@@ -1795,7 +2058,7 @@ export default function AdminPage() {
               ] as const).map(s => (
                 <button key={s.id} onClick={() => setOpsTab(s.id)}
                   className={`px-5 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all whitespace-nowrap ${
-                    opsTab === s.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
+                    opsTab === s.id ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[var(--admin-muted)] hover:text-[var(--mc-muted)]"
                   }`}>
                   {s.label}
                 </button>
@@ -1838,17 +2101,17 @@ export default function AdminPage() {
           <div>
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
               <div>
-                <p className="text-white font-semibold text-lg flex items-center gap-2">
+                <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2">
                   <MessageSquare size={18} className="text-[var(--mc-accent)]" /> Help Desk
                 </p>
-                <p className="text-[#555] text-sm mt-1">{messages.length} total · {unreadMessages} unread</p>
+                <p className="text-[var(--admin-muted)] text-sm mt-1">{messages.length} total · {unreadMessages} unread</p>
               </div>
               <button onClick={fetchMessages} className="flex items-center gap-2 border border-[var(--mc-border)] text-[var(--mc-text-dim)] px-4 py-2 text-sm hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
                 <RefreshCw size={14} /> Refresh
               </button>
             </div>
             {messages.length === 0 ? (
-              <div className="text-center py-20 luxury-card"><MessageSquare size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No messages yet</p></div>
+              <div className="text-center py-20 luxury-card"><MessageSquare size={48} className="text-[var(--admin-muted)] mx-auto mb-4" /><p className="text-[var(--admin-muted)]">No messages yet</p></div>
             ) : (
               <div className="space-y-3">
                 {[...messages].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map(msg => (
@@ -1856,11 +2119,11 @@ export default function AdminPage() {
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <p className="text-white font-semibold">{msg.name}</p>
+                          <p className="text-[var(--admin-text)] font-semibold">{msg.name}</p>
                           {!msg.read && <span className="text-[10px] px-2 py-0.5 bg-[var(--mc-accent)]/15 border border-[var(--mc-accent)]/30 text-[var(--mc-accent)] uppercase tracking-wider">New</span>}
                         </div>
                         <p className="text-[var(--mc-text-dim)] text-sm mb-1"><a href={`mailto:${msg.email}`} className="hover:text-[var(--mc-accent)] transition-colors">{msg.email}</a></p>
-                        <p className="text-[#333] text-xs mb-3">{new Date(msg.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+                        <p className="text-[var(--admin-muted)] text-xs mb-3">{new Date(msg.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
                         <div className="bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] p-4 text-[var(--mc-muted)] text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -1875,7 +2138,7 @@ export default function AdminPage() {
                           <Send size={14} />
                         </a>
                         <button onClick={() => deleteMessage(msg.id)}
-                          className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-red-500/50 hover:text-red-400 transition-all cursor-pointer">
+                          className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-red-500/50 hover:text-red-400 transition-all cursor-pointer">
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -1889,7 +2152,7 @@ export default function AdminPage() {
             {marketingTab === "newsletter" && (
           <div className="space-y-6">
             <div className="luxury-card p-6">
-              <h3 className="text-white font-semibold text-lg mb-6 flex items-center gap-2"><Send size={18} className="text-[var(--mc-accent)]" /> Compose Newsletter</h3>
+              <h3 className="text-[var(--admin-text)] font-semibold text-lg mb-6 flex items-center gap-2"><Send size={18} className="text-[var(--mc-accent)]" /> Compose Newsletter</h3>
               <div className="space-y-4">
                 <div>
                   <label className={labelCls}>Subject</label>
@@ -1900,7 +2163,7 @@ export default function AdminPage() {
                   <textarea rows={10} value={newsletter.message} onChange={e => setNewsletter(p => ({ ...p, message: e.target.value }))} placeholder="Write your newsletter here…" className={`${inputCls} resize-none`} />
                 </div>
                 <div className="flex items-center justify-between pt-2">
-                  <p className="text-[#555] text-xs">Sending to <span className="text-[var(--mc-accent)]">{activeSubscribers}</span> subscriber{activeSubscribers !== 1 ? "s" : ""}</p>
+                  <p className="text-[var(--admin-muted)] text-xs">Sending to <span className="text-[var(--mc-accent)]">{activeSubscribers}</span> subscriber{activeSubscribers !== 1 ? "s" : ""}</p>
                   <button onClick={sendNewsletter} disabled={sending || !newsletter.subject || !newsletter.message || activeSubscribers === 0}
                     className="gold-gradient-bg text-black font-bold px-8 py-3 text-sm uppercase tracking-widest hover:opacity-90 disabled:opacity-40 cursor-pointer flex items-center gap-2 transition-opacity">
                     {sending ? <><Loader size={14} className="animate-spin" /> Sending…</> : <><Send size={14} /> Send Now</>}
@@ -1914,7 +2177,7 @@ export default function AdminPage() {
               </div>
             </div>
             <div className="luxury-card p-6">
-              <h3 className="text-white font-semibold mb-4 flex items-center gap-2"><Plus size={16} className="text-[var(--mc-accent)]" /> Add Subscriber</h3>
+              <h3 className="text-[var(--admin-text)] font-semibold mb-4 flex items-center gap-2"><Plus size={16} className="text-[var(--mc-accent)]" /> Add Subscriber</h3>
               <div className="flex flex-col gap-3">
                 <input type="text" value={newName} onChange={e => setNewName(e.target.value)} placeholder="Name (optional)" className={inputCls} />
                 <input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder="Email address" className={inputCls} />
@@ -1926,21 +2189,21 @@ export default function AdminPage() {
             </div>
             <div className="luxury-card p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-white font-semibold flex items-center gap-2"><Users size={16} className="text-[var(--mc-accent)]" /> Subscribers <span className="text-[var(--mc-accent)] text-sm font-normal">({activeSubscribers} active)</span></h3>
+                <h3 className="text-[var(--admin-text)] font-semibold flex items-center gap-2"><Users size={16} className="text-[var(--mc-accent)]" /> Subscribers <span className="text-[var(--mc-accent)] text-sm font-normal">({activeSubscribers} active)</span></h3>
               </div>
               {subscribers.length === 0 ? (
-                <div className="text-center py-12"><Mail size={40} className="text-[#333] mx-auto mb-3" /><p className="text-[#555] text-sm">No subscribers yet</p></div>
+                <div className="text-center py-12"><Mail size={40} className="text-[var(--admin-muted)] mx-auto mb-3" /><p className="text-[var(--admin-muted)] text-sm">No subscribers yet</p></div>
               ) : (
                 <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
                   {subscribers.map(sub => (
                     <div key={sub.id} className={`flex items-center justify-between p-3 border ${sub.active ? "border-[var(--mc-border)]" : "border-[var(--mc-border)] opacity-40"}`}>
                       <div>
-                        {sub.name && <p className="text-white text-sm font-medium">{sub.name}</p>}
+                        {sub.name && <p className="text-[var(--admin-text)] text-sm font-medium">{sub.name}</p>}
                         <p className="text-[var(--mc-text-dim)] text-sm">{sub.email}</p>
-                        <p className="text-[#333] text-xs mt-0.5">{new Date(sub.subscribedAt).toLocaleDateString()}</p>
+                        <p className="text-[var(--admin-muted)] text-xs mt-0.5">{new Date(sub.subscribedAt).toLocaleDateString()}</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`text-xs px-2 py-0.5 border ${sub.active ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[#555] border-[var(--mc-border)]"}`}>{sub.active ? "active" : "off"}</span>
+                        <span className={`text-xs px-2 py-0.5 border ${sub.active ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[var(--admin-muted)] border-[var(--mc-border)]"}`}>{sub.active ? "active" : "off"}</span>
                         <button onClick={() => removeSubscriber(sub.id)} className="w-7 h-7 flex items-center justify-center text-[var(--mc-text-dim)] hover:text-red-400 transition-colors cursor-pointer"><Trash2 size={13} /></button>
                       </div>
                     </div>
@@ -1953,31 +2216,31 @@ export default function AdminPage() {
             {marketingTab === "automation" && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-white font-semibold text-lg flex items-center gap-2">
+                  <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2">
                     <Zap size={18} className="text-[var(--mc-accent)]" /> Email Automation
                   </p>
-                  {savingAutomation && <span className="text-[#555] text-xs">Saving…</span>}
+                  {savingAutomation && <span className="text-[var(--admin-muted)] text-xs">Saving…</span>}
                 </div>
 
                 {/* Appointment Reminder */}
                 <div className="luxury-card p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-semibold mb-1 flex items-center gap-2">
+                      <p className="text-[var(--admin-text)] font-semibold mb-1 flex items-center gap-2">
                         <Bell size={16} className="text-[var(--mc-accent)]" /> Appointment Reminder
                       </p>
                       <p className="text-[var(--mc-text-dim)] text-sm">Send reminder email 24h before each confirmed appointment</p>
-                      <p className="text-[#555] text-xs mt-2">Last sent: 3 reminders this week</p>
+                      <p className="text-[var(--admin-muted)] text-xs mt-2">Last sent: 3 reminders this week</p>
                     </div>
                     <button onClick={() => toggleAutomation("appointmentReminder")}
                       className="shrink-0 transition-colors cursor-pointer"
                       aria-label="Toggle appointment reminder">
                       {automation.appointmentReminder
                         ? <ToggleRight size={36} className="text-[var(--mc-accent)]" />
-                        : <ToggleLeft size={36} className="text-[#444]" />}
+                        : <ToggleLeft size={36} className="text-[var(--admin-muted)]" />}
                     </button>
                   </div>
-                  <div className={`mt-3 text-xs px-3 py-1.5 border w-fit ${automation.appointmentReminder ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[#555] border-[var(--mc-border)]"}`}>
+                  <div className={`mt-3 text-xs px-3 py-1.5 border w-fit ${automation.appointmentReminder ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[var(--admin-muted)] border-[var(--mc-border)]"}`}>
                     {automation.appointmentReminder ? "Active" : "Off"}
                   </div>
                 </div>
@@ -1986,11 +2249,11 @@ export default function AdminPage() {
                 <div className="luxury-card p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-semibold mb-1 flex items-center gap-2">
+                      <p className="text-[var(--admin-text)] font-semibold mb-1 flex items-center gap-2">
                         <RefreshCw size={16} className="text-[var(--mc-accent)]" /> Re-engagement
                       </p>
                       <p className="text-[var(--mc-text-dim)] text-sm">Email clients not seen in 60 days with a special offer</p>
-                      <p className="text-[#555] text-xs mt-2">
+                      <p className="text-[var(--admin-muted)] text-xs mt-2">
                         <span className="text-[var(--mc-accent)] font-semibold">{reEngagementCount}</span> client{reEngagementCount !== 1 ? "s" : ""} eligible right now
                       </p>
                     </div>
@@ -1999,10 +2262,10 @@ export default function AdminPage() {
                       aria-label="Toggle re-engagement">
                       {automation.reEngagement
                         ? <ToggleRight size={36} className="text-[var(--mc-accent)]" />
-                        : <ToggleLeft size={36} className="text-[#444]" />}
+                        : <ToggleLeft size={36} className="text-[var(--admin-muted)]" />}
                     </button>
                   </div>
-                  <div className={`mt-3 text-xs px-3 py-1.5 border w-fit ${automation.reEngagement ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[#555] border-[var(--mc-border)]"}`}>
+                  <div className={`mt-3 text-xs px-3 py-1.5 border w-fit ${automation.reEngagement ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[var(--admin-muted)] border-[var(--mc-border)]"}`}>
                     {automation.reEngagement ? "Active" : "Off"}
                   </div>
                 </div>
@@ -2011,11 +2274,11 @@ export default function AdminPage() {
                 <div className="luxury-card p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-semibold mb-1 flex items-center gap-2">
+                      <p className="text-[var(--admin-text)] font-semibold mb-1 flex items-center gap-2">
                         <Star size={16} className="text-[var(--mc-accent)]" /> Birthday Offer
                       </p>
                       <p className="text-[var(--mc-text-dim)] text-sm">Send a birthday discount on the client&apos;s birthday month</p>
-                      <p className="text-[#555] text-xs mt-2 flex items-center gap-1">
+                      <p className="text-[var(--admin-muted)] text-xs mt-2 flex items-center gap-1">
                         <AlertTriangle size={11} /> Requires birthday on file
                       </p>
                     </div>
@@ -2024,10 +2287,10 @@ export default function AdminPage() {
                       aria-label="Toggle birthday offer">
                       {automation.birthdayOffer
                         ? <ToggleRight size={36} className="text-[var(--mc-accent)]" />
-                        : <ToggleLeft size={36} className="text-[#444]" />}
+                        : <ToggleLeft size={36} className="text-[var(--admin-muted)]" />}
                     </button>
                   </div>
-                  <div className={`mt-3 text-xs px-3 py-1.5 border w-fit ${automation.birthdayOffer ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[#555] border-[var(--mc-border)]"}`}>
+                  <div className={`mt-3 text-xs px-3 py-1.5 border w-fit ${automation.birthdayOffer ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-[var(--admin-muted)] border-[var(--mc-border)]"}`}>
                     {automation.birthdayOffer ? "Active" : "Off"}
                   </div>
                 </div>
@@ -2038,82 +2301,299 @@ export default function AdminPage() {
         )}
 
         {/* ── CLIENTS ──────────────────────────────────────────────────────── */}
-        {tab === "clients" && (
+        {tab === "clients" && !selectedClientEmail && (
           <div>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-              <p className="text-[#555] text-sm">{uniqueClients.length} unique client{uniqueClients.length !== 1 ? "s" : ""}</p>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={clientSearch}
-                  onChange={e => setClientSearch(e.target.value)}
-                  placeholder="Search by name or email…"
-                  className="bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white px-4 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444] w-72"
-                />
-              </div>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <p className="text-[var(--admin-muted)] text-sm">{uniqueClients.length} client{uniqueClients.length !== 1 ? "s" : ""}</p>
+              <input
+                type="text"
+                value={clientSearch}
+                onChange={e => setClientSearch(e.target.value)}
+                placeholder="Search by name or email…"
+                className="bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[var(--admin-muted)] w-64"
+              />
             </div>
+
             {uniqueClients.length === 0 ? (
-              <div className="text-center py-20 luxury-card"><Users size={48} className="text-[#333] mx-auto mb-4" /><p className="text-[#555]">No clients yet</p></div>
+              <div className="text-center py-20 luxury-card">
+                <Users size={40} className="text-[var(--admin-muted)] mx-auto mb-3" />
+                <p className="text-[var(--admin-muted)] text-sm">No clients yet</p>
+              </div>
             ) : (
-              <div className="space-y-4">
+              <div className="luxury-card overflow-hidden">
+                {/* Table header */}
+                <div className="grid grid-cols-[1fr_1fr_60px_80px_80px_80px] gap-0 border-b border-[var(--mc-border)]/40 px-4 py-2">
+                  {["Client","Email","Visits","Spent","Tier","Last"].map(h => (
+                    <p key={h} className="text-[9px] uppercase tracking-widest text-[var(--admin-muted)] font-semibold">{h}</p>
+                  ))}
+                </div>
                 {uniqueClients
-                  .filter(client => {
+                  .filter(c => {
                     if (!clientSearch) return true;
                     const q = clientSearch.toLowerCase();
-                    return client.name.toLowerCase().includes(q) || client.email.toLowerCase().includes(q);
+                    return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q);
                   })
                   .sort((a, b) => {
                     const spendA = (clientMap[a.email] || []).filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
                     const spendB = (clientMap[b.email] || []).filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
                     return spendB - spendA;
                   })
-                  .map(client => {
-                  const visits   = clientMap[client.email] || [];
-                  const lastVisit = visits.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-                  const totalSpend = visits.filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
-                  return (
-                    <div key={client.email} className="luxury-card p-6">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
-                        <div>
-                          <p className="text-white font-semibold text-lg">{client.name}</p>
-                          <p className="text-[var(--mc-text-dim)] text-sm">{client.email}</p>
-                          <p className="text-[var(--mc-text-dim)] text-sm">{client.phone}</p>
-                        </div>
-                        <div className="text-right shrink-0 flex flex-col items-end gap-2">
-                          <div>
-                            <p className="font-serif text-3xl gold-gradient font-bold">{visits.length}</p>
-                            <p className="text-[#555] text-xs">appointment{visits.length !== 1 ? "s" : ""}</p>
+                  .map((client, i) => {
+                    const visits = clientMap[client.email] || [];
+                    const totalSpend = visits.filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
+                    const sorted = [...visits].sort((a, b) => b.date.localeCompare(a.date));
+                    const lastVisit = sorted[0];
+                    const upcoming = sorted.filter(v => v.date >= new Date().toISOString().split("T")[0] && v.status !== "cancelled");
+                    const initials = client.name.split(" ").map((n: string) => n[0]).join("").slice(0,2).toUpperCase();
+                    return (
+                      <button key={client.email}
+                        onClick={() => openClientProfile(client.email)}
+                        className={`w-full grid grid-cols-[1fr_1fr_60px_80px_80px_80px] gap-0 px-4 py-2.5 text-left hover:bg-[var(--mc-accent)]/[0.04] transition-colors cursor-pointer border-b border-[var(--mc-border)]/20 last:border-b-0 ${i % 2 === 0 ? "" : "bg-[var(--admin-surface)]/40"}`}>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="w-7 h-7 rounded-full bg-[var(--mc-accent)]/10 border border-[var(--mc-accent)]/30 flex items-center justify-center shrink-0">
+                            <span className="text-[9px] font-bold text-[var(--mc-accent)]">{initials}</span>
                           </div>
-                          {totalSpend > 0 && (
-                            <div>
-                              <p className="font-serif text-xl text-green-400 font-bold">${totalSpend.toFixed(0)}</p>
-                              <p className="text-[#555] text-xs">total spent</p>
-                            </div>
-                          )}
-                          <span className={`text-xs px-2 py-0.5 border inline-block ${statusColors[lastVisit?.status || "pending"]}`}>Last: {lastVisit?.status}</span>
-                        </div>
-                      </div>
-                      <div className="border-t border-[var(--mc-border)] pt-4 space-y-2">
-                        <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-3">Appointment History</p>
-                        {visits.map(v => (
-                          <div key={v.id} className="flex flex-col sm:flex-row sm:items-center justify-between text-sm gap-1">
-                            <div>
-                              <span className="text-[var(--mc-muted)]">{v.date} at {v.time}</span>
-                              <span className="text-[var(--mc-text-dim)] mx-2">·</span>
-                              <span className="text-[var(--mc-text-dim)]">{v.service.split("–")[1]?.trim() || v.service}</span>
-                              {v.stylist && <><span className="text-[var(--mc-text-dim)] mx-2">·</span><span className="text-[#555]">{v.stylist}</span></>}
-                            </div>
-                            <span className={`text-xs px-2 py-0.5 border ${statusColors[v.status]}`}>{v.status}</span>
+                          <div className="min-w-0">
+                            <p className="text-[var(--admin-text)] text-xs font-semibold truncate">{client.name}</p>
+                            {upcoming.length > 0 && <p className="text-[9px] text-green-400">↑ {upcoming.length} upcoming</p>}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+                        </div>
+                        <p className="text-[var(--admin-muted)] text-xs self-center truncate pr-2">{client.email}</p>
+                        <p className="text-[var(--admin-text)] text-xs self-center font-semibold">{visits.length}</p>
+                        <p className="text-xs self-center font-semibold text-green-400">{totalSpend > 0 ? `$${totalSpend.toFixed(0)}` : "—"}</p>
+                        <p className="text-[9px] self-center text-[var(--mc-accent)] uppercase tracking-wide">—</p>
+                        <span className={`text-[9px] px-1.5 py-0.5 border self-center inline-block ${lastVisit ? statusColors[lastVisit.status] : ""}`}>
+                          {lastVisit ? lastVisit.status : "—"}
+                        </span>
+                      </button>
+                    );
+                  })}
               </div>
             )}
           </div>
         )}
+
+        {/* ── CLIENT PROFILE ────────────────────────────────────────────────── */}
+        {tab === "clients" && selectedClientEmail && (() => {
+          const fallbackVisits = clientMap[selectedClientEmail] || [];
+          const todayStr = new Date().toISOString().split("T")[0];
+          const profileBookings = clientProfile?.bookings || fallbackVisits;
+          const upcoming = profileBookings.filter(v => v.date >= todayStr && v.status !== "cancelled")
+            .sort((a, b) => a.date.localeCompare(b.date));
+          const past = profileBookings.filter(v => v.date < todayStr || v.status === "cancelled")
+            .sort((a, b) => b.date.localeCompare(a.date));
+          const c = clientProfile?.customer;
+          const packages = clientProfile?.packages || [];
+          const rewards = clientProfile?.rewards || [];
+          const totalSpend = profileBookings.filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
+
+          return (
+            <div>
+              {/* Back button */}
+              <button onClick={() => { setSelectedClientEmail(null); setClientProfile(null); }}
+                className="flex items-center gap-1.5 text-[var(--admin-muted)] text-xs uppercase tracking-widest hover:text-[var(--mc-accent)] transition-colors cursor-pointer mb-5">
+                ← Back to Clients
+              </button>
+
+              {clientProfileLoading ? (
+                <div className="text-center py-20 text-[var(--admin-muted)] text-sm">Loading profile…</div>
+              ) : (
+                <div className="space-y-5">
+
+                  {/* Header card */}
+                  <div className="luxury-card p-5">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-full bg-[var(--mc-accent)]/10 border border-[var(--mc-accent)]/30 flex items-center justify-center shrink-0">
+                          <span className="text-lg font-bold text-[var(--mc-accent)]">
+                            {(c?.name || selectedClientEmail).split(" ").map((n: string) => n[0]).join("").slice(0,2).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-[var(--admin-text)] font-semibold text-lg font-serif">{c?.name || "—"}</p>
+                          <p className="text-[var(--admin-muted)] text-sm">{selectedClientEmail}</p>
+                          <p className="text-[var(--admin-muted)] text-sm">{c?.phone || "—"}</p>
+                          {c?.birthday && <p className="text-[var(--mc-accent)] text-xs mt-0.5">🎂 {c.birthday}</p>}
+                        </div>
+                      </div>
+                      <div className="flex gap-4 text-center shrink-0">
+                        <div>
+                          <p className="font-serif text-2xl font-bold gold-gradient">{profileBookings.length}</p>
+                          <p className="text-[9px] uppercase tracking-wider text-[var(--admin-muted)]">Visits</p>
+                        </div>
+                        <div>
+                          <p className="font-serif text-2xl font-bold text-green-400">${totalSpend.toFixed(0)}</p>
+                          <p className="text-[9px] uppercase tracking-wider text-[var(--admin-muted)]">Spent</p>
+                        </div>
+                        <div>
+                          <p className="font-serif text-2xl font-bold text-[var(--mc-accent)]">{c?.points ?? 0}</p>
+                          <p className="text-[9px] uppercase tracking-wider text-[var(--admin-muted)]">Points</p>
+                        </div>
+                        <div>
+                          <p className="font-serif text-2xl font-bold text-[var(--admin-text)]">{c?.tier || "Bronze"}</p>
+                          <p className="text-[9px] uppercase tracking-wider text-[var(--admin-muted)]">Tier</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Edit details */}
+                  <div className="luxury-card p-5">
+                    <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-4">Edit Profile</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {[
+                        { key: "name",             label: "Full Name",         type: "text" },
+                        { key: "phone",            label: "Phone",             type: "tel"  },
+                        { key: "birthday",         label: "Birthday (YYYY-MM-DD)", type: "text" },
+                        { key: "preferredStylist", label: "Preferred Stylist", type: "text" },
+                      ].map(f => (
+                        <div key={f.key}>
+                          <label className="text-[9px] uppercase tracking-widest text-[var(--admin-muted)] block mb-1">{f.label}</label>
+                          <input type={f.type} value={clientEditFields[f.key] || ""}
+                            onChange={e => setClientEditFields(p => ({ ...p, [f.key]: e.target.value }))}
+                            className="w-full bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors"
+                          />
+                        </div>
+                      ))}
+                      <div className="sm:col-span-2">
+                        <label className="text-[9px] uppercase tracking-widest text-[var(--admin-muted)] block mb-1">Allergies / Sensitivities</label>
+                        <input type="text" value={clientEditFields.allergies || ""}
+                          onChange={e => setClientEditFields(p => ({ ...p, allergies: e.target.value }))}
+                          className="w-full bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="text-[9px] uppercase tracking-widest text-[var(--admin-muted)] block mb-1">Admin Notes</label>
+                        <textarea value={clientEditFields.adminNotes || ""}
+                          onChange={e => setClientEditFields(p => ({ ...p, adminNotes: e.target.value }))}
+                          rows={3}
+                          className="w-full bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors resize-none"
+                        />
+                      </div>
+                    </div>
+                    <button onClick={saveClientProfile} disabled={clientEditSaving}
+                      className="mt-4 px-5 py-2 gold-gradient-bg text-black text-[10px] uppercase tracking-widest font-bold cursor-pointer hover:opacity-90 transition-all disabled:opacity-50">
+                      {clientEditSaving ? "Saving…" : "Save Changes"}
+                    </button>
+                  </div>
+
+                  {/* Upcoming reservations */}
+                  <div className="luxury-card p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold">Upcoming Reservations</p>
+                      <button onClick={() => setCreateBookingOpen(true)}
+                        className="text-[9px] uppercase tracking-widest text-[var(--mc-accent)] border border-[var(--mc-accent)]/40 px-2 py-1 hover:bg-[var(--mc-accent)]/10 transition-all cursor-pointer">
+                        + Add
+                      </button>
+                    </div>
+                    {upcoming.length === 0 ? (
+                      <p className="text-[var(--admin-muted)] text-sm">No upcoming appointments.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {upcoming.map(v => (
+                          <div key={v.id} className="flex items-center gap-3 px-3 py-2 border border-[var(--mc-border)]/30">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[var(--admin-text)] text-sm font-medium">{v.date} · {v.time}</p>
+                              <p className="text-[var(--admin-muted)] text-xs truncate">{v.service.split("–").pop()?.trim() || v.service}{v.stylist ? ` · ${v.stylist}` : ""}</p>
+                            </div>
+                            <span className={`text-[9px] px-1.5 py-0.5 border ${statusColors[v.status]}`}>{v.status}</span>
+                            <button onClick={() => startEditBooking(v)}
+                              className="text-[var(--admin-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer shrink-0">
+                              <Pencil size={12} />
+                            </button>
+                            <div className="flex gap-1">
+                              {v.status === "pending" && (
+                                <button onClick={() => { updateStatus(v.id, "confirmed"); openClientProfile(selectedClientEmail!); }}
+                                  className="text-[9px] px-1.5 py-0.5 border border-green-400/40 text-green-400 hover:bg-green-400/10 cursor-pointer">✓</button>
+                              )}
+                              <button onClick={() => { updateStatus(v.id, "cancelled"); openClientProfile(selectedClientEmail!); }}
+                                className="text-[9px] px-1.5 py-0.5 border border-red-400/30 text-red-400 hover:bg-red-400/10 cursor-pointer">✕</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Appointment history */}
+                  <div className="luxury-card p-5">
+                    <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-4">Appointment History</p>
+                    {past.length === 0 ? (
+                      <p className="text-[var(--admin-muted)] text-sm">No past appointments.</p>
+                    ) : (
+                      <div className="space-y-1.5">
+                        {past.map(v => (
+                          <div key={v.id} className="flex items-center gap-3 px-3 py-2 border border-[var(--mc-border)]/20 hover:border-[var(--mc-border)]/40 transition-colors">
+                            <div className="flex-1 min-w-0">
+                              <span className="text-[var(--admin-muted)] text-xs">{v.date} · {v.time}</span>
+                              <span className="text-[var(--admin-muted)] mx-2 text-xs">·</span>
+                              <span className="text-[var(--admin-text)] text-xs">{v.service.split("–").pop()?.trim() || v.service}</span>
+                              {v.stylist && <span className="text-[var(--admin-muted)] text-xs ml-2">{v.stylist}</span>}
+                              {v.servicePrice && <span className="text-green-400 text-xs ml-2">${v.servicePrice}</span>}
+                            </div>
+                            <span className={`text-[9px] px-1.5 py-0.5 border ${statusColors[v.status]} shrink-0`}>{v.status}</span>
+                            <button onClick={() => startEditBooking(v)}
+                              className="text-[var(--admin-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer shrink-0">
+                              <Pencil size={11} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Packages + Rewards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="luxury-card p-5">
+                      <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-3">Packages</p>
+                      {packages.length === 0 ? (
+                        <p className="text-[var(--admin-muted)] text-sm">No packages purchased.</p>
+                      ) : packages.map(pkg => (
+                        <div key={pkg.id} className="mb-3 pb-3 border-b border-[var(--mc-border)]/20 last:border-0 last:mb-0 last:pb-0">
+                          <p className="text-[var(--admin-text)] text-sm font-medium">{pkg.name}</p>
+                          <p className="text-[var(--admin-muted)] text-xs mt-0.5">{pkg.sessionsUsed}/{pkg.sessionsTotal} sessions used · expires {pkg.expiresAt}</p>
+                          <div className="mt-1.5 h-1.5 bg-[var(--admin-surface)] rounded-full overflow-hidden">
+                            <div className="h-full gold-gradient-bg rounded-full" style={{ width: `${Math.round((pkg.sessionsUsed / pkg.sessionsTotal) * 100)}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="luxury-card p-5">
+                      <p className="text-[var(--mc-accent)] text-[10px] uppercase tracking-widest font-semibold mb-3">
+                        Rewards · {c?.points ?? 0} pts · {c?.tier || "Bronze"}
+                      </p>
+                      <p className="text-[var(--admin-muted)] text-xs mb-3">Visit streak: {c?.visitStreak ?? 0} · Blowouts earned: {c?.blowoutsEarned ?? 0}</p>
+                      {rewards.length === 0 ? (
+                        <p className="text-[var(--admin-muted)] text-sm">No rewards redeemed yet.</p>
+                      ) : rewards.map(r => (
+                        <div key={r.id} className="flex justify-between items-center py-1.5 border-b border-[var(--mc-border)]/20 last:border-0">
+                          <p className="text-[var(--admin-text)] text-xs">{r.name}</p>
+                          <p className="text-[var(--admin-muted)] text-[10px]">{r.pointsCost} pts · {r.redeemedAt.slice(0,10)}</p>
+                        </div>
+                      ))}
+                      {/* Adjust points */}
+                      <div className="mt-4 flex gap-2 items-center">
+                        <label className="text-[9px] uppercase tracking-widest text-[var(--admin-muted)]">Adjust pts</label>
+                        <input type="number" id="pts-adj" className="w-20 bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-2 py-1 text-xs focus:outline-none focus:border-[var(--mc-accent)]" />
+                        <button
+                          onClick={() => {
+                            const el = document.getElementById("pts-adj") as HTMLInputElement;
+                            if (!el) return;
+                            fetch("/api/customers", { method: "PATCH", headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ email: selectedClientEmail, points: Number(el.value) }) })
+                              .then(() => openClientProfile(selectedClientEmail!));
+                          }}
+                          className="text-[9px] px-2 py-1 border border-[var(--mc-accent)]/40 text-[var(--mc-accent)] hover:bg-[var(--mc-accent)]/10 cursor-pointer">Set</button>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── REPORTS ───────────────────────────────────────────────────────── */}
         {tab === "reports" && (
@@ -2150,8 +2630,8 @@ export default function AdminPage() {
                 <div key={s.label} className="luxury-card p-5">
                   <div className="text-[var(--mc-accent)] mb-3">{s.icon}</div>
                   <p className="font-serif text-3xl font-bold gold-gradient">{s.value}</p>
-                  <p className="text-[#555] text-xs uppercase tracking-widest mt-1">{s.label}</p>
-                  <p className="text-[#333] text-xs mt-1">{s.sub}</p>
+                  <p className="text-[var(--admin-muted)] text-xs uppercase tracking-widest mt-1">{s.label}</p>
+                  <p className="text-[var(--admin-muted)] text-xs mt-1">{s.sub}</p>
                 </div>
               ))}
             </div>
@@ -2159,8 +2639,8 @@ export default function AdminPage() {
             {/* Top Services + Per-Stylist */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="luxury-card p-6">
-                <h3 className="text-white font-semibold mb-6 flex items-center gap-2"><BarChart2 size={16} className="text-[var(--mc-accent)]" /> Top Services</h3>
-                {periodTopServicesSorted.length === 0 ? <p className="text-[#555] text-sm">No data for this period</p> : (
+                <h3 className="text-[var(--admin-text)] font-semibold mb-6 flex items-center gap-2"><BarChart2 size={16} className="text-[var(--mc-accent)]" /> Top Services</h3>
+                {periodTopServicesSorted.length === 0 ? <p className="text-[var(--admin-muted)] text-sm">No data for this period</p> : (
                   <div className="space-y-4">
                     {periodTopServicesSorted.map(([name, count]) => (
                       <div key={name}>
@@ -2172,8 +2652,8 @@ export default function AdminPage() {
                 )}
               </div>
               <div className="luxury-card p-6">
-                <h3 className="text-white font-semibold mb-6 flex items-center gap-2"><Users size={16} className="text-[var(--mc-accent)]" /> By Stylist</h3>
-                {Object.keys(periodStylistMap).length === 0 ? <p className="text-[#555] text-sm">No data for this period</p> : (
+                <h3 className="text-[var(--admin-text)] font-semibold mb-6 flex items-center gap-2"><Users size={16} className="text-[var(--mc-accent)]" /> By Stylist</h3>
+                {Object.keys(periodStylistMap).length === 0 ? <p className="text-[var(--admin-muted)] text-sm">No data for this period</p> : (
                   <div className="space-y-4">
                     {Object.entries(periodStylistMap).sort((a, b) => b[1].count - a[1].count).map(([stylist, data]) => (
                       <div key={stylist}>
@@ -2202,8 +2682,8 @@ export default function AdminPage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
               <div>
-                <p className="text-white font-semibold text-lg flex items-center gap-2"><UserCheck size={18} className="text-[var(--mc-accent)]" /> Team Management</p>
-                <p className="text-[#555] text-sm mt-1">{staff.length} team member{staff.length !== 1 ? "s" : ""} · Click a card to edit</p>
+                <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2"><UserCheck size={18} className="text-[var(--mc-accent)]" /> Team Management</p>
+                <p className="text-[var(--admin-muted)] text-sm mt-1">{staff.length} team member{staff.length !== 1 ? "s" : ""} · Click a card to edit</p>
               </div>
               <button onClick={createNewStaff}
                 className="flex items-center gap-2 gold-gradient-bg text-black font-bold px-5 py-2.5 text-xs uppercase tracking-widest hover:opacity-90 cursor-pointer transition-opacity">
@@ -2223,18 +2703,18 @@ export default function AdminPage() {
                       <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <User size={48} className="text-[#333]" />
+                        <User size={48} className="text-[var(--admin-muted)]" />
                       </div>
                     )}
                     {/* Upload overlay */}
                     <label className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70 opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
                       {uploadingPhoto === member.id ? (
-                        <Loader size={24} className="text-white animate-spin" />
+                        <Loader size={24} className="text-[var(--admin-text)] animate-spin" />
                       ) : (
                         <>
-                          <Upload size={22} className="text-white" />
-                          <span className="text-white text-xs uppercase tracking-wider">Change Photo</span>
-                          <span className="text-white/50 text-[10px]">JPG, PNG, WEBP, MP4</span>
+                          <Upload size={22} className="text-[var(--admin-text)]" />
+                          <span className="text-[var(--admin-text)] text-xs uppercase tracking-wider">Change Photo</span>
+                          <span className="text-[var(--admin-text)]/50 text-[10px]">JPG, PNG, WEBP, MP4</span>
                         </>
                       )}
                       <input type="file" className="hidden" accept="image/*,video/mp4,video/mov,video/webm"
@@ -2245,7 +2725,7 @@ export default function AdminPage() {
                   <div className="p-5">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <p className="text-white font-semibold text-lg leading-tight">{member.name}</p>
+                        <p className="text-[var(--admin-text)] font-semibold text-lg leading-tight">{member.name}</p>
                         <p className="text-[var(--mc-accent)] text-xs uppercase tracking-wider mt-0.5">{member.role}</p>
                       </div>
                       {member.isMakeupArtist && (
@@ -2254,7 +2734,7 @@ export default function AdminPage() {
                     </div>
                     <div className="flex flex-wrap gap-1 mb-4">
                       {member.specialties.slice(0, 3).map(s => (
-                        <span key={s} className="text-[10px] px-2 py-0.5 border border-[var(--mc-border)] text-[#555]">{s}</span>
+                        <span key={s} className="text-[10px] px-2 py-0.5 border border-[var(--mc-border)] text-[var(--admin-muted)]">{s}</span>
                       ))}
                     </div>
                     <div className="flex items-center gap-2">
@@ -2267,7 +2747,7 @@ export default function AdminPage() {
                         <Pencil size={11} /> {editingStaff === member.id ? "Close" : "Edit Profile"}
                       </button>
                       <button onClick={() => handleDeleteStaff(member.id)}
-                        className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[#555] hover:border-red-500/50 hover:text-red-400 transition-all cursor-pointer">
+                        className="w-9 h-9 flex items-center justify-center border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-red-500/50 hover:text-red-400 transition-all cursor-pointer">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -2280,7 +2760,7 @@ export default function AdminPage() {
             {editingStaff && staffForm.id && (
               <div ref={editPanelRef} className="luxury-card p-7 border border-[var(--mc-accent)]/20">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-white font-semibold text-lg flex items-center gap-2">
+                  <h3 className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2">
                     <Pencil size={16} className="text-[var(--mc-accent)]" /> Editing: {staffForm.name}
                   </h3>
                   {staffSaved && <span className="text-green-400 text-sm flex items-center gap-1"><Check size={13} /> Saved!</span>}
@@ -2325,9 +2805,9 @@ export default function AdminPage() {
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <label className={labelCls + " mb-0"}>Portfolio Media</label>
-                      <span className="text-[#555] text-xs">{(staffForm.portfolio || []).length} item{(staffForm.portfolio || []).length !== 1 ? "s" : ""}</span>
+                      <span className="text-[var(--admin-muted)] text-xs">{(staffForm.portfolio || []).length} item{(staffForm.portfolio || []).length !== 1 ? "s" : ""}</span>
                     </div>
-                    <p className="text-[#555] text-xs mb-4">Upload photos & videos. Supports JPG, PNG, WEBP, MP4, MOV — any size.</p>
+                    <p className="text-[var(--admin-muted)] text-xs mb-4">Upload photos & videos. Supports JPG, PNG, WEBP, MP4, MOV — any size.</p>
 
                     <div className="grid grid-cols-3 gap-2 mb-4">
                       {(staffForm.portfolio || []).map((media, i) => (
@@ -2335,7 +2815,7 @@ export default function AdminPage() {
                           {media.type === "video" ? (
                             <div className="w-full h-full flex flex-col items-center justify-center gap-1">
                               <Film size={24} className="text-[var(--mc-accent)]" />
-                              <span className="text-[10px] text-[#555]">Video</span>
+                              <span className="text-[10px] text-[var(--admin-muted)]">Video</span>
                             </div>
                           ) : (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -2344,7 +2824,7 @@ export default function AdminPage() {
                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <button onClick={() => removePortfolioItem(i)}
                               className="w-8 h-8 bg-red-500 flex items-center justify-center cursor-pointer hover:bg-red-600 transition-colors">
-                              <Trash2 size={14} className="text-white" />
+                              <Trash2 size={14} className="text-[var(--admin-text)]" />
                             </button>
                           </div>
                         </div>
@@ -2356,8 +2836,8 @@ export default function AdminPage() {
                           <Loader size={22} className="text-[var(--mc-accent)] animate-spin" />
                         ) : (
                           <>
-                            <Upload size={20} className="text-[#555] mb-1" />
-                            <span className="text-[10px] text-[#555] text-center">Add Photos<br/>or Videos</span>
+                            <Upload size={20} className="text-[var(--admin-muted)] mb-1" />
+                            <span className="text-[10px] text-[var(--admin-muted)] text-center">Add Photos<br/>or Videos</span>
                           </>
                         )}
                         <input type="file" className="hidden" accept="image/*,video/*" multiple
@@ -2422,10 +2902,10 @@ export default function AdminPage() {
               {/* Header */}
               <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                 <div>
-                  <p className="text-white font-semibold text-lg flex items-center gap-2">
+                  <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2">
                     <Gift size={18} className="text-[var(--mc-accent)]" /> MC Rewards Program
                   </p>
-                  <p className="text-[#555] text-sm mt-1">
+                  <p className="text-[var(--admin-muted)] text-sm mt-1">
                     {rewardsData.length} members &nbsp;·&nbsp; {totalPoints.toLocaleString()} points issued &nbsp;·&nbsp; {totalRedeem} rewards redeemed
                   </p>
                 </div>
@@ -2443,7 +2923,7 @@ export default function AdminPage() {
               )}
 
               {/* Scan station quick-access */}
-              <div className="border border-[var(--mc-accent)]/30 bg-[#0a0800] p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+              <div className="border border-[var(--mc-accent)]/30 bg-[var(--admin-surface-dark)] p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
                 <div>
                   <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-1 flex items-center gap-2">
                     <Scissors size={13} /> On-Site Scan Station
@@ -2459,54 +2939,54 @@ export default function AdminPage() {
                 </a>
               </div>
 
-              {/* Stat cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                {[
-                  { label: "Total Members",      value: rewardsData.length,                                                    icon: <Users size={18} />    },
-                  { label: "Points Issued",       value: totalPoints.toLocaleString(),                                          icon: <Star size={18} />     },
-                  { label: "Blowouts Earned",     value: rewardsData.reduce((s, c) => s + (c.blowoutsEarned ?? 0), 0),          icon: <Scissors size={18} /> },
-                  { label: "Rewards Redeemed",    value: totalRedeem,                                                           icon: <Gift size={18} />     },
-                ].map(({ label, value, icon }) => (
-                  <div key={label} className="luxury-card p-5">
-                    <div className="text-[var(--mc-accent)] mb-3">{icon}</div>
-                    <p className="font-serif text-2xl font-bold text-white">{value}</p>
-                    <p className="text-[#555] text-xs uppercase tracking-widest mt-1">{label}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Tier breakdown */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-                {(["Bronze", "Silver", "Gold", "Platinum"] as const).map((tier) => {
-                  const meta = TIER_META[tier];
-                  const count = tierCount[tier] || 0;
-                  const pct = rewardsData.length ? Math.round((count / rewardsData.length) * 100) : 0;
-                  return (
-                    <div key={tier} className={`border ${meta.border} ${meta.bg} p-4`}>
-                      <div className="flex items-center gap-2 mb-2" style={{ color: meta.color }}>
-                        {meta.icon}
-                        <span className="text-xs uppercase tracking-widest font-bold">{tier}</span>
-                      </div>
-                      <p className="font-serif text-3xl font-bold text-white">{count}</p>
-                      <p className="text-[#555] text-xs mt-1">{pct}% of members</p>
-                      <div className="mt-3 h-1 bg-[#111]">
-                        <div className="h-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: meta.color }} />
-                      </div>
+              {/* Compact stats + tier strip */}
+              <div className="luxury-card mb-5 overflow-hidden">
+                {/* Top stat row */}
+                <div className="grid grid-cols-4 divide-x divide-[var(--admin-border)]/40">
+                  {[
+                    { label: "Members",  value: rewardsData.length },
+                    { label: "Points",   value: totalPoints.toLocaleString() },
+                    { label: "Blowouts", value: rewardsData.reduce((s, c) => s + (c.blowoutsEarned ?? 0), 0) },
+                    { label: "Redeemed", value: totalRedeem },
+                  ].map(s => (
+                    <div key={s.label} className="px-4 py-3 text-center">
+                      <p className="font-serif text-xl font-bold gold-gradient">{s.value}</p>
+                      <p className="text-[9px] uppercase tracking-widest text-[var(--admin-muted)] mt-0.5">{s.label}</p>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
+                {/* Tier row */}
+                <div className="grid grid-cols-4 divide-x divide-[var(--admin-border)]/40 border-t border-[var(--admin-border)]/40">
+                  {(["Bronze", "Silver", "Gold", "Platinum"] as const).map((tier) => {
+                    const meta = TIER_META[tier];
+                    const count = tierCount[tier] || 0;
+                    const pct = rewardsData.length ? Math.round((count / rewardsData.length) * 100) : 0;
+                    return (
+                      <div key={tier} className="px-4 py-2.5">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[9px] uppercase tracking-widest font-bold" style={{ color: meta.color }}>{tier}</span>
+                          <span className="text-[var(--admin-text)] text-xs font-bold">{count}</span>
+                        </div>
+                        <div className="h-1 bg-[var(--admin-border)]/40 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: meta.color }} />
+                        </div>
+                        <p className="text-[9px] text-[var(--admin-muted)] mt-1">{pct}%</p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Member leaderboard */}
               <div>
-                <p className="text-white font-semibold mb-4 flex items-center gap-2">
+                <p className="text-[var(--admin-text)] font-semibold mb-4 flex items-center gap-2">
                   <TrendingUp size={15} className="text-[var(--mc-accent)]" /> Member Leaderboard
                 </p>
 
                 {sorted.length === 0 ? (
                   <div className="text-center py-20 luxury-card">
-                    <Gift size={40} className="text-[#333] mx-auto mb-4" />
-                    <p className="text-[#555]">No members yet. Clients who sign up will appear here.</p>
+                    <Gift size={40} className="text-[var(--admin-muted)] mx-auto mb-4" />
+                    <p className="text-[var(--admin-muted)]">No members yet. Clients who sign up will appear here.</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -2521,14 +3001,14 @@ export default function AdminPage() {
                           {/* Main row */}
                           <div className="p-4 flex items-center gap-4 flex-wrap">
                             {/* Rank */}
-                            <span className="text-[#333] font-mono text-sm w-7 shrink-0 text-center">
+                            <span className="text-[var(--admin-muted)] font-mono text-sm w-7 shrink-0 text-center">
                               {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`}
                             </span>
 
                             {/* Name + email */}
                             <div className="flex-1 min-w-0">
-                              <p className="text-white font-semibold text-sm truncate">{customer.name}</p>
-                              <p className="text-[#555] text-xs truncate">{customer.email}</p>
+                              <p className="text-[var(--admin-text)] font-semibold text-sm truncate">{customer.name}</p>
+                              <p className="text-[var(--admin-muted)] text-xs truncate">{customer.email}</p>
                             </div>
 
                             {/* Tier badge */}
@@ -2540,10 +3020,10 @@ export default function AdminPage() {
                             {/* Points + bar */}
                             <div className="w-32 shrink-0 hidden sm:block">
                               <div className="flex justify-between text-[10px] mb-1">
-                                <span className="text-white font-semibold">{customer.points.toLocaleString()} pts</span>
-                                <span className="text-[#444]">{customer.visits} visits</span>
+                                <span className="text-[var(--admin-text)] font-semibold">{customer.points.toLocaleString()} pts</span>
+                                <span className="text-[var(--admin-muted)]">{customer.visits} visits</span>
                               </div>
-                              <div className="h-1.5 bg-[#111]">
+                              <div className="h-1.5 bg-[var(--admin-border)]">
                                 <div className="h-full transition-all" style={{ width: `${barPct}%`, backgroundColor: meta.color }} />
                               </div>
                             </div>
@@ -2553,7 +3033,7 @@ export default function AdminPage() {
                               {Array.from({ length: 10 }).map((_, i) => (
                                 <div key={i} className={`w-2 h-2 rounded-full ${i < (customer.visitStreak ?? 0) ? "bg-[var(--mc-accent)]" : "bg-[#1a1a1a]"}`} />
                               ))}
-                              <span className="text-[#444] text-[10px] ml-1">{customer.visitStreak ?? 0}/10</span>
+                              <span className="text-[var(--admin-muted)] text-[10px] ml-1">{customer.visitStreak ?? 0}/10</span>
                             </div>
 
                             {/* Blowouts earned */}
@@ -2567,12 +3047,12 @@ export default function AdminPage() {
                             {/* QR link */}
                             <a href={`/scan/${customer.id}`} target="_blank" rel="noopener noreferrer"
                               title="Open scan page"
-                              className="w-8 h-8 shrink-0 border border-[#222] flex items-center justify-center text-[#444] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                              className="w-8 h-8 shrink-0 border border-[#222] flex items-center justify-center text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
                               <QrCode size={13} />
                             </a>
 
                             {/* Joined */}
-                            <span className="text-[#444] text-xs shrink-0 hidden lg:block">
+                            <span className="text-[var(--admin-muted)] text-xs shrink-0 hidden lg:block">
                               {new Date(customer.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
                             </span>
 
@@ -2587,7 +3067,7 @@ export default function AdminPage() {
                               className={`shrink-0 h-8 px-3 border text-xs uppercase tracking-wider font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                                 isOpen
                                   ? "border-[var(--mc-accent)] text-[var(--mc-accent)] bg-[var(--mc-accent)]/10"
-                                  : "border-[#222] text-[#555] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)]"
+                                  : "border-[#222] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)]"
                               }`}
                             >
                               <Star size={11} /> Adjust
@@ -2606,7 +3086,7 @@ export default function AdminPage() {
                                   <button
                                     onClick={() => setAdjustMode("add")}
                                     className={`flex items-center gap-1 px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                                      adjustMode === "add" ? "bg-green-500/20 text-green-400 border-r border-[#222]" : "text-[#555] border-r border-[#222]"
+                                      adjustMode === "add" ? "bg-green-500/20 text-green-400 border-r border-[#222]" : "text-[var(--admin-muted)] border-r border-[#222]"
                                     }`}
                                   >
                                     <Plus size={11} /> Add
@@ -2614,7 +3094,7 @@ export default function AdminPage() {
                                   <button
                                     onClick={() => setAdjustMode("subtract")}
                                     className={`flex items-center gap-1 px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                                      adjustMode === "subtract" ? "bg-red-500/20 text-red-400" : "text-[#555]"
+                                      adjustMode === "subtract" ? "bg-red-500/20 text-red-400" : "text-[var(--admin-muted)]"
                                     }`}
                                   >
                                     <Minus size={11} /> Deduct
@@ -2623,26 +3103,26 @@ export default function AdminPage() {
 
                                 {/* Amount */}
                                 <div className="flex flex-col gap-1">
-                                  <label className="text-[#444] text-[10px] uppercase tracking-widest">Points</label>
+                                  <label className="text-[var(--admin-muted)] text-[10px] uppercase tracking-widest">Points</label>
                                   <input
                                     type="number"
                                     min="1"
                                     placeholder="e.g. 100"
                                     value={adjustAmount}
                                     onChange={(e) => setAdjustAmount(e.target.value)}
-                                    className="w-28 bg-[#0a0a0a] border border-[#222] text-white px-3 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors"
+                                    className="w-28 bg-[#0a0a0a] border border-[#222] text-[var(--admin-text)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors"
                                   />
                                 </div>
 
                                 {/* Reason */}
                                 <div className="flex flex-col gap-1 flex-1 min-w-40">
-                                  <label className="text-[#444] text-[10px] uppercase tracking-widest">Reason (optional)</label>
+                                  <label className="text-[var(--admin-muted)] text-[10px] uppercase tracking-widest">Reason (optional)</label>
                                   <input
                                     type="text"
                                     placeholder="Birthday bonus, service adjustment..."
                                     value={adjustReason}
                                     onChange={(e) => setAdjustReason(e.target.value)}
-                                    className="w-full bg-[#0a0a0a] border border-[#222] text-white px-3 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors"
+                                    className="w-full bg-[#0a0a0a] border border-[#222] text-[var(--admin-text)] px-3 py-2 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors"
                                   />
                                 </div>
 
@@ -2657,7 +3137,7 @@ export default function AdminPage() {
                                 </button>
                                 <button
                                   onClick={() => setAdjustTarget(null)}
-                                  className="border border-[#222] text-[#555] px-4 py-2 text-xs hover:border-[#444] transition-colors cursor-pointer"
+                                  className="border border-[#222] text-[var(--admin-muted)] px-4 py-2 text-xs hover:border-[#444] transition-colors cursor-pointer"
                                 >
                                   Cancel
                                 </button>
@@ -2665,8 +3145,8 @@ export default function AdminPage() {
 
                               {/* Preview */}
                               {adjustAmount && (
-                                <p className="text-[#555] text-xs mt-3">
-                                  Current: <span className="text-white">{customer.points.toLocaleString()} pts</span>
+                                <p className="text-[var(--admin-muted)] text-xs mt-3">
+                                  Current: <span className="text-[var(--admin-text)]">{customer.points.toLocaleString()} pts</span>
                                   {" → "}
                                   New:{" "}
                                   <span className={adjustMode === "add" ? "text-green-400" : "text-red-400"}>
@@ -2678,7 +3158,7 @@ export default function AdminPage() {
                               {/* Redemption history */}
                               {customer.rewards.length > 0 && (
                                 <div className="mt-4 border-t border-[#111] pt-3">
-                                  <p className="text-[#444] text-[10px] uppercase tracking-widest mb-2">Redemption History</p>
+                                  <p className="text-[var(--admin-muted)] text-[10px] uppercase tracking-widest mb-2">Redemption History</p>
                                   <div className="space-y-1.5">
                                     {customer.rewards.slice(0, 5).map((r) => (
                                       <div key={r.id} className="flex justify-between text-xs">
@@ -2707,8 +3187,8 @@ export default function AdminPage() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <div>
-                <p className="text-white font-semibold text-lg flex items-center gap-2"><Settings size={18} className="text-[var(--mc-accent)]" /> Site Settings</p>
-                <p className="text-[#555] text-sm mt-1">Full control over your site — content, colors, hours, and more</p>
+                <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2"><Settings size={18} className="text-[var(--mc-accent)]" /> Site Settings</p>
+                <p className="text-[var(--admin-muted)] text-sm mt-1">Full control over your site — content, colors, hours, and more</p>
               </div>
               {settingsSaved && <span className="text-green-400 text-sm flex items-center gap-1"><Check size={13} /> Saved!</span>}
             </div>
@@ -2718,7 +3198,7 @@ export default function AdminPage() {
               {(["business", "hours", "hero", "theme", "pages", "users"] as const).map(s => (
                 <button key={s} onClick={() => setSettingsTab(s)}
                   className={`px-5 py-3 text-sm uppercase tracking-widest cursor-pointer border-b-2 -mb-px transition-all whitespace-nowrap ${
-                    settingsTab === s ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[#555] hover:text-[var(--mc-muted)]"
+                    settingsTab === s ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-transparent text-[var(--admin-muted)] hover:text-[var(--mc-muted)]"
                   }`}>
                   {s === "business" ? "Business Info"
                     : s === "hours" ? "Hours"
@@ -2733,7 +3213,7 @@ export default function AdminPage() {
             {/* Business Info */}
             {settingsTab === "business" && settingsForm && (
               <div className="luxury-card p-7 max-w-2xl">
-                <h3 className="text-white font-semibold mb-6 flex items-center gap-2"><Building2 size={16} className="text-[var(--mc-accent)]" /> Business Information</h3>
+                <h3 className="text-[var(--admin-text)] font-semibold mb-6 flex items-center gap-2"><Building2 size={16} className="text-[var(--mc-accent)]" /> Business Information</h3>
                 <div className="space-y-5">
                   {([
                     { label: "Salon Name",     key: "name",      hint: "Appears in header, email, and meta tags" },
@@ -2750,7 +3230,7 @@ export default function AdminPage() {
                         value={settingsForm.business[f.key] || ""}
                         onChange={e => setSettingsForm(p => p ? ({ ...p, business: { ...p.business, [f.key]: e.target.value } }) : p)}
                         className={inputCls} />
-                      <p className="text-[#444] text-xs mt-1">{f.hint}</p>
+                      <p className="text-[var(--admin-muted)] text-xs mt-1">{f.hint}</p>
                     </div>
                   ))}
                   <button onClick={saveSettings} disabled={savingSettings}
@@ -2764,8 +3244,8 @@ export default function AdminPage() {
             {/* Hours */}
             {settingsTab === "hours" && settingsForm && (
               <div className="luxury-card p-7 max-w-xl">
-                <h3 className="text-white font-semibold mb-2 flex items-center gap-2"><Clock size={16} className="text-[var(--mc-accent)]" /> Operating Hours</h3>
-                <p className="text-[#555] text-sm mb-6">Use any format: "10:00 AM", "10am", "Closed"</p>
+                <h3 className="text-[var(--admin-text)] font-semibold mb-2 flex items-center gap-2"><Clock size={16} className="text-[var(--mc-accent)]" /> Operating Hours</h3>
+                <p className="text-[var(--admin-muted)] text-sm mb-6">Use any format: "10:00 AM", "10am", "Closed"</p>
                 <div className="space-y-3">
                   {settingsForm.hours.map((h, i) => (
                     <div key={h.day} className="flex items-center gap-3">
@@ -2778,7 +3258,7 @@ export default function AdminPage() {
                             setSettingsForm(p => p ? ({ ...p, hours }) : p);
                           }}
                           placeholder="Open" className={`${inputCls} flex-1`} />
-                        <span className="text-[#555] shrink-0">—</span>
+                        <span className="text-[var(--admin-muted)] shrink-0">—</span>
                         <input type="text" value={h.close}
                           onChange={e => {
                             const hours = [...settingsForm.hours];
@@ -2800,34 +3280,34 @@ export default function AdminPage() {
             {/* Homepage */}
             {settingsTab === "hero" && settingsForm && (
               <div className="luxury-card p-7 max-w-2xl">
-                <h3 className="text-white font-semibold mb-2 flex items-center gap-2"><Globe size={16} className="text-[var(--mc-accent)]" /> Homepage Content</h3>
-                <p className="text-[#555] text-sm mb-6">Controls the main hero section on the home page</p>
+                <h3 className="text-[var(--admin-text)] font-semibold mb-2 flex items-center gap-2"><Globe size={16} className="text-[var(--mc-accent)]" /> Homepage Content</h3>
+                <p className="text-[var(--admin-muted)] text-sm mb-6">Controls the main hero section on the home page</p>
                 <div className="space-y-5">
                   <div>
                     <label className={labelCls}>Main Headline</label>
                     <input type="text" value={settingsForm.hero.headline}
                       onChange={e => setSettingsForm(p => p ? ({ ...p, hero: { ...p.hero, headline: e.target.value } }) : p)}
                       className={inputCls} placeholder="e.g. Upper East Side's" />
-                    <p className="text-[#444] text-xs mt-1">First line of the hero heading (plain white text)</p>
+                    <p className="text-[var(--admin-muted)] text-xs mt-1">First line of the hero heading (plain white text)</p>
                   </div>
                   <div>
                     <label className={labelCls}>Headline Accent (Gold Text)</label>
                     <input type="text" value={settingsForm.hero.headlineAccent}
                       onChange={e => setSettingsForm(p => p ? ({ ...p, hero: { ...p.hero, headlineAccent: e.target.value } }) : p)}
                       className={inputCls} placeholder="e.g. Premier Hair Salon" />
-                    <p className="text-[#444] text-xs mt-1">Second line rendered in gold gradient</p>
+                    <p className="text-[var(--admin-muted)] text-xs mt-1">Second line rendered in gold gradient</p>
                   </div>
                   <div>
                     <label className={labelCls}>Subheadline</label>
                     <textarea rows={3} value={settingsForm.hero.subheadline}
                       onChange={e => setSettingsForm(p => p ? ({ ...p, hero: { ...p.hero, subheadline: e.target.value } }) : p)}
                       className={`${inputCls} resize-none`} />
-                    <p className="text-[#444] text-xs mt-1">Paragraph text below the heading</p>
+                    <p className="text-[var(--admin-muted)] text-xs mt-1">Paragraph text below the heading</p>
                   </div>
                   {/* Live preview */}
                   <div className="border border-[var(--mc-border)] p-6 bg-[var(--mc-bg)] text-center">
                     <p className="text-[var(--mc-accent)] text-xs uppercase tracking-widest mb-2">Preview</p>
-                    <h2 className="font-serif text-2xl font-bold text-white">{settingsForm.hero.headline}</h2>
+                    <h2 className="font-serif text-2xl font-bold text-[var(--admin-text)]">{settingsForm.hero.headline}</h2>
                     <h2 className="font-serif text-2xl font-bold gold-gradient">{settingsForm.hero.headlineAccent}</h2>
                     <p className="text-[var(--mc-muted)] text-sm mt-3 leading-relaxed">{settingsForm.hero.subheadline}</p>
                   </div>
@@ -2843,10 +3323,10 @@ export default function AdminPage() {
             {settingsTab === "theme" && settingsForm && (
               <div className="max-w-2xl space-y-6">
                 <div className="luxury-card p-7">
-                  <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                  <h3 className="text-[var(--admin-text)] font-semibold mb-2 flex items-center gap-2">
                     <Zap size={16} className="text-[var(--mc-accent)]" /> Theme & Brand Colors
                   </h3>
-                  <p className="text-[#555] text-sm mb-6">Changes apply site-wide instantly. Default theme is gold on black.</p>
+                  <p className="text-[var(--admin-muted)] text-sm mb-6">Changes apply site-wide instantly. Default theme is gold on black.</p>
                   <div className="space-y-5">
                     {([
                       { label: "Primary Accent Color",    key: "accent",  hint: "Main brand color — buttons, highlights, gold by default (#C9A84C)" },
@@ -2878,12 +3358,12 @@ export default function AdminPage() {
                             placeholder="#000000"
                           />
                         </div>
-                        <p className="text-[#444] text-xs mt-1">{f.hint}</p>
+                        <p className="text-[var(--admin-muted)] text-xs mt-1">{f.hint}</p>
                       </div>
                     ))}
                   </div>
                   <div className="mt-6 p-4 border border-[var(--mc-border)] bg-[var(--mc-surface-dark)] flex items-center gap-4 flex-wrap">
-                    <div className="text-xs text-[#555] uppercase tracking-widest">Preview</div>
+                    <div className="text-xs text-[var(--admin-muted)] uppercase tracking-widest">Preview</div>
                     <div className="flex gap-2 items-center">
                       <div className="w-8 h-8 rounded-full" style={{ background: settingsForm.theme?.accent ?? "#C9A84C" }} />
                       <div className="w-8 h-8 border" style={{ background: settingsForm.theme?.surface ?? "#0f0f0f", borderColor: settingsForm.theme?.border ?? "#2a2a2a" }} />
@@ -2897,7 +3377,7 @@ export default function AdminPage() {
                       {savingSettings ? <><Loader size={14} className="animate-spin" /> Saving…</> : <><Save size={14} /> Save Colors</>}
                     </button>
                     <button onClick={() => setSettingsForm(p => p ? ({ ...p, theme: { accent: "#C9A84C", accent2: "#FFD700", bg: "#000000", surface: "#0f0f0f", border: "#2a2a2a", text: "#f5f0e8", muted: "#a89070" } }) : p)}
-                      className="px-6 py-3 border border-[var(--mc-border)] text-[#555] text-sm uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
+                      className="px-6 py-3 border border-[var(--mc-border)] text-[var(--admin-muted)] text-sm uppercase tracking-widest hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer">
                       Reset to Gold Default
                     </button>
                   </div>
@@ -2909,8 +3389,8 @@ export default function AdminPage() {
             {settingsTab === "pages" && settingsForm && (
               <div className="max-w-2xl space-y-4">
                 <div className="luxury-card p-5">
-                  <h3 className="text-white font-semibold mb-1 flex items-center gap-2"><Globe size={16} className="text-[var(--mc-accent)]" /> Pages & Content</h3>
-                  <p className="text-[#555] text-sm mb-6">Jump to the section that controls each page.</p>
+                  <h3 className="text-[var(--admin-text)] font-semibold mb-1 flex items-center gap-2"><Globe size={16} className="text-[var(--mc-accent)]" /> Pages & Content</h3>
+                  <p className="text-[var(--admin-muted)] text-sm mb-6">Jump to the section that controls each page.</p>
                   {[
                     { label: "Homepage Hero Text",       sub: "Headline, accent line, and paragraph",          action: () => setSettingsTab("hero") },
                     { label: "Business Info & Contact",  sub: "Salon name, phone, email, social links",        action: () => setSettingsTab("business") },
@@ -2923,10 +3403,10 @@ export default function AdminPage() {
                     <button key={item.label} onClick={item.action}
                       className="w-full flex items-center justify-between px-5 py-4 border border-[var(--mc-border)] hover:border-[var(--mc-accent)] transition-all group cursor-pointer mb-2">
                       <div className="text-left">
-                        <p className="text-white text-sm font-semibold group-hover:text-[var(--mc-accent)] transition-colors">{item.label}</p>
-                        <p className="text-[#555] text-xs mt-0.5">{item.sub}</p>
+                        <p className="text-[var(--admin-text)] text-sm font-semibold group-hover:text-[var(--mc-accent)] transition-colors">{item.label}</p>
+                        <p className="text-[var(--admin-muted)] text-xs mt-0.5">{item.sub}</p>
                       </div>
-                      <ChevronRight size={16} className="text-[#555] group-hover:text-[var(--mc-accent)] transition-colors shrink-0" />
+                      <ChevronRight size={16} className="text-[var(--admin-muted)] group-hover:text-[var(--mc-accent)] transition-colors shrink-0" />
                     </button>
                   ))}
                 </div>
@@ -2941,10 +3421,10 @@ export default function AdminPage() {
           <div>
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
               <div>
-                <p className="text-white font-semibold text-lg flex items-center gap-2">
+                <p className="text-[var(--admin-text)] font-semibold text-lg flex items-center gap-2">
                   <ShieldCheck size={18} className="text-[var(--mc-accent)]" /> Admin Access
                 </p>
-                <p className="text-[#555] text-sm mt-1">
+                <p className="text-[var(--admin-muted)] text-sm mt-1">
                   {adminUsers.filter(u => u.isAdmin).length} admin{adminUsers.filter(u => u.isAdmin).length !== 1 ? "s" : ""} · {adminUsers.length} registered users
                 </p>
               </div>
@@ -2952,7 +3432,7 @@ export default function AdminPage() {
 
             {/* Grant by email */}
             <div className="luxury-card p-6 mb-6">
-              <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+              <h3 className="text-[var(--admin-text)] font-semibold mb-4 flex items-center gap-2">
                 <Plus size={16} className="text-[var(--mc-accent)]" /> Grant Admin by Email
               </h3>
               <div className="flex gap-3">
@@ -2972,16 +3452,16 @@ export default function AdminPage() {
                   {adminGrantLoading ? "Granting…" : "Grant"}
                 </button>
               </div>
-              <p className="text-[#444] text-xs mt-2">User must log out and back in for changes to take effect.</p>
+              <p className="text-[var(--admin-muted)] text-xs mt-2">User must log out and back in for changes to take effect.</p>
             </div>
 
             {/* Users list */}
             {usersLoading ? (
-              <div className="text-center py-20 text-[#555]">Loading…</div>
+              <div className="text-center py-20 text-[var(--admin-muted)]">Loading…</div>
             ) : adminUsers.length === 0 ? (
               <div className="text-center py-20 luxury-card">
-                <Users size={48} className="text-[#333] mx-auto mb-4" />
-                <p className="text-[#555]">No registered users yet</p>
+                <Users size={48} className="text-[var(--admin-muted)] mx-auto mb-4" />
+                <p className="text-[var(--admin-muted)]">No registered users yet</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -2989,25 +3469,25 @@ export default function AdminPage() {
                   <div key={user.id} className={`luxury-card p-4 flex items-center justify-between gap-4 flex-wrap border-l-2 ${user.isAdmin ? "border-l-[var(--mc-accent)]" : "border-l-transparent"}`}>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <p className="text-white font-semibold text-sm">{user.name}</p>
+                        <p className="text-[var(--admin-text)] font-semibold text-sm">{user.name}</p>
                         {user.isAdmin && (
                           <span className="text-[10px] px-2 py-0.5 bg-[var(--mc-accent)]/15 border border-[var(--mc-accent)]/30 text-[var(--mc-accent)] uppercase tracking-wider flex items-center gap-1">
                             <ShieldCheck size={10} /> Admin
                           </span>
                         )}
                         {user.isEnvAdmin && (
-                          <span className="text-[10px] px-2 py-0.5 border border-[#555]/40 text-[#555] uppercase tracking-wider" title="Set via ADMIN_EMAIL env var">ENV</span>
+                          <span className="text-[10px] px-2 py-0.5 border border-[#555]/40 text-[var(--admin-muted)] uppercase tracking-wider" title="Set via ADMIN_EMAIL env var">ENV</span>
                         )}
                       </div>
-                      <p className="text-[#555] text-xs">{user.email}</p>
+                      <p className="text-[var(--admin-muted)] text-xs">{user.email}</p>
                       {user.adminEntry && (
-                        <p className="text-[#333] text-[10px] mt-0.5">
+                        <p className="text-[var(--admin-muted)] text-[10px] mt-0.5">
                           Added by {user.adminEntry.addedBy} · {new Date(user.adminEntry.addedAt).toLocaleDateString()}
                         </p>
                       )}
                     </div>
                     {user.isEnvAdmin ? (
-                      <span className="text-[#444] text-xs shrink-0">env-protected</span>
+                      <span className="text-[var(--admin-muted)] text-xs shrink-0">env-protected</span>
                     ) : (
                       <button
                         onClick={() => handleAdminToggle(user.email, user.isAdmin ? "revoke" : "grant")}

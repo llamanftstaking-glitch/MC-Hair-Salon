@@ -30,6 +30,10 @@ export const customers = pgTable("customers", {
   blowoutsEarned:       integer("blowouts_earned").notNull().default(0),
   stripeCustomerId:     text("stripe_customer_id"),
   stripePaymentMethodId: text("stripe_payment_method_id"),
+  birthday:             text("birthday"),
+  preferredStylist:     text("preferred_stylist"),
+  allergies:            text("allergies"),
+  adminNotes:           text("admin_notes"),
 });
 
 // ── customer_appointments ────────────────────────────────────────────────────

@@ -147,110 +147,105 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* ── DESKTOP main bar (lg+) — centered logo layout ── */}
-        <div className="hidden lg:grid lg:grid-cols-[1fr_auto_1fr] items-center h-[60px] px-6 border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/95">
+        {/* ── DESKTOP main bar (lg+) — clean centered logo ── */}
+        <div className="hidden lg:block border-t border-[var(--mc-border)] bg-[var(--mc-bg)]/97">
+          {/* Primary row */}
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center h-[56px] px-8">
 
-          {/* Left nav links */}
-          <nav className="flex items-center gap-0" aria-label="Main navigation">
-            {navLinks.slice(0, 4).map(l => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={`relative px-3 py-3 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer group ${
-                  pathname === l.href
-                    ? "text-[var(--mc-accent)]"
-                    : "text-[var(--mc-muted)] hover:text-[var(--mc-text)]"
-                }`}
-              >
-                {l.label}
-                <span className={`absolute bottom-0 left-3 right-3 h-px bg-[var(--mc-accent)] transition-transform duration-300 origin-left ${
-                  pathname === l.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                }`} />
-              </Link>
-            ))}
-          </nav>
-
-          {/* Center — logo */}
-          <Link href="/" className="flex items-center justify-center cursor-pointer px-4">
-            <div
-              className="relative w-11 h-11"
-              style={{
-                opacity: isHome && !scrolled ? 0 : 1,
-                transition: "opacity 0.4s ease",
-                pointerEvents: isHome && !scrolled ? "none" : "auto",
-              }}
-            >
-              <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" priority />
-              <Image src="/mc-logo-black.png" alt="" fill className="logo-light object-contain" priority />
-            </div>
-          </Link>
-
-          {/* Right nav links + CTA */}
-          <div className="flex items-center justify-end gap-0">
-            <nav className="flex items-center gap-0" aria-label="Secondary navigation">
-              {navLinks.slice(4).map(l => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={`relative px-3 py-3 text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors whitespace-nowrap cursor-pointer group ${
-                    pathname === l.href
-                      ? "text-[var(--mc-accent)]"
-                      : "text-[var(--mc-muted)] hover:text-[var(--mc-text)]"
-                  }`}
-                >
+            {/* Left — 4 core links */}
+            <nav className="flex items-center" aria-label="Main navigation left">
+              {navLinks.slice(0, 4).map(l => (
+                <Link key={l.href} href={l.href}
+                  className={`relative px-3.5 py-2 text-[10.5px] uppercase tracking-[0.18em] font-semibold transition-colors whitespace-nowrap cursor-pointer group ${
+                    pathname === l.href ? "text-[var(--mc-accent)]" : "text-[var(--mc-muted)] hover:text-[var(--mc-text)]"
+                  }`}>
                   {l.label}
-                  <span className={`absolute bottom-0 left-3 right-3 h-px bg-[var(--mc-accent)] transition-transform duration-300 origin-left ${
+                  <span className={`absolute bottom-0 left-3.5 right-3.5 h-px bg-[var(--mc-accent)] transition-transform duration-300 origin-left ${
                     pathname === l.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                   }`} />
                 </Link>
               ))}
-              <div className="h-4 w-px bg-[var(--mc-border)] mx-2" />
-              {featuredLinks.map(l => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={`mx-0.5 px-2.5 py-1.5 text-[10px] uppercase tracking-[0.15em] font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1 border ${
-                    pathname === l.href
-                      ? "border-[#C9A84C] bg-[#C9A84C]/15 text-[#C9A84C]"
-                      : "border-[#C9A84C]/30 text-[#C9A84C] hover:border-[#C9A84C] hover:bg-[#C9A84C]/10"
-                  }`}
-                >
-                  <l.icon size={10} />
-                  {l.label}
-                </Link>
-              ))}
             </nav>
 
-            <div className="flex items-center gap-3 ml-3" suppressHydrationWarning>
-              {user ? (
-                <>
-                  <Link href="/account"
-                    className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer flex items-center gap-1.5 text-[11px] uppercase tracking-widest"
-                    title={user.name}>
-                    <User size={14} />
-                    <span className="hidden xl:block max-w-[100px] truncate">{user.name.split(" ")[0]}</span>
-                  </Link>
-                  <button onClick={handleLogout}
-                    className="text-[var(--mc-muted)] hover:text-red-400 transition-colors cursor-pointer"
-                    title="Sign Out">
-                    <LogOut size={14} />
-                  </button>
-                </>
-              ) : (
-                <Link href="/login"
-                  className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer"
-                  title="Sign In">
-                  <User size={16} />
-                </Link>
-              )}
+            {/* Center — logo */}
+            <Link href="/" className="flex items-center justify-center cursor-pointer px-6">
+              <div className="relative w-10 h-10" style={{
+                opacity: isHome && !scrolled ? 0 : 1,
+                transition: "opacity 0.4s ease",
+                pointerEvents: isHome && !scrolled ? "none" : "auto",
+              }}>
+                <Image src="/mc-logo-bw.png"    alt="MC Hair Salon" fill className="logo-bw    object-contain" priority />
+                <Image src="/mc-logo-black.png" alt="" fill className="logo-light object-contain" priority />
+              </div>
+            </Link>
 
-              <Link href="/book"
-                className="ml-1 px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest text-black cursor-pointer hover:brightness-110 transition-all whitespace-nowrap relative overflow-hidden group"
-                style={{ background: "linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #C9A84C 100%)" }}>
-                <span className="relative z-10">Book Now</span>
-                <span className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200" />
-              </Link>
+            {/* Right — 4 core links + user + Book Now */}
+            <div className="flex items-center justify-end">
+              <nav className="flex items-center" aria-label="Main navigation right">
+                {navLinks.slice(4).map(l => (
+                  <Link key={l.href} href={l.href}
+                    className={`relative px-3.5 py-2 text-[10.5px] uppercase tracking-[0.18em] font-semibold transition-colors whitespace-nowrap cursor-pointer group ${
+                      pathname === l.href ? "text-[var(--mc-accent)]" : "text-[var(--mc-muted)] hover:text-[var(--mc-text)]"
+                    }`}>
+                    {l.label}
+                    <span className={`absolute bottom-0 left-3.5 right-3.5 h-px bg-[var(--mc-accent)] transition-transform duration-300 origin-left ${
+                      pathname === l.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                    }`} />
+                  </Link>
+                ))}
+              </nav>
+
+              <div className="h-4 w-px bg-[var(--mc-border)] mx-3" />
+
+              <div className="flex items-center gap-2" suppressHydrationWarning>
+                {user ? (
+                  <>
+                    <Link href="/account"
+                      className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer flex items-center gap-1.5 text-[10px] uppercase tracking-widest"
+                      title={user.name}>
+                      <User size={13} />
+                      <span className="hidden xl:block max-w-[80px] truncate">{user.name.split(" ")[0]}</span>
+                    </Link>
+                    <button onClick={handleLogout}
+                      className="text-[var(--mc-muted)] hover:text-red-400 transition-colors cursor-pointer"
+                      title="Sign Out">
+                      <LogOut size={13} />
+                    </button>
+                  </>
+                ) : (
+                  <Link href="/login" className="text-[var(--mc-muted)] hover:text-[var(--mc-accent)] transition-colors cursor-pointer" title="Sign In">
+                    <User size={15} />
+                  </Link>
+                )}
+
+                <Link href="/book"
+                  className="ml-2 px-5 py-2 text-[10.5px] font-bold uppercase tracking-widest text-black cursor-pointer hover:brightness-110 transition-all whitespace-nowrap relative overflow-hidden group"
+                  style={{ background: "linear-gradient(135deg, #B8860B 0%, #FFD700 50%, #C9A84C 100%)" }}>
+                  <span className="relative z-10">Book Now</span>
+                  <span className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200" />
+                </Link>
+              </div>
             </div>
+          </div>
+
+          {/* Secondary micro-row — Packages, Gift Cards, and secondary links */}
+          <div className="flex items-center justify-center gap-6 pb-1.5 border-t border-[var(--mc-border)]/30">
+            {featuredLinks.map(l => (
+              <Link key={l.href} href={l.href}
+                className={`flex items-center gap-1 text-[9px] uppercase tracking-[0.2em] transition-colors cursor-pointer ${
+                  pathname === l.href ? "text-[#C9A84C]" : "text-[#C9A84C]/60 hover:text-[#C9A84C]"
+                }`}>
+                <l.icon size={9} />
+                {l.label}
+              </Link>
+            ))}
+            <span className="w-px h-2.5 bg-[var(--mc-border)]/50" />
+            {secondaryLinks.slice(0, 3).map(l => (
+              <Link key={l.href} href={l.href}
+                className="text-[9px] uppercase tracking-[0.2em] text-[var(--mc-muted)]/50 hover:text-[var(--mc-muted)] transition-colors cursor-pointer whitespace-nowrap">
+                {l.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

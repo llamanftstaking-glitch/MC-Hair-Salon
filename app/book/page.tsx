@@ -102,8 +102,17 @@ const TIME_SLOTS = [
   "1:00 PM",  "1:30 PM",  "2:00 PM",  "2:30 PM",
   "3:00 PM",  "3:30 PM",  "4:00 PM",  "4:30 PM",
   "5:00 PM",  "5:30 PM",  "6:00 PM",  "6:30 PM",
-  "7:00 PM",
+  "7:00 PM",  "7:30 PM",
 ];
+
+const DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+function slotToMins(slot: string): number {
+  const [time, period] = slot.split(" ");
+  const [h, m] = time.split(":").map(Number);
+  const hour = period === "PM" && h !== 12 ? h + 12 : period === "AM" && h === 12 ? 0 : h;
+  return hour * 60 + m;
+}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Step = 0 | 1 | 2 | 3 | 4;
@@ -436,10 +445,36 @@ function SpecialistStep({ selected, onSelect, onBack }: { selected: string; onSe
 }
 
 // ── Step 3 — Date & Time ──────────────────────────────────────────────────────
-function DateTimeStep({ date, time, onSelect, onBack }: { date: string; time: string; onSelect: (date: string, time: string) => void; onBack: () => void }) {
+type HoursEntry = { day: string; open: string; close: string; closed?: boolean };
+function DateTimeStep({ date, time, openingHours, onSelect, onBack }: {
+  date: string; time: string;
+  openingHours: HoursEntry[];
+  onSelect: (date: string, time: string) => void;
+  onBack: () => void;
+}) {
   const [selectedDate, setSelectedDate] = useState(date);
   const [selectedTime, setSelectedTime] = useState(time);
   const today = new Date().toISOString().split("T")[0];
+
+  const dayEntry = selectedDate
+    ? openingHours.find(h => h.day === DAY_NAMES[new Date(selectedDate + "T12:00:00").getDay()])
+    : null;
+
+  const availableSlots = dayEntry && !dayEntry.closed
+    ? TIME_SLOTS.filter(s => slotToMins(s) >= slotToMins(dayEntry.open) && slotToMins(s) <= slotToMins(dayEntry.close))
+    : openingHours.length > 0
+      ? [] // date selected but no hours found — shouldn't happen
+      : TIME_SLOTS; // hours not loaded yet — show all
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value;
+    setSelectedDate(newDate);
+    const entry = openingHours.find(h => h.day === DAY_NAMES[new Date(newDate + "T12:00:00").getDay()]);
+    if (entry && !entry.closed && selectedTime) {
+      const m = slotToMins(selectedTime);
+      if (m < slotToMins(entry.open) || m > slotToMins(entry.close)) setSelectedTime("");
+    }
+  };
 
   return (
     <div className="luxury-card p-6 md:p-8">
@@ -450,15 +485,26 @@ function DateTimeStep({ date, time, onSelect, onBack }: { date: string; time: st
       {/* Date */}
       <div className="mb-6">
         <label className={labelCls}>Date</label>
-        <input type="date" min={today} value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
+        <input type="date" min={today} value={selectedDate} onChange={handleDateChange}
           className={inputCls} style={{ colorScheme: "dark" }} />
+        {dayEntry && !dayEntry.closed && (
+          <p className="text-[var(--mc-muted)] text-xs mt-2">
+            Hours: {dayEntry.open} – {dayEntry.close}
+          </p>
+        )}
+        {dayEntry?.closed && (
+          <p className="text-red-400 text-xs mt-2">We are closed on this day. Please select another date.</p>
+        )}
       </div>
 
       {/* Time slots */}
       <div className="mb-6">
         <label className={labelCls}>Time</label>
+        {availableSlots.length === 0 && selectedDate && openingHours.length > 0 ? (
+          <p className="text-[var(--mc-muted)] text-sm mt-2">No available times for this day.</p>
+        ) : (
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-          {TIME_SLOTS.map(slot => (
+          {availableSlots.map(slot => (
             <button key={slot} onClick={() => setSelectedTime(slot)}
               className={`py-3 text-xs font-semibold transition-all cursor-pointer min-h-[44px] ${
                 selectedTime === slot
@@ -469,6 +515,7 @@ function DateTimeStep({ date, time, onSelect, onBack }: { date: string; time: st
             </button>
           ))}
         </div>
+        )}
       </div>
 
       <button onClick={() => { if (selectedDate && selectedTime) onSelect(selectedDate, selectedTime); }}
@@ -848,6 +895,7 @@ function BookingFlow() {
     service: "", servicePrice: undefined, selectedServices: [], stylist: "No preference", date: "", time: "", notes: "",
   });
   const [authChecked, setAuthChecked] = useState(false);
+  const [openingHours, setOpeningHours] = useState<{ day: string; open: string; close: string; closed?: boolean }[]>([]);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -857,6 +905,10 @@ function BookingFlow() {
       })
       .catch(() => {})
       .finally(() => setAuthChecked(true));
+    fetch("/api/settings")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.hours) setOpeningHours(data.hours); })
+      .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -942,6 +994,7 @@ function BookingFlow() {
                   <DateTimeStep
                     date={selection.date}
                     time={selection.time}
+                    openingHours={openingHours}
                     onSelect={(date, time) => { setSelection(s => ({ ...s, date, time })); setStep(4); }}
                     onBack={() => setStep(2)}
                   />

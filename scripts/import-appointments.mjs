@@ -8,16 +8,17 @@ import { resolve } from "path";
 
 const jsonPath = process.argv[2] || "/Users/rayquinones/Downloads/appointments.json";
 const baseUrl  = process.argv[3] || "https://mchairsalon.com";
+const email    = process.env.ADMIN_EMAIL    || "hello@mchairsalon.com";
 const password = process.env.ADMIN_PASSWORD || "MCAdmin2040!";
 
 const appointments = JSON.parse(readFileSync(resolve(jsonPath), "utf8"));
 console.log(`Importing ${appointments.length} appointments to ${baseUrl}...`);
 
 // Login to get session cookie
-const loginRes = await fetch(`${baseUrl}/api/admin/login`, {
+const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ password }),
+  body: JSON.stringify({ email, password }),
 });
 
 if (!loginRes.ok) {

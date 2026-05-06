@@ -8,7 +8,7 @@ import {
   CreditCard, AlertTriangle, ShieldCheck,
   Gift, Star, Crown, Zap, Minus, Scissors, QrCode, Edit2,
   Download, ToggleLeft, ToggleRight, DollarSign, LayoutGrid,
-  CalendarClock, Wrench, Tag, Ticket, Sun, Moon, ChevronDown,
+  CalendarClock, Wrench, Tag, Ticket, Sun, Moon, ChevronDown, Search,
 } from "lucide-react";
 import type { Booking } from "@/lib/bookings";
 import type { ContactMessage } from "@/lib/messages";
@@ -85,7 +85,7 @@ const statusColors: Record<string, string> = {
   no_show:   "text-orange-400 border-orange-400/30 bg-orange-400/10",
 };
 
-const inputCls = "w-full bg-[var(--mc-surface-dark)] border border-[var(--mc-border)] text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[#444]";
+const inputCls = "w-full bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-4 py-2.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[var(--admin-muted)]";
 const labelCls = "block text-[var(--mc-accent)] text-xs uppercase tracking-widest font-semibold mb-2";
 
 // ── Vendors Panel ──────────────────────────────────────────────────────────────
@@ -722,6 +722,7 @@ export default function AdminPage() {
 
   // ── Rewards state ────────────────────────────────────────────────────────────
   const [rewardsData,    setRewardsData]    = useState<RewardCustomer[]>([]);
+  const [rewardsSearch,  setRewardsSearch]  = useState("");
   const [adjustTarget,   setAdjustTarget]   = useState<string | null>(null);
   const [adjustAmount,   setAdjustAmount]   = useState("");
   const [adjustMode,     setAdjustMode]     = useState<"add" | "subtract">("add");
@@ -825,6 +826,7 @@ export default function AdminPage() {
   // ── Create booking state (admin walk-in / phone) ─────────────────────────────
   const [createBookingOpen, setCreateBookingOpen] = useState(false);
   const [createForm, setCreateForm] = useState({ name: "", email: "", phone: "", service: "", stylist: "", date: new Date().toISOString().split("T")[0], time: "", notes: "" });
+  const [createServices, setCreateServices] = useState<string[]>([]);
   const [createLoading, setCreateLoading] = useState(false);
 
   // ── Fetch functions ─────────────────────────────────────────────────────────
@@ -1908,13 +1910,19 @@ export default function AdminPage() {
             {/* ── Create Booking Modal ─────────────────────────────────────── */}
             {createBookingOpen && (() => {
               const submitCreate = async () => {
-                if (!createForm.name || !createForm.email || !createForm.phone || !createForm.service || !createForm.date || !createForm.time) return;
+                if (!createForm.name || !createForm.email || !createForm.phone || createServices.length === 0 || !createForm.date || !createForm.time) return;
                 setCreateLoading(true);
                 try {
+                  const primaryService = createServices[0];
+                  const payload = {
+                    ...createForm,
+                    service: primaryService,
+                    services: createServices.map(s => ({ name: s })),
+                  };
                   const res = await fetch("/api/bookings", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(createForm),
+                    body: JSON.stringify(payload),
                   });
                   if (res.ok) {
                     const created = await res.json();
@@ -1925,11 +1933,12 @@ export default function AdminPage() {
                     });
                     setCreateBookingOpen(false);
                     setCreateForm({ name: "", email: "", phone: "", service: "", stylist: "", date: dailyDate, time: "", notes: "" });
+                    setCreateServices([]);
                     fetchBookings();
                   }
                 } finally { setCreateLoading(false); }
               };
-              const canSubmit = !!(createForm.name && createForm.email && createForm.phone && createForm.service && createForm.date && createForm.time);
+              const canSubmit = !!(createForm.name && createForm.email && createForm.phone && createServices.length > 0 && createForm.date && createForm.time);
               return (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4" onClick={() => setCreateBookingOpen(false)}>
                   <div className="luxury-card w-full max-w-lg p-6 md:p-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
@@ -1962,11 +1971,22 @@ export default function AdminPage() {
                         </div>
                       </div>
                       <div>
-                        <label className={labelCls}>Service</label>
-                        <select value={createForm.service} onChange={e => setCreateForm(f => ({ ...f, service: e.target.value }))} className={inputCls}>
-                          <option value="">Select service…</option>
-                          {SERVICES_LIST.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
+                        <label className={labelCls}>Services <span className="text-[var(--mc-accent)] text-[10px] ml-1">(select all that apply)</span></label>
+                        <div className="grid grid-cols-2 gap-1.5 mt-1 max-h-40 overflow-y-auto pr-1">
+                          {SERVICES_LIST.map(s => {
+                            const checked = createServices.includes(s);
+                            return (
+                              <button key={s} type="button"
+                                onClick={() => setCreateServices(prev => checked ? prev.filter(x => x !== s) : [...prev, s])}
+                                className={`text-left text-xs px-2.5 py-1.5 border transition-all cursor-pointer ${checked ? "border-[var(--mc-accent)] text-[var(--mc-accent)] bg-[var(--mc-accent)]/10" : "border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)]/50"}`}>
+                                {s}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {createServices.length > 0 && (
+                          <p className="text-[10px] text-[var(--mc-accent)] mt-1">{createServices.length} selected</p>
+                        )}
                       </div>
                       <div>
                         <label className={labelCls}>Stylist</label>
@@ -2698,14 +2718,9 @@ export default function AdminPage() {
                   className={`luxury-card overflow-hidden transition-all duration-200 ${editingStaff === member.id ? "ring-1 ring-[var(--mc-accent)]" : "hover:-translate-y-0.5"}`}>
                   {/* Photo with upload overlay */}
                   <div className="relative h-52 bg-[var(--mc-surface-dark)]">
-                    {member.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <User size={48} className="text-[var(--admin-muted)]" />
-                      </div>
-                    )}
+                    <div className="w-full h-full flex items-center justify-center">
+                      <User size={48} className="text-[var(--admin-muted)]" />
+                    </div>
                     {/* Upload overlay */}
                     <label className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70 opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
                       {uploadingPhoto === member.id ? (
@@ -2884,7 +2899,10 @@ export default function AdminPage() {
 
         {/* ── REWARDS ──────────────────────────────────────────────────────── */}
         {tab === "rewards" && (() => {
-          const sorted       = [...rewardsData].sort((a, b) => b.points - a.points);
+          const sortedAll    = [...rewardsData].sort((a, b) => b.points - a.points);
+          const sorted       = rewardsSearch.trim()
+            ? sortedAll.filter(c => c.name.toLowerCase().includes(rewardsSearch.toLowerCase()) || c.email.toLowerCase().includes(rewardsSearch.toLowerCase()))
+            : sortedAll;
           const totalPoints  = rewardsData.reduce((s, c) => s + c.points, 0);
           const totalRedeem  = rewardsData.reduce((s, c) => s + c.rewards.length, 0);
           const tierCount    = { Bronze: 0, Silver: 0, Gold: 0, Platinum: 0 } as Record<string, number>;
@@ -2979,9 +2997,21 @@ export default function AdminPage() {
 
               {/* Member leaderboard */}
               <div>
-                <p className="text-[var(--admin-text)] font-semibold mb-4 flex items-center gap-2">
-                  <TrendingUp size={15} className="text-[var(--mc-accent)]" /> Member Leaderboard
-                </p>
+                <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                  <p className="text-[var(--admin-text)] font-semibold flex items-center gap-2">
+                    <TrendingUp size={15} className="text-[var(--mc-accent)]" /> Member Leaderboard
+                  </p>
+                  <div className="relative">
+                    <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-muted)]" />
+                    <input
+                      type="text"
+                      value={rewardsSearch}
+                      onChange={e => setRewardsSearch(e.target.value)}
+                      placeholder="Search members…"
+                      className="pl-8 pr-3 py-1.5 text-xs bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] placeholder-[var(--admin-muted)] focus:outline-none focus:border-[var(--mc-accent)] w-48"
+                    />
+                  </div>
+                </div>
 
                 {sorted.length === 0 ? (
                   <div className="text-center py-20 luxury-card">

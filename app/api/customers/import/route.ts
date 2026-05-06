@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { customers } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 interface ImportClient {
@@ -25,22 +25,30 @@ export async function POST(req: Request) {
   for (const c of body.clients) {
     if (!c.name?.trim()) { errors++; continue; }
 
-    const email = c.email?.trim().toLowerCase() ||
-      `noemail+${randomUUID()}@mc-placeholder.invalid`;
+    const email = c.email?.trim().toLowerCase() || "";
+    const phone = c.phone?.trim() || "";
 
     try {
-      const existing = await db.select({ id: customers.id })
-        .from(customers)
-        .where(eq(customers.email, email))
-        .limit(1);
+      // Dedup by email (if present) OR phone (if present) to avoid re-inserting no-email clients
+      const conditions = [];
+      if (email) conditions.push(eq(customers.email, email));
+      if (phone) conditions.push(eq(customers.phone, phone));
 
-      if (existing.length > 0) { skipped++; continue; }
+      if (conditions.length > 0) {
+        const existing = await db.select({ id: customers.id })
+          .from(customers)
+          .where(conditions.length === 1 ? conditions[0] : or(...conditions))
+          .limit(1);
+        if (existing.length > 0) { skipped++; continue; }
+      }
+
+      const resolvedEmail = email || `noemail+${randomUUID()}@mc-placeholder.invalid`;
 
       await db.insert(customers).values({
         id: randomUUID(),
         name: c.name.trim(),
-        email,
-        phone: c.phone?.trim() || "",
+        email: resolvedEmail,
+        phone,
         createdAt: new Date().toISOString(),
         points: 0,
         visits: 0,

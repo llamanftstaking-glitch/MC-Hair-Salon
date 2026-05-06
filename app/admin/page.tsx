@@ -1191,7 +1191,8 @@ export default function AdminPage() {
   const confirmed        = bookings.filter(b => b.status === "confirmed").length;
   // Use DB customers as source of truth; fall back to booking-derived only if DB is empty
   const uniqueClients = allDbCustomers.length > 0
-    ? allDbCustomers.map(c => ({ email: c.email, name: c.name, phone: c.phone, service: "", stylist: "", date: "", time: "", status: "confirmed" as const, id: c.id, createdAt: c.createdAt }))
+    ? [...new Map(allDbCustomers.map(c => [c.phone && c.phone.trim() !== "" ? c.phone.trim() : c.email, c])).values()]
+        .map(c => ({ email: c.email, name: c.name, phone: c.phone, service: "", stylist: "", date: "", time: "", status: "confirmed" as const, id: c.id, createdAt: c.createdAt }))
     : [...new Map(bookings.map(b => [b.email, b])).values()];
   const activeSubscribers = subscribers.filter(s => s.active).length;
   const unreadMessages   = messages.filter(m => !m.read).length;
@@ -2538,7 +2539,7 @@ export default function AdminPage() {
                   type="text"
                   value={clientSearch}
                   onChange={e => setClientSearch(e.target.value)}
-                  placeholder="Search by name or email…"
+                  placeholder="Search by name, email, or phone…"
                   className="bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[var(--admin-muted)] w-56"
                 />
                 <button
@@ -2568,6 +2569,17 @@ export default function AdminPage() {
                   }}
                   className={`border border-blue-500/50 text-blue-400 font-bold px-4 py-1.5 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5 ${seedingClients ? "opacity-50 pointer-events-none" : ""}`}>
                   {seedingClients ? seedProgress : "⟳ Seed Clients"}
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!confirm("Remove duplicate phone-number entries from the database?")) return;
+                    const res = await fetch("/api/customers/dedup", { method: "POST" });
+                    const data = await res.json();
+                    alert(`Dedup complete — ${data.deleted} duplicates removed`);
+                    fetchAllCustomers();
+                  }}
+                  className="border border-yellow-500/50 text-yellow-400 font-bold px-4 py-1.5 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5">
+                  ✦ Dedup DB
                 </button>
                 <label className={`border border-[var(--mc-accent)]/50 text-[var(--mc-accent)] font-bold px-4 py-1.5 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5 ${importing ? "opacity-50 pointer-events-none" : ""}`}>
                   <input type="file" accept=".json" className="hidden" onChange={async e => {
@@ -2727,7 +2739,7 @@ export default function AdminPage() {
                   .filter(c => {
                     if (!clientSearch) return true;
                     const q = clientSearch.toLowerCase();
-                    return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q);
+                    return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.phone || "").toLowerCase().includes(q);
                   })
                   .sort((a, b) => {
                     const spendA = (clientMap[a.email] || []).filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);

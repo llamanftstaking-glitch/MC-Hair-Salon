@@ -3,8 +3,6 @@ import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { salonServices } from "@/lib/schema";
 
-// Seed data derived from SERVICES_LIST in app/admin/page.tsx
-// with reasonable prices for each service
 const SEED_SERVICES: Array<{
   name: string;
   category: string;
@@ -13,31 +11,37 @@ const SEED_SERVICES: Array<{
   durationMins: number | null;
   sortOrder: number;
 }> = [
-  // Hair
-  { name: "Women's Haircut",           category: "Hair",       priceMin: 45,  priceMax: 65,  durationMins: 60,  sortOrder: 10 },
-  { name: "Men's Haircut",             category: "Hair",       priceMin: 30,  priceMax: 40,  durationMins: 30,  sortOrder: 20 },
-  { name: "Kids' Haircut",             category: "Hair",       priceMin: 20,  priceMax: 30,  durationMins: 30,  sortOrder: 30 },
-  { name: "Curly Cut",                 category: "Hair",       priceMin: 55,  priceMax: 80,  durationMins: 75,  sortOrder: 40 },
+  // Haircuts
+  { name: "Men's Haircut",                    category: "Haircuts",   priceMin: 50,  priceMax: null, durationMins: 30,  sortOrder: 10  },
+  { name: "Women's Haircut",                  category: "Haircuts",   priceMin: 120, priceMax: null, durationMins: 60,  sortOrder: 20  },
+  { name: "Girl's Haircut",                   category: "Haircuts",   priceMin: 55,  priceMax: null, durationMins: 60,  sortOrder: 30  },
+  { name: "Boy's Haircut",                    category: "Haircuts",   priceMin: 45,  priceMax: null, durationMins: 30,  sortOrder: 40  },
+  { name: "Bangs",                            category: "Haircuts",   priceMin: 20,  priceMax: null, durationMins: 10,  sortOrder: 50  },
+  // Blowout & Styling
+  { name: "Blowdry",                          category: "Styling",    priceMin: 45,  priceMax: null, durationMins: 45,  sortOrder: 60  },
+  { name: "Updo",                             category: "Styling",    priceMin: 85,  priceMax: null, durationMins: 60,  sortOrder: 70  },
   // Color
-  { name: "Balayage",                  category: "Color",      priceMin: 120, priceMax: 200, durationMins: 180, sortOrder: 50 },
-  { name: "Highlights",                category: "Color",      priceMin: 95,  priceMax: 150, durationMins: 120, sortOrder: 60 },
-  { name: "Baby Lights",               category: "Color",      priceMin: 110, priceMax: 170, durationMins: 150, sortOrder: 70 },
-  { name: "Hair Color",                category: "Color",      priceMin: 75,  priceMax: 110, durationMins: 90,  sortOrder: 80 },
-  { name: "Color Correction",          category: "Color",      priceMin: 150, priceMax: 300, durationMins: 240, sortOrder: 90 },
+  { name: "Clear Glossy",                     category: "Color",      priceMin: 35,  priceMax: null, durationMins: 15,  sortOrder: 80  },
+  { name: "Single Process",                   category: "Color",      priceMin: 100, priceMax: null, durationMins: 40,  sortOrder: 90  },
+  { name: "Single Process w/ Moroccan Oil",   category: "Color",      priceMin: 120, priceMax: null, durationMins: 50,  sortOrder: 100 },
+  { name: "Partial Highlights",               category: "Color",      priceMin: 250, priceMax: null, durationMins: 120, sortOrder: 110 },
+  { name: "Full Highlights",                  category: "Color",      priceMin: 350, priceMax: null, durationMins: 155, sortOrder: 120 },
+  { name: "Face Frame",                       category: "Color",      priceMin: 130, priceMax: null, durationMins: 60,  sortOrder: 130 },
+  { name: "Toner",                            category: "Color",      priceMin: 45,  priceMax: null, durationMins: 20,  sortOrder: 140 },
+  { name: "Partial Balayage",                 category: "Color",      priceMin: 250, priceMax: null, durationMins: 120, sortOrder: 150 },
+  { name: "Full Balayage",                    category: "Color",      priceMin: 400, priceMax: null, durationMins: 155, sortOrder: 160 },
+  { name: "Double Process",                   category: "Color",      priceMin: 0,   priceMax: null, durationMins: 120, sortOrder: 170 },
+  { name: "Color Correction",                 category: "Color",      priceMin: 0,   priceMax: null, durationMins: 150, sortOrder: 180 },
   // Treatments
-  { name: "Keratin Treatment",         category: "Treatments", priceMin: 200, priceMax: 350, durationMins: 180, sortOrder: 100 },
-  { name: "Hair Botox Treatment",      category: "Treatments", priceMin: 150, priceMax: 250, durationMins: 120, sortOrder: 110 },
-  { name: "Relaxer",                   category: "Treatments", priceMin: 80,  priceMax: 120, durationMins: 120, sortOrder: 120 },
-  // Styling
-  { name: "Blowout / Blow Dry",        category: "Hair",       priceMin: 55,  priceMax: 75,  durationMins: 45,  sortOrder: 130 },
-  { name: "Updo & Special Event Styling", category: "Hair",    priceMin: 85,  priceMax: 150, durationMins: 90,  sortOrder: 140 },
+  { name: "Keratin Treatment",                category: "Treatments", priceMin: 350, priceMax: null, durationMins: 150, sortOrder: 190 },
+  { name: "Hair Botox Treatment",             category: "Treatments", priceMin: 185, priceMax: null, durationMins: 90,  sortOrder: 200 },
+  { name: "Relaxer",                          category: "Treatments", priceMin: 180, priceMax: null, durationMins: 120, sortOrder: 210 },
+  { name: "Extensions",                       category: "Treatments", priceMin: 0,   priceMax: null, durationMins: 120, sortOrder: 220 },
+  { name: "Extension Removal",                category: "Treatments", priceMin: 100, priceMax: null, durationMins: 30,  sortOrder: 230 },
   // Makeup
-  { name: "Bridal Makeup",             category: "Makeup",     priceMin: 150, priceMax: 250, durationMins: 90,  sortOrder: 150 },
-  { name: "Makeup Application",        category: "Makeup",     priceMin: 75,  priceMax: 120, durationMins: 60,  sortOrder: 160 },
-  // Skin
-  { name: "Eyebrow & Lip Wax",         category: "Skin",       priceMin: 25,  priceMax: 40,  durationMins: 20,  sortOrder: 170 },
+  { name: "Makeup Application",               category: "Makeup",     priceMin: 125, priceMax: null, durationMins: null, sortOrder: 240 },
   // Other
-  { name: "Other (specify in notes)",  category: "Other",      priceMin: 0,   priceMax: null, durationMins: null, sortOrder: 999 },
+  { name: "Other (specify in notes)",         category: "Other",      priceMin: 0,   priceMax: null, durationMins: null, sortOrder: 999 },
 ];
 
 export async function GET() {

@@ -76,6 +76,9 @@ export default function ServicesPage() {
                       <span className="inline-block gold-gradient font-serif text-lg sm:text-xl font-bold tabular-nums">
                         {"priceLabel" in item ? item.priceLabel : `$${(item as { price: number }).price}`}
                       </span>
+                      {"duration" in item && item.duration && (
+                        <p className="text-[#444] text-[10px] mt-0.5 tracking-wide">{String(item.duration)}</p>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -1269,11 +1269,19 @@ export default function AdminPage() {
 
   // ── Shared booking form constants ────────────────────────────────────────────
   const SERVICES_LIST = [
-    "Women's Haircut","Men's Haircut","Kids' Haircut","Curly Cut",
-    "Blowout / Blow Dry","Updo & Special Event Styling",
-    "Balayage","Highlights","Baby Lights","Hair Color","Color Correction",
-    "Keratin Treatment","Hair Botox Treatment","Relaxer",
-    "Bridal Makeup","Makeup Application","Eyebrow & Lip Wax",
+    // Haircuts
+    "Men's Haircut","Women's Haircut","Girl's Haircut","Boy's Haircut","Bangs",
+    // Blowout & Styling
+    "Blowdry","Updo",
+    // Color
+    "Clear Glossy","Single Process","Single Process w/ Moroccan Oil",
+    "Partial Highlights","Full Highlights","Face Frame","Toner",
+    "Partial Balayage","Full Balayage","Double Process","Color Correction",
+    // Treatments
+    "Keratin Treatment","Hair Botox Treatment","Relaxer","Extensions","Extension Removal",
+    // Makeup
+    "Makeup Application",
+    // Other
     "Other (specify in notes)",
   ];
   const STYLISTS_LIST_ALL = ["Maria","Meagan","Sally","Kato","Juany","Dhariana"];

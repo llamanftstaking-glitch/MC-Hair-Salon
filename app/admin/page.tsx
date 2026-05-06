@@ -1186,14 +1186,10 @@ export default function AdminPage() {
   const filtered         = filter === "all" ? bookings : bookings.filter(b => b.status === filter);
   const pending          = bookings.filter(b => b.status === "pending").length;
   const confirmed        = bookings.filter(b => b.status === "confirmed").length;
-  // Merge DB customers + booking-derived clients; DB rows take precedence
-  const bookingClientMap = new Map(bookings.map(b => [b.email, b]));
-  const dbClientEmails = new Set(allDbCustomers.map(c => c.email));
-  const bookingOnlyClients = bookings.filter(b => !dbClientEmails.has(b.email));
-  const uniqueClients = [
-    ...allDbCustomers.map(c => ({ email: c.email, name: c.name, phone: c.phone, service: "", stylist: "", date: "", time: "", status: "confirmed" as const, id: c.id, createdAt: c.createdAt })),
-    ...[...new Map(bookingOnlyClients.map(b => [b.email, b])).values()],
-  ];
+  // Use DB customers as source of truth; fall back to booking-derived only if DB is empty
+  const uniqueClients = allDbCustomers.length > 0
+    ? allDbCustomers.map(c => ({ email: c.email, name: c.name, phone: c.phone, service: "", stylist: "", date: "", time: "", status: "confirmed" as const, id: c.id, createdAt: c.createdAt }))
+    : [...new Map(bookings.map(b => [b.email, b])).values()];
   const activeSubscribers = subscribers.filter(s => s.active).length;
   const unreadMessages   = messages.filter(m => !m.read).length;
 

@@ -682,6 +682,7 @@ export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("overview");
   const hasAutoRouted = useRef(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [allDbCustomers, setAllDbCustomers] = useState<{ id: string; name: string; email: string; phone: string; points: number; visits: number; totalSpent: number; tier: string; createdAt: string }[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -859,6 +860,14 @@ export default function AdminPage() {
     } catch { /* non-fatal */ }
     finally { setLoading(false); }
   }, []);
+
+  const fetchAllCustomers = useCallback(async () => {
+    try {
+      const res = await fetch("/api/customers");
+      const data = await res.json();
+      setAllDbCustomers(Array.isArray(data.customers) ? data.customers : []);
+    } catch { /* non-fatal */ }
+  }, []);
   const fetchSubscribers = useCallback(async () => {
     try {
       const res = await fetch("/api/newsletter");
@@ -916,8 +925,8 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); fetchAutomation(); fetchSchedule();
-  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards, fetchAdminUsers, fetchAutomation, fetchSchedule]);
+    fetchBookings(); fetchSubscribers(); fetchMessages(); fetchStaff(); fetchSettings(); fetchRewards(); fetchAdminUsers(); fetchAutomation(); fetchSchedule(); fetchAllCustomers();
+  }, [fetchBookings, fetchSubscribers, fetchMessages, fetchStaff, fetchSettings, fetchRewards, fetchAdminUsers, fetchAutomation, fetchSchedule, fetchAllCustomers]);
 
   // Auto-route on initial load: pending → reservations/pending; none → stay on overview
   useEffect(() => {
@@ -1177,7 +1186,14 @@ export default function AdminPage() {
   const filtered         = filter === "all" ? bookings : bookings.filter(b => b.status === filter);
   const pending          = bookings.filter(b => b.status === "pending").length;
   const confirmed        = bookings.filter(b => b.status === "confirmed").length;
-  const uniqueClients    = [...new Map(bookings.map(b => [b.email, b])).values()];
+  // Merge DB customers + booking-derived clients; DB rows take precedence
+  const bookingClientMap = new Map(bookings.map(b => [b.email, b]));
+  const dbClientEmails = new Set(allDbCustomers.map(c => c.email));
+  const bookingOnlyClients = bookings.filter(b => !dbClientEmails.has(b.email));
+  const uniqueClients = [
+    ...allDbCustomers.map(c => ({ email: c.email, name: c.name, phone: c.phone, service: "", stylist: "", date: "", time: "", status: "confirmed" as const, id: c.id, createdAt: c.createdAt })),
+    ...[...new Map(bookingOnlyClients.map(b => [b.email, b])).values()],
+  ];
   const activeSubscribers = subscribers.filter(s => s.active).length;
   const unreadMessages   = messages.filter(m => !m.read).length;
 
@@ -2514,6 +2530,7 @@ export default function AdminPage() {
                         offset = data.nextOffset;
                       }
                       setSeedProgress(`Done — ${totalInserted} added, ${totalSkipped} already existed`);
+                      fetchAllCustomers();
                     } catch {
                       setSeedProgress("Error — check console");
                     } finally {

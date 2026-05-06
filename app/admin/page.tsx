@@ -686,6 +686,7 @@ export default function AdminPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bookingSort, setBookingSort] = useState<{ col: "date" | "name" | "stylist" | "status" | "created"; dir: "asc" | "desc" }>({ col: "created", dir: "desc" });
   const [filter, setFilter] = useState<"all" | "pending" | "confirmed" | "cancelled" | "no_show">("all");
   const [emailStatus, setEmailStatus] = useState<Record<string, string>>({});
   const [newsletter, setNewsletter] = useState({ subject: "", message: "" });
@@ -724,6 +725,7 @@ export default function AdminPage() {
   // ── Rewards state ────────────────────────────────────────────────────────────
   const [rewardsData,    setRewardsData]    = useState<RewardCustomer[]>([]);
   const [rewardsSearch,  setRewardsSearch]  = useState("");
+  const [rewardsSort, setRewardsSort] = useState<{ col: "name" | "points" | "visits" | "tier" | "spent"; dir: "asc" | "desc" }>({ col: "points", dir: "desc" });
   const [adjustTarget,   setAdjustTarget]   = useState<string | null>(null);
   const [adjustAmount,   setAdjustAmount]   = useState("");
   const [adjustMode,     setAdjustMode]     = useState<"add" | "subtract">("add");
@@ -768,6 +770,7 @@ export default function AdminPage() {
   const [addClientOpen, setAddClientOpen] = useState(false);
   const [addClientForm, setAddClientForm] = useState({ name: "", email: "", phone: "", birthday: "", preferredStylist: "", allergies: "", adminNotes: "" });
   const [addClientLoading, setAddClientLoading] = useState(false);
+  const [clientSort, setClientSort] = useState<{ col: "name" | "email" | "visits" | "spent" | "added"; dir: "asc" | "desc" }>({ col: "name", dir: "asc" });
   const [addClientError, setAddClientError] = useState("");
   const [importResult, setImportResult] = useState<{ inserted: number; skipped: number; errors: number } | null>(null);
   const [importing, setImporting] = useState(false);
@@ -1881,7 +1884,31 @@ export default function AdminPage() {
               <div className="text-center py-20 luxury-card"><Calendar size={48} className="text-[var(--admin-muted)] mx-auto mb-4" /><p className="text-[var(--admin-muted)]">No bookings found</p></div>
             ) : (
               <div className="space-y-3">
-                {filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((booking) => (
+                <div className="flex items-center gap-1 flex-wrap mb-1">
+                  <span className="text-[9px] text-[var(--admin-muted)] uppercase tracking-widest mr-1">Sort:</span>
+                  {([
+                    { label: "Date",     col: "date"    },
+                    { label: "Name",     col: "name"    },
+                    { label: "Stylist",  col: "stylist" },
+                    { label: "Status",   col: "status"  },
+                    { label: "Created",  col: "created" },
+                  ] as const).map(opt => (
+                    <button key={opt.col}
+                      onClick={() => setBookingSort(s => ({ col: opt.col, dir: s.col === opt.col && s.dir === "asc" ? "desc" : "asc" }))}
+                      className={`px-2 py-0.5 text-[9px] uppercase tracking-widest border transition-all cursor-pointer ${bookingSort.col === opt.col ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[#444]"}`}>
+                      {opt.label} {bookingSort.col === opt.col ? (bookingSort.dir === "asc" ? "↑" : "↓") : ""}
+                    </button>
+                  ))}
+                </div>
+                {[...filtered].sort((a, b) => {
+                  let cmp = 0;
+                  if (bookingSort.col === "date")    cmp = a.date.localeCompare(b.date);
+                  else if (bookingSort.col === "name")    cmp = a.name.localeCompare(b.name);
+                  else if (bookingSort.col === "stylist") cmp = a.stylist.localeCompare(b.stylist);
+                  else if (bookingSort.col === "status")  cmp = a.status.localeCompare(b.status);
+                  else if (bookingSort.col === "created") cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+                  return bookingSort.dir === "asc" ? cmp : -cmp;
+                }).map((booking) => (
                   <div key={booking.id} className="luxury-card p-5 md:p-6">
                     <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
@@ -2674,8 +2701,20 @@ export default function AdminPage() {
               <div className="luxury-card overflow-hidden">
                 {/* Table header */}
                 <div className="grid grid-cols-[1fr_1fr_60px_80px_80px_80px] gap-0 border-b border-[var(--mc-border)]/40 px-4 py-2">
-                  {["Client","Email","Visits","Spent","Tier","Last"].map(h => (
-                    <p key={h} className="text-[9px] uppercase tracking-widest text-[var(--admin-muted)] font-semibold">{h}</p>
+                  {([
+                    { label: "Client",  col: "name"    },
+                    { label: "Email",   col: "email"   },
+                    { label: "Visits",  col: "visits"  },
+                    { label: "Spent",   col: "spent"   },
+                    { label: "Tier",    col: null       },
+                    { label: "Added",   col: "added"   },
+                  ] as const).map(h => (
+                    <button key={h.label}
+                      onClick={() => h.col && setClientSort(s => ({ col: h.col as typeof s.col, dir: s.col === h.col && s.dir === "asc" ? "desc" : "asc" }))}
+                      className={`text-[9px] uppercase tracking-widest font-semibold text-left flex items-center gap-0.5 ${h.col ? "cursor-pointer hover:text-[var(--mc-accent)] transition-colors" : "cursor-default"} ${clientSort.col === h.col ? "text-[var(--mc-accent)]" : "text-[var(--admin-muted)]"}`}>
+                      {h.label}
+                      {h.col && clientSort.col === h.col && <span className="text-[8px]">{clientSort.dir === "asc" ? "↑" : "↓"}</span>}
+                    </button>
                   ))}
                 </div>
                 {uniqueClients
@@ -2687,7 +2726,15 @@ export default function AdminPage() {
                   .sort((a, b) => {
                     const spendA = (clientMap[a.email] || []).filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
                     const spendB = (clientMap[b.email] || []).filter(v => v.status === "confirmed").reduce((s, v) => s + (v.servicePrice ?? 0), 0);
-                    return spendB - spendA;
+                    const visitsA = (clientMap[a.email] || []).length;
+                    const visitsB = (clientMap[b.email] || []).length;
+                    let cmp = 0;
+                    if (clientSort.col === "name")    cmp = a.name.localeCompare(b.name);
+                    else if (clientSort.col === "email")  cmp = a.email.localeCompare(b.email);
+                    else if (clientSort.col === "visits") cmp = visitsA - visitsB;
+                    else if (clientSort.col === "spent")  cmp = spendA - spendB;
+                    else if (clientSort.col === "added")  cmp = (a.createdAt || "").localeCompare(b.createdAt || "");
+                    return clientSort.dir === "asc" ? cmp : -cmp;
                   })
                   .map((client, i) => {
                     const visits = clientMap[client.email] || [];
@@ -3229,7 +3276,15 @@ export default function AdminPage() {
 
         {/* ── REWARDS ──────────────────────────────────────────────────────── */}
         {tab === "rewards" && (() => {
-          const sortedAll    = [...rewardsData].sort((a, b) => b.points - a.points);
+          const sortedAll    = [...rewardsData].sort((a, b) => {
+            let cmp = 0;
+            if (rewardsSort.col === "name")   cmp = a.name.localeCompare(b.name);
+            else if (rewardsSort.col === "points") cmp = a.points - b.points;
+            else if (rewardsSort.col === "visits") cmp = a.visits - b.visits;
+            else if (rewardsSort.col === "tier")   cmp = a.tier.localeCompare(b.tier);
+            else if (rewardsSort.col === "spent")  cmp = a.totalSpent - b.totalSpent;
+            return rewardsSort.dir === "asc" ? cmp : -cmp;
+          });
           const sorted       = rewardsSearch.trim()
             ? sortedAll.filter(c => c.name.toLowerCase().includes(rewardsSearch.toLowerCase()) || c.email.toLowerCase().includes(rewardsSearch.toLowerCase()))
             : sortedAll;
@@ -3340,6 +3395,21 @@ export default function AdminPage() {
                       placeholder="Search members…"
                       className="pl-8 pr-3 py-1.5 text-xs bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] placeholder-[var(--admin-muted)] focus:outline-none focus:border-[var(--mc-accent)] w-48"
                     />
+                  </div>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {([
+                      { label: "Points",  col: "points" },
+                      { label: "Name",    col: "name"   },
+                      { label: "Visits",  col: "visits" },
+                      { label: "Tier",    col: "tier"   },
+                      { label: "Spent",   col: "spent"  },
+                    ] as const).map(opt => (
+                      <button key={opt.col}
+                        onClick={() => setRewardsSort(s => ({ col: opt.col, dir: s.col === opt.col && s.dir === "asc" ? "desc" : "asc" }))}
+                        className={`px-2 py-0.5 text-[9px] uppercase tracking-widest border transition-all cursor-pointer ${rewardsSort.col === opt.col ? "border-[var(--mc-accent)] text-[var(--mc-accent)]" : "border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[#444]"}`}>
+                        {opt.label} {rewardsSort.col === opt.col ? (rewardsSort.dir === "asc" ? "↑" : "↓") : ""}
+                      </button>
+                    ))}
                   </div>
                 </div>
 

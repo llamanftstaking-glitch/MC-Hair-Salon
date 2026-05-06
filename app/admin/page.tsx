@@ -349,7 +349,7 @@ function ExpenseReportsPanel() {
         </div>
         <div className="border border-[var(--mc-accent)]/30 px-5 py-2 bg-[var(--mc-accent)]/5">
           <p className="text-[10px] text-[var(--admin-muted)] uppercase tracking-widest">Total in Range</p>
-          <p className="text-[var(--mc-accent)] font-bold text-xl">${total.toLocaleString("en-US",{minimumFractionDigits:2})}</p>
+          <p className="text-[var(--mc-accent)] font-bold text-xl font-num">${total.toLocaleString("en-US",{minimumFractionDigits:2})}</p>
         </div>
       </div>
 
@@ -396,7 +396,7 @@ function ExpenseReportsPanel() {
           {inRange.map(e => (
             <div key={e.id} className="luxury-card px-5 py-3 flex items-center gap-4 flex-wrap">
               <span className="text-[var(--admin-muted)] text-xs w-24 shrink-0">{new Date(e.date+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</span>
-              <span className="text-[var(--mc-accent)] font-bold text-sm w-20 shrink-0">${e.amount.toFixed(2)}</span>
+              <span className="text-[var(--mc-accent)] font-bold text-sm w-20 shrink-0 font-num">${e.amount.toFixed(2)}</span>
               <span className="text-[10px] border border-[var(--mc-border)] text-[var(--admin-muted)] px-2 py-0.5 uppercase tracking-wider shrink-0">{e.category}</span>
               <span className="text-[var(--mc-muted)] text-sm flex-1 min-w-0 truncate">{e.description}</span>
               {e.vendor && <span className="text-[var(--admin-muted)] text-xs shrink-0">{e.vendor}</span>}
@@ -764,6 +764,10 @@ export default function AdminPage() {
   const [clientProfileLoading, setClientProfileLoading] = useState(false);
   const [clientEditFields, setClientEditFields] = useState<Record<string, string>>({});
   const [clientEditSaving, setClientEditSaving] = useState(false);
+  const [addClientOpen, setAddClientOpen] = useState(false);
+  const [addClientForm, setAddClientForm] = useState({ name: "", email: "", phone: "", birthday: "", preferredStylist: "", allergies: "", adminNotes: "" });
+  const [addClientLoading, setAddClientLoading] = useState(false);
+  const [addClientError, setAddClientError] = useState("");
 
   const openClientProfile = async (email: string) => {
     setSelectedClientEmail(email);
@@ -1500,7 +1504,7 @@ export default function AdminPage() {
                     { label: "No-Shows",     value: monthNoShows,                        sub: "this month" },
                   ].map(s => (
                     <div key={s.label} className="luxury-card p-4 text-center">
-                      <p className="text-xl font-bold font-serif gold-gradient">{s.value}</p>
+                      <p className="text-xl font-bold font-num gold-gradient">{s.value}</p>
                       <p className="text-[10px] uppercase tracking-wider text-[var(--admin-muted)] mt-1">{s.label}</p>
                       <p className="text-[9px] text-[var(--admin-muted)] mt-0.5 opacity-60">{s.sub}</p>
                     </div>
@@ -1737,7 +1741,7 @@ export default function AdminPage() {
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <p className="text-[var(--admin-text)] font-semibold">{booking.name}</p>
                           <span className={`text-xs px-2 py-0.5 border uppercase tracking-wider ${statusColors[booking.status]}`}>{booking.status}</span>
-                          <span className="text-[var(--admin-muted)] text-xs font-mono">{booking.id}</span>
+                          <span className="text-[var(--admin-muted)] text-xs font-num">{booking.id}</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm mb-2">
                           <span className="text-[var(--mc-text-dim)] truncate">{booking.email}</span>
@@ -2326,14 +2330,101 @@ export default function AdminPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <p className="text-[var(--admin-muted)] text-sm">{uniqueClients.length} client{uniqueClients.length !== 1 ? "s" : ""}</p>
-              <input
-                type="text"
-                value={clientSearch}
-                onChange={e => setClientSearch(e.target.value)}
-                placeholder="Search by name or email…"
-                className="bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[var(--admin-muted)] w-64"
-              />
+              <div className="flex items-center gap-2 flex-wrap">
+                <input
+                  type="text"
+                  value={clientSearch}
+                  onChange={e => setClientSearch(e.target.value)}
+                  placeholder="Search by name or email…"
+                  className="bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[var(--admin-muted)] w-56"
+                />
+                <button onClick={() => { setAddClientOpen(true); setAddClientError(""); setAddClientForm({ name: "", email: "", phone: "", birthday: "", preferredStylist: "", allergies: "", adminNotes: "" }); }}
+                  className="gold-gradient-bg text-black font-bold px-4 py-1.5 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5">
+                  <Plus size={13} /> Add Client
+                </button>
+              </div>
             </div>
+
+            {/* Add Client Modal */}
+            {addClientOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4" onClick={() => setAddClientOpen(false)}>
+                <div className="luxury-card w-full max-w-lg p-6 md:p-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="font-serif text-xl font-bold text-[var(--admin-text)]">Add New Client</h3>
+                      <p className="text-[var(--admin-muted)] text-xs mt-0.5">Create a client profile manually</p>
+                    </div>
+                    <button onClick={() => setAddClientOpen(false)} className="text-[var(--admin-muted)] hover:text-[var(--admin-text)] cursor-pointer"><X size={20} /></button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="col-span-2">
+                        <label className={labelCls}>Full Name *</label>
+                        <input type="text" value={addClientForm.name} onChange={e => setAddClientForm(f => ({ ...f, name: e.target.value }))} className={inputCls} placeholder="Maria Garcia" />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Email *</label>
+                        <input type="email" value={addClientForm.email} onChange={e => setAddClientForm(f => ({ ...f, email: e.target.value }))} className={inputCls} placeholder="email@example.com" />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Phone</label>
+                        <input type="tel" value={addClientForm.phone} onChange={e => setAddClientForm(f => ({ ...f, phone: e.target.value }))} className={inputCls} placeholder="(212) 555-0000" />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Birthday</label>
+                        <input type="date" value={addClientForm.birthday} onChange={e => setAddClientForm(f => ({ ...f, birthday: e.target.value }))} className={inputCls} style={{ colorScheme: "dark" }} />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Preferred Stylist</label>
+                        <select value={addClientForm.preferredStylist} onChange={e => setAddClientForm(f => ({ ...f, preferredStylist: e.target.value }))} className={inputCls}>
+                          <option value="">No preference</option>
+                          {staff.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+                        </select>
+                      </div>
+                      <div className="col-span-2">
+                        <label className={labelCls}>Allergies / Notes</label>
+                        <textarea value={addClientForm.allergies} onChange={e => setAddClientForm(f => ({ ...f, allergies: e.target.value }))} rows={2} className={`${inputCls} resize-none`} placeholder="Product sensitivities, hair concerns…" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className={labelCls}>Admin Notes</label>
+                        <textarea value={addClientForm.adminNotes} onChange={e => setAddClientForm(f => ({ ...f, adminNotes: e.target.value }))} rows={2} className={`${inputCls} resize-none`} placeholder="Internal notes visible to staff only…" />
+                      </div>
+                    </div>
+
+                    {addClientError && <p className="text-red-400 text-xs">{addClientError}</p>}
+
+                    <div className="flex gap-3 mt-2">
+                      <button
+                        disabled={addClientLoading || !addClientForm.name || !addClientForm.email}
+                        onClick={async () => {
+                          setAddClientLoading(true);
+                          setAddClientError("");
+                          try {
+                            const res = await fetch("/api/customers", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify(addClientForm),
+                            });
+                            const data = await res.json();
+                            if (!res.ok) { setAddClientError(data.error || "Failed to create client"); return; }
+                            setAddClientOpen(false);
+                            fetchBookings();
+                            openClientProfile(addClientForm.email.trim().toLowerCase());
+                          } finally { setAddClientLoading(false); }
+                        }}
+                        className="flex-1 gold-gradient-bg text-black font-bold py-3 text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2">
+                        {addClientLoading ? <><Loader size={14} className="animate-spin" /> Creating…</> : <><UserCheck size={14} /> Create Client</>}
+                      </button>
+                      <button onClick={() => setAddClientOpen(false)}
+                        className="px-5 border border-[var(--mc-border)] text-[var(--admin-muted)] hover:border-[var(--mc-accent)] hover:text-[var(--mc-accent)] transition-all cursor-pointer text-sm">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {uniqueClients.length === 0 ? (
               <div className="text-center py-20 luxury-card">
@@ -2439,19 +2530,19 @@ export default function AdminPage() {
                       </div>
                       <div className="flex gap-4 text-center shrink-0">
                         <div>
-                          <p className="font-serif text-2xl font-bold gold-gradient">{profileBookings.length}</p>
+                          <p className="font-num text-2xl font-bold gold-gradient">{profileBookings.length}</p>
                           <p className="text-[9px] uppercase tracking-wider text-[var(--admin-muted)]">Visits</p>
                         </div>
                         <div>
-                          <p className="font-serif text-2xl font-bold text-green-400">${totalSpend.toFixed(0)}</p>
+                          <p className="font-num text-2xl font-bold text-green-400">${totalSpend.toFixed(0)}</p>
                           <p className="text-[9px] uppercase tracking-wider text-[var(--admin-muted)]">Spent</p>
                         </div>
                         <div>
-                          <p className="font-serif text-2xl font-bold text-[var(--mc-accent)]">{c?.points ?? 0}</p>
+                          <p className="font-num text-2xl font-bold text-[var(--mc-accent)]">{c?.points ?? 0}</p>
                           <p className="text-[9px] uppercase tracking-wider text-[var(--admin-muted)]">Points</p>
                         </div>
                         <div>
-                          <p className="font-serif text-2xl font-bold text-[var(--admin-text)]">{c?.tier || "Bronze"}</p>
+                          <p className="font-num text-2xl font-bold text-[var(--admin-text)]">{c?.tier || "Bronze"}</p>
                           <p className="text-[9px] uppercase tracking-wider text-[var(--admin-muted)]">Tier</p>
                         </div>
                       </div>
@@ -2649,7 +2740,7 @@ export default function AdminPage() {
               ].map(s => (
                 <div key={s.label} className="luxury-card p-5">
                   <div className="text-[var(--mc-accent)] mb-3">{s.icon}</div>
-                  <p className="font-serif text-3xl font-bold gold-gradient">{s.value}</p>
+                  <p className="font-num text-3xl font-bold gold-gradient">{s.value}</p>
                   <p className="text-[var(--admin-muted)] text-xs uppercase tracking-widest mt-1">{s.label}</p>
                   <p className="text-[var(--admin-muted)] text-xs mt-1">{s.sub}</p>
                 </div>
@@ -2968,7 +3059,7 @@ export default function AdminPage() {
                     { label: "Redeemed", value: totalRedeem },
                   ].map(s => (
                     <div key={s.label} className="px-4 py-3 text-center">
-                      <p className="font-serif text-xl font-bold gold-gradient">{s.value}</p>
+                      <p className="font-num text-xl font-bold gold-gradient">{s.value}</p>
                       <p className="text-[9px] uppercase tracking-widest text-[var(--admin-muted)] mt-0.5">{s.label}</p>
                     </div>
                   ))}
@@ -3031,7 +3122,7 @@ export default function AdminPage() {
                           {/* Main row */}
                           <div className="p-4 flex items-center gap-4 flex-wrap">
                             {/* Rank */}
-                            <span className="text-[var(--admin-muted)] font-mono text-sm w-7 shrink-0 text-center">
+                            <span className="text-[var(--admin-muted)] font-num text-sm w-7 shrink-0 text-center">
                               {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`}
                             </span>
 
@@ -3384,7 +3475,7 @@ export default function AdminPage() {
                               ...p,
                               theme: { ...(p.theme ?? {}), [f.key]: e.target.value }
                             } as SiteSettings) : p)}
-                            className={`${inputCls} font-mono`}
+                            className={`${inputCls} font-num`}
                             placeholder="#000000"
                           />
                         </div>

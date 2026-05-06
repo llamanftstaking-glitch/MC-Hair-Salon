@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -76,6 +76,7 @@ body {
 }
 
 .font-serif { font-family: 'Playfair Display', Georgia, serif; }
+.font-num  { font-family: 'DM Mono', 'Fira Mono', monospace; font-variant-numeric: tabular-nums lining-nums; letter-spacing: 0.02em; }
 
 /* ── THEMED UTILITY CLASSES ────────────────────────────────────────────────── */
 .gold-gradient {

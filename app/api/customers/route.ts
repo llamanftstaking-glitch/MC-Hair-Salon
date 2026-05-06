@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { customers, bookings, customerPackages, customerRewards } from "@/lib/schema";
 import { eq, or, ilike } from "drizzle-orm";
+import { randomUUID } from "crypto";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -46,4 +47,27 @@ export async function PATCH(req: NextRequest) {
 
   await db.update(customers).set(update).where(eq(customers.email, email));
   return NextResponse.json({ ok: true });
+}
+
+export async function POST(req: NextRequest) {
+  const { name, email, phone, birthday, preferredStylist, allergies, adminNotes } = await req.json();
+  if (!name || !email) return NextResponse.json({ error: "name and email required" }, { status: 400 });
+
+  const existing = await db.select().from(customers).where(eq(customers.email, email));
+  if (existing.length > 0) return NextResponse.json({ error: "Email already registered" }, { status: 409 });
+
+  const newCustomer = {
+    id:        randomUUID(),
+    name:      name.trim(),
+    email:     email.trim().toLowerCase(),
+    phone:     phone?.trim() ?? "",
+    createdAt: new Date().toISOString(),
+    birthday:  birthday || null,
+    preferredStylist: preferredStylist || null,
+    allergies: allergies || null,
+    adminNotes: adminNotes || null,
+  };
+
+  await db.insert(customers).values(newCustomer);
+  return NextResponse.json({ ok: true, customer: newCustomer });
 }

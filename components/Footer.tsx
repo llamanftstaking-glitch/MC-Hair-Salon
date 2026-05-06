@@ -115,7 +115,6 @@ export default async function Footer() {
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <p className="text-[var(--mc-text-dim)] text-xs">© {new Date().getFullYear()} MC Hair Salon & Spa. All rights reserved.</p>
             <Link href="/terms" className="text-[var(--mc-text-dim)] text-xs hover:text-[var(--mc-accent)] transition-colors uppercase tracking-widest">Terms & Conditions</Link>
-            <Link href="/login?redirect=/admin" className="text-[var(--mc-text-dim)] text-xs hover:text-[var(--mc-accent)] transition-colors uppercase tracking-widest">Staff & Admin</Link>
           </div>
           {/* LGBTQ+ Friendly badge */}
           <div className="flex items-center gap-3">

@@ -768,6 +768,8 @@ export default function AdminPage() {
   const [addClientForm, setAddClientForm] = useState({ name: "", email: "", phone: "", birthday: "", preferredStylist: "", allergies: "", adminNotes: "" });
   const [addClientLoading, setAddClientLoading] = useState(false);
   const [addClientError, setAddClientError] = useState("");
+  const [importResult, setImportResult] = useState<{ inserted: number; skipped: number; errors: number } | null>(null);
+  const [importing, setImporting] = useState(false);
 
   const openClientProfile = async (email: string) => {
     setSelectedClientEmail(email);
@@ -2492,12 +2494,45 @@ export default function AdminPage() {
                   placeholder="Search by name or email…"
                   className="bg-[var(--admin-surface)] border border-[var(--mc-border)] text-[var(--admin-text)] px-3 py-1.5 text-sm focus:outline-none focus:border-[var(--mc-accent)] transition-colors placeholder-[var(--admin-muted)] w-56"
                 />
+                <label className={`border border-[var(--mc-accent)]/50 text-[var(--mc-accent)] font-bold px-4 py-1.5 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5 ${importing ? "opacity-50 pointer-events-none" : ""}`}>
+                  <input type="file" accept=".json" className="hidden" onChange={async e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setImporting(true);
+                    setImportResult(null);
+                    try {
+                      const text = await file.text();
+                      const clients = JSON.parse(text);
+                      const res = await fetch("/api/customers/import", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ clients }),
+                      });
+                      const data = await res.json();
+                      setImportResult(data);
+                    } catch {
+                      setImportResult({ inserted: 0, skipped: 0, errors: 1 });
+                    } finally {
+                      setImporting(false);
+                      e.target.value = "";
+                    }
+                  }} />
+                  {importing ? "Importing…" : "↑ Import JSON"}
+                </label>
                 <button onClick={() => { setAddClientOpen(true); setAddClientError(""); setAddClientForm({ name: "", email: "", phone: "", birthday: "", preferredStylist: "", allergies: "", adminNotes: "" }); }}
                   className="gold-gradient-bg text-black font-bold px-4 py-1.5 text-xs uppercase tracking-widest hover:opacity-90 transition-opacity cursor-pointer flex items-center gap-1.5">
                   <Plus size={13} /> Add Client
                 </button>
               </div>
             </div>
+
+            {/* Import result banner */}
+            {importResult && (
+              <div className={`flex items-center justify-between px-4 py-2.5 mb-4 text-sm border ${importResult.errors > 0 && importResult.inserted === 0 ? "border-red-500/30 bg-red-900/20 text-red-400" : "border-green-500/30 bg-green-900/20 text-green-400"}`}>
+                <span>Import complete — <strong>{importResult.inserted}</strong> added · <strong>{importResult.skipped}</strong> skipped (exist) · <strong>{importResult.errors}</strong> errors</span>
+                <button onClick={() => setImportResult(null)} className="text-[#555] hover:text-white ml-4 cursor-pointer"><X size={14} /></button>
+              </div>
+            )}
 
             {/* Add Client Modal */}
             {addClientOpen && (
